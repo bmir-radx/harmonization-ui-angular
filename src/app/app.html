@@ -1,0 +1,23 @@
+<div class="h-screen flex flex-col bg-[#1e1e1e]">
+    <app-header-bar></app-header-bar>
+
+    <div class="flex-1 overflow-hidden">
+        <p-splitter [panelSizes]="[15, 70, 15]" style="height:100%;" class="mb-8">
+            <ng-template #panel>
+                <div class="h-full w-full">
+                    <app-left-sidebar></app-left-sidebar>
+                </div>
+            </ng-template>
+            <ng-template #panel>
+                <div class="h-full w-full min-w-0 overflow-hidden">
+                    <app-main-content></app-main-content>
+                </div>
+            </ng-template>
+            <ng-template #panel>
+                <div class="h-full w-full">
+                    <app-right-sidebar></app-right-sidebar>
+                </div>
+            </ng-template>
+        </p-splitter>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+a {
+  cursor: default;
+}
+
+p-menubar {
+  z-index: 5;
+}
+
+.gap-2 p-menubar {
+  --p-menubar-gap: calc(var(--spacing) * 2);
+}
+
+.gap-1 p-menubar {
+  --p-menubar-gap: calc(var(--spacing) * 1);
+}
+
+::ng-deep .p-menubar-submenu .p-menubar-separator {
+  margin: calc(var(--spacing) * 1) 0;
+}
+
+::ng-deep .p-menubar-item .p-menubar-submenu {
+  margin-top: calc(var(--spacing) * 1);
+}
+
+::ng-deep .gap-1 .p-menubar-submenu {
+  transform: translateX(calc(-100% + 30px));
+  white-space: nowrap;
+  min-width: calc(var(--spacing) * 64);
+}

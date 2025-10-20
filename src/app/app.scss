@@ -1,0 +1,7 @@
+::ng-deep .p-splitter-gutter:hover {
+    background-color: var(--filter-hover);
+}
+
+::ng-deep .dark .p-splitter-gutter:hover {
+    background-color: #007fd4;
+}

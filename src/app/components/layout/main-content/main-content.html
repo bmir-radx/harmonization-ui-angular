@@ -1,0 +1,98 @@
+<div class="h-full flex flex-col bg-[#252526]">
+    <!-- Tab Navigation - Show if we have mappings tabs enabled or open file tabs -->
+
+    <!-- Content Area - Constrained to available space with proper overflow handling -->
+    <div class="flex-1 overflow-hidden">
+
+        <!-- EmptyState component -->
+        <div class="h-full flex items-center justify-center bg-[#252526] p-8">
+            <div class="text-center max-w-md">
+
+                <!-- Icon-->
+                <div class="mb-6">
+                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="pi pi-database w-10 h-10 text-[#007fd4]" style="--p-icon-size: 40px;"></i>
+                    </div>
+                </div>
+
+                <!-- Main heading -->
+                <h2 class="text-xl font-medium text-[#cccccc] mb-3">
+                    Get Started with Data Harmonization
+                </h2>
+
+                <!-- Description -->
+                <p class="text-[#a0a0a0] text-base mb-8 leading-relaxed">
+                    Begin by uploading your source datasets and creating or uploading your target data dictionary to start the harmonization process.
+                </p>
+
+                <!-- Steps - Now showing as parallel options -->
+                <div class="mb-8">
+                    <h3 class="text-[#cccccc] font-medium mb-4">Choose your starting point:</h3>
+
+                    <div class="flex flex-col gap-4">
+
+                        <!-- Source Dataset Option -->
+                        <button class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
+                            <div class="flex items-start gap-3 text-left">
+                                <div class="w-8 h-8 bg-[#007fd4] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="pi pi-upload w-4 h-4 text-white" style="--p-icon-size: 16px;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-[#cccccc] font-medium mb-1">Upload Source Dataset</h4>
+                                    <p class="text-[#808080] text-sm">
+                                        Select or drag and drop your source data files and data dictionary
+                                    </p>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- OR Divider -->
+                        <div class="flex items-center gap-3 text-[#808080] text-sm">
+                            <div class="flex-1 h-px bg-[#3c3c3c]"></div>
+                            <span class="px-2">OR</span>
+                            <div class="flex-1 h-px bg-[#3c3c3c]"></div>
+                        </div>
+
+                        <!-- Target Dictionary Option -->
+                        <button class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
+                            <div class="flex items-start gap-3 text-left">
+                                <div class="w-8 h-8 bg-[#4CAF50] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                    <i class="pi pi-file w-4 h-4 text-white" style="--p-icon-size: 16px;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-[#cccccc] font-medium mb-1">Create Target Data Dictionary</h4>
+                                    <p class="text-[#808080] text-sm">
+                                        Upload or create your target schema to define harmonization targets
+                                    </p>
+                                </div>
+                            </div>
+                        </button>
+
+                    </div>
+
+                    <!-- Next Step -->
+                    <div class="mt-6 flex items-center justify-center gap-2 text-[#808080] text-sm">
+                        <i class="pi pi-arrow-right w-4 h-4" style="--p-icon-size: 16px;"></i>
+                        <span>Once both are ready, start harmonization mapping</span>
+                    </div>
+                    
+                </div>
+
+                <!-- Upload hints -->
+                <div class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4">
+                    <h4 class="text-[#cccccc] font-medium mb-3 flex items-center gap-2">
+                        <i class="pi pi-file w-4 h-4" style="--p-icon-size: 16px;"></i>
+                        Supported File Types
+                    </h4>
+                    <div class="text-[#a0a0a0] text-sm space-y-1">
+                        <div><strong>Data Files:</strong> CSV, Excel (.xlsx)</div>
+                        <div><strong>Data Dictionaries:</strong> CSV, Excel (.xlsx)</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- File Type Selection Dialog -->
+</div>
