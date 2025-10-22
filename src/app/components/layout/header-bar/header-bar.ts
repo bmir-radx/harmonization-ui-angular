@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../services/theme.service';
+import { ProjectService, Project } from '../../../services/project.service';
+import { HistoryService, HistoryItem } from '../../../services/history.service';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
 
@@ -10,9 +12,24 @@ import { Menubar } from 'primeng/menubar';
   templateUrl: './header-bar.html',
   styleUrl: './header-bar.scss'
 })
-export class HeaderBar implements OnInit {
+export class HeaderBar {
     isDarkMode = true;
-    fontSize = 13;
+    currentProject: Project | null = null;
+    projectHistory: HistoryItem[] = [];
+
+    leftMenu: MenuItem[] | undefined;
+    rightMenu: MenuItem[] | undefined;
+
+    constructor(private projectService: ProjectService, private historyService: HistoryService, private themeService: ThemeService) {
+        effect(() => {
+            this.currentProject = this.projectService.currentProject();
+            this.projectHistory = this.historyService.projectHistory();
+            this.isDarkMode = this.themeService.isDarkMode()();
+
+            this.leftMenu = this.buildLeftMenu();
+            this.rightMenu = this.buildRightMenu();
+        });
+    }
 
     formatDate = (date: Date) => {
         return date.toLocaleDateString('en-US', {
@@ -25,23 +42,10 @@ export class HeaderBar implements OnInit {
         return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     };
 
-    constructor(private themeService: ThemeService) {}
-
-    leftMenu: MenuItem[] | undefined;
-    rightMenu: MenuItem[] | undefined;
-
-    ngOnInit(): void {
-        this.themeService.isDarkMode().subscribe((value) => {
-            this.isDarkMode = value;
-            this.leftMenu = this.buildLeftMenu(this.isDarkMode);
-            this.rightMenu = this.buildRightMenu(this.isDarkMode);
-        });
-    }
-
-    buildLeftMenu(isDarkMode: boolean): MenuItem[] {
+    buildLeftMenu(): MenuItem[] {
         return [
             {
-                label: 'Project Name',
+                label: this.currentProject?.name,
                 items: [
                     {
                         label: 'New Project',
@@ -64,22 +68,7 @@ export class HeaderBar implements OnInit {
                     {
                         title: 'Recent Projects'
                     },
-                    {
-                        label: 'Healthcare Data Integration Healthcare Data Integration',
-                        lastModified: new Date(2024, 11, 5)
-                    },
-                    {
-                        label: 'Financial Reports Standardization',
-                        lastModified: new Date(2024, 11, 2)
-                    },
-                    {
-                        label: 'Survey Data Consolidation',
-                        lastModified: new Date(2024, 10, 28)
-                    },
-                    {
-                        label: 'Customer Data Unification',
-                        lastModified: new Date(2024, 9, 15)
-                    },
+                    ...this.projectHistory.slice(0, 4),
                     {
                         separator: true
                     },
@@ -209,7 +198,7 @@ export class HeaderBar implements OnInit {
         ]
     }
 
-    buildRightMenu(isDarkMode: boolean): MenuItem[] {
+    buildRightMenu(): MenuItem[] {
         return [
             {
                 icon: 'pi pi-user'
@@ -241,7 +230,7 @@ export class HeaderBar implements OnInit {
                         command: () => {
                             const value = `${parseFloat(this.getCSSVar('--font-size')) + 1}px`;
                             document.documentElement.style.setProperty('--font-size', value);
-                            this.rightMenu = this.buildRightMenu(this.isDarkMode);
+                            this.rightMenu = this.buildRightMenu();
                         }
                     },
                     {
@@ -251,7 +240,7 @@ export class HeaderBar implements OnInit {
                         command: () => {
                             const value = `${parseFloat(this.getCSSVar('--font-size')) - 1}px`;
                             document.documentElement.style.setProperty('--font-size', value);
-                            this.rightMenu = this.buildRightMenu(this.isDarkMode);
+                            this.rightMenu = this.buildRightMenu();
                         }
                     },
                     {
@@ -260,7 +249,7 @@ export class HeaderBar implements OnInit {
                         shortcut: this.getCSSVar('--font-size'),
                         command: () => {
                             document.documentElement.style.setProperty('--font-size', '16px');
-                            this.rightMenu = this.buildRightMenu(this.isDarkMode);
+                            this.rightMenu = this.buildRightMenu();
                         }
                     }
                 ]

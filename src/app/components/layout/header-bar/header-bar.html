@@ -1,4 +1,4 @@
-<div class="h-10 border-b flex items-center justify-between px-4 flex-shrink-0" [ngClass]="isDarkMode ? 'bg-[#252526] border-[#3c3c3c]' : 'bg-white border-gray-200'" [style.fontSize.px]="fontSize">
+<div class="h-10 border-b flex items-center justify-between px-4 flex-shrink-0" [ngClass]="isDarkMode ? 'bg-[#252526] border-[#3c3c3c]' : 'bg-white border-gray-200'" style="font-size: 13px;">
 
     <!-- Left side - Logo, App Name, Project, and Menus -->
     <div class="flex items-center gap-2">
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                     <span *ngIf="item.shortcut" class="ml-auto text-xs" [ngClass]="isDarkMode ? 'text-[#808080]' : 'text-gray-400'">{{ item.shortcut }}</span>
-                    <i *ngIf="item.items" [ngClass]="['ml-auto pi', root ? (['File', 'View'].includes(item.label) ? '' : 'pi-angle-down') : 'pi-angle-right']"></i>
+                    <i *ngIf="item.items && !['File', 'View'].includes(item.label)" [ngClass]="['ml-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
                 </a>
                 <div *ngIf="item.title" class="px-3 py-2 text-xs font-medium" [ngClass]="isDarkMode ? 'text-[#a0a0a0]' : 'text-gray-500'">
                     {{ item.title }}
@@ -53,7 +53,7 @@
             <ng-template #item let-item let-root="root">
                 <a pRipple *ngIf="!item.title" class="flex items-center" [ngClass]="[root ? 'gap-1 px-2 py-1 rounded text-sm transition-colors' : 'gap-3 px-3 py-2', isDarkMode ? (root ? 'text-[#cccccc] hover:bg-[#3c3c3c]' : 'hover:bg-[#3c3c3c] text-[#cccccc]') : (root ? 'text-gray-700 hover:bg-gray-100' : 'hover:bg-gray-50 text-gray-700')]">
                     <span *ngIf="item.icon" class="w-4 h-4" [ngClass]="item.icon"></span>
-                    <div [ngClass]="root ? '' : 'font-medium text-sm'">{{ item.label }}</div>
+                    <div *ngIf="item.label" [ngClass]="root ? '' : 'font-medium text-sm'">{{ item.label }}</div>
                     <span *ngIf="item.shortcut" class="ml-auto text-xs" [ngClass]="isDarkMode ? 'text-[#808080]' : 'text-gray-400'">{{ item.shortcut }}</span>
                 </a>
                 <div *ngIf="item.title" class="px-3 py-2 text-xs font-medium" [ngClass]="isDarkMode ? 'text-[#a0a0a0]' : 'text-gray-500'">

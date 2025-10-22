@@ -1,25 +1,25 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-    private darkMode$ = new BehaviorSubject<boolean>(true);
+    private readonly _darkMode = signal<boolean>(true);
+    readonly darkMode = this._darkMode.asReadonly();
 
     toggleDarkMode() {
-        const newMode = !this.darkMode$.value;
-        this.darkMode$.next(newMode);
+        const newMode = !this._darkMode();
+        this._darkMode.set(newMode);
         this.applyDarkModeToHtml(newMode);
     }
 
     setDarkMode(isDarkMode: boolean) {
-        this.darkMode$.next(isDarkMode);
+        this._darkMode.set(isDarkMode);
         this.applyDarkModeToHtml(isDarkMode);
     }
 
     isDarkMode() {
-        return this.darkMode$.asObservable();
+        return this.darkMode;
     }
 
     private applyDarkModeToHtml(isDarkMode: boolean) {
