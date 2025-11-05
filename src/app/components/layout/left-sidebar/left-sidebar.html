@@ -55,6 +55,7 @@
                 <i class="pi pi-filter w-4 h-4" style="--p-icon-size: 16px;"></i>
             </button>
 
+            </div>
         </div>
         
         <!-- Results count indicator -->
@@ -66,7 +67,7 @@
         <div class="min-w-max">
 
             <!-- Empty State -->
-            <div class="text-center py-8 px-3">
+            <div *ngIf="!uploadService.hasFiles()" class="text-center py-8 px-3">
                 <div class="w-12 h-12 bg-[#3c3c3c] rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="pi pi-database w-6 h-6 text-[#007fd4]" style="--p-icon-size: 24px;"></i>
                 </div>
@@ -81,14 +82,85 @@
                     <i class="pi pi-upload w-3 h-3" style="--p-icon-size: 12px;"></i>
                     Upload Dataset
                 </button>
-                <ng-template #tooltipContent>
-                    <div class="bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance">
-                        <p>Upload Source Data Files</p>
-                        <p class="text-xs text-muted-foreground">Supports CSV, Excel (.xlsx)</p>
-                    </div>
-                </ng-template>
             </div>
 
+            <ng-template #tooltipContent>
+                <div class="bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance">
+                    <p>Upload Source Data Files</p>
+                    <p class="text-xs text-muted-foreground">Supports CSV, Excel (.xlsx)</p>
+                </div>
+            </ng-template>
+
+            <!-- Has Uploaded Files -->
+            <div *ngIf="uploadService.hasFiles()" class="space-y-1 min-w-max pt-2">
+                <div *ngFor="let file of uploadService.uploadedFiles()">
+                    <div 
+                        class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dataset-item"
+                        [style]="{ marginLeft: '24px' }"
+                    >
+                        <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
+                            <i class="pi pi-chevron-down w-4 h-4 text-[#808080]" style="--p-icon-size: 12px; margin-top: 4px;"></i>
+                        </div>
+                        <i class="pi pi-folder-open w-5 h-5 text-[#007FD4] shrink-0" style="--p-icon-size: 20px;"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[#cccccc] font-medium truncate">{{file.name}}</div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="file.type === 'data'"
+                        class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-file-item"
+                        (dblclick)="uploadService.openFile(file)"
+                        [style]="{ marginLeft: '48px' }"
+                    >
+                        <i class="pi pi-table w-4 h-4 text-[#569cd6] shrink-0" style="--p-icon-size: 16px;"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[#cccccc] text-sm truncate">{{file.name}}</div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="file.type === 'dictionary'">
+                        <div 
+                            class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dictionary-item"
+                            (dblclick)="uploadService.openFile(file)"
+                            [style]="{ marginLeft: '48px' }"
+                        >
+                            <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
+                                <i class="pi pi-chevron-down w-4 h-4 text-[#808080]" style="--p-icon-size: 12px; margin-top: 4px;"></i>
+                            </div>
+                            <div class="w-4 h-4 shrink-0">
+                                <div class="relative size-full" data-name="Component 1">
+                                    <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                        <g id="Component 1">
+                                            <path d="M2.66667 13V3C2.66667 2.55797 2.84226 2.13405 3.15482 1.82149C3.46738 1.50893 3.89131 1.33333 4.33333 1.33333H13.3333V14.6667H4.33333C3.89131 14.6667 3.46738 14.4911 3.15482 14.1785C2.84226 13.866 2.66667 13.442 2.66667 13ZM2.66667 13C2.66667 12.558 2.84226 12.134 3.15482 11.8215C3.46738 11.5089 3.89131 11.3333 4.33333 11.3333H13.3333" id="Vector" stroke="var(--stroke-0, #DCDCAA)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33333"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[#cccccc] text-sm truncate">{{file.name}}</div>
+                            </div>
+                        </div>
+
+                        <div *ngFor="let row of file.data">
+                            <div 
+                                class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer"
+                                [style]="{ marginLeft: '72px' }"
+                            >
+                                <div class="relative w-4 h-4">
+                                    <div class="relative w-full h-full">
+                                        <div class="box-border content-stretch flex flex-col items-center justify-center relative w-full h-full">
+                                            <div class="font-['Inter:Bold',_sans-serif] font-bold leading-[0] not-italic relative shrink-0 text-[14px] text-center" [ngClass]="getDataClass(row.Datatype)">
+                                                <p class="block leading-[normal] whitespace-pre">{{row.Datatype.toLowerCase() === 'datetime' ? 't' : row.Datatype[0].toLowerCase()}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-[#cccccc] flex-1 truncate">{{row.Id}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

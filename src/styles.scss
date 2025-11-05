@@ -3235,6 +3235,31 @@
   --p-menubar-submenu-border-radius: 4px;
   --p-menubar-submenu-padding: calc(var(--spacing) * 1);
   --p-menubar-separator-border-color: var(--color-gray-200);
+  --p-mask-background: color-mix(in oklab, var(--color-black) 50%, transparent);
+  --p-dialog-background: #2d2d30;
+  --p-dialog-border-color: #3c3c3c;
+  --p-dialog-border-radius: var(--radius);
+  --p-dialog-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  --p-dialog-title-font-size: var(--text-lg);
+  --p-dialog-title-font-weight: var(--font-weight-semibold);
+  --p-dialog-header-padding: calc(var(--spacing) * 6) calc(var(--spacing) * 6) calc(var(--spacing) * 2);
+  --p-dialog-content-padding: 0 calc(var(--spacing) * 6) calc(var(--spacing) * 6);
+  --p-tabs-tablist-border-width: 0;
+  --p-tabs-tab-border-color: transparent;
+  --p-tabs-tab-active-border-color: #007fd4;
+  --p-tabs-tab-hover-border-color: transparent;
+  --p-tabs-tab-border-width: 0 1px 1px 0;
+  --p-tabs-tab-padding: 0;
+}
+
+data-dictionary-viewer {
+  --dd-color-primary: #007fd4;
+}
+
+data-dictionary-viewer .dark {
+  --dd-color-body-bg: #1e1e1e;
+  --dd-color-input-bg: #121212;
+  --dd-color-primary: #007fd4;
 }
 
 .dark {

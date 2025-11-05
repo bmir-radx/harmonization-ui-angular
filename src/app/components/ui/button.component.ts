@@ -1,10 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-button',
   template: `
-    <button [class]="baseClass + ' ' + variantClass + ' ' + sizeClass + ' ' + class" [ngClass]="ngClass" [disabled]="disabled">
+    <button (click)="handleClick()" [class]="baseClass + ' ' + variantClass + ' ' + sizeClass + ' ' + class" [ngClass]="ngClass" [disabled]="disabled">
       <ng-content></ng-content>
     </button>
   `,
@@ -17,10 +17,15 @@ import { CommonModule } from '@angular/common';
 })
 export class Button {
   @Input() variant: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' = 'default';
-  @Input() size: 'default' | 'sm' | 'lg' | 'icon' = 'default';
+  @Input() size: 'default' | 'sm' | 'md' | 'lg' | 'icon' = 'default';
   @Input() disabled: boolean = false;
   @Input() class: string = '';
   @Input() ngClass: any;
+  @Output() clicked = new EventEmitter<void>();
+
+  handleClick() {
+    this.clicked.emit();
+  }
 
   get baseClass(): string {
     return "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive";
@@ -41,6 +46,7 @@ export class Button {
     return {
       default: 'h-9 px-4 py-2 has-[>svg]:px-3',
       sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+      md: 'has-[>svg]:px-3 w-full',
       lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
       icon: 'size-9 rounded-md'
     }[this.size];
