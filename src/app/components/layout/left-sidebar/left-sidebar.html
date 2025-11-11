@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <h2 class="text-base font-medium text-[#cccccc] truncate">Source Datasets</h2>
 
-            <button class="p-1 text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors shrink-0" [pTooltip]="tooltipContent" tooltipPosition="bottom" positionTop="10">
+            <button (click)="uploadService.openFileDialog()" class="p-1 text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors shrink-0" [pTooltip]="tooltipContent" tooltipPosition="bottom" positionTop="10">
                 <i class="pi pi-upload w-4 h-4" style="--p-icon-size: 16px;"></i>
             </button>
         </div>
@@ -76,6 +76,7 @@
                     Upload your source data files to get started
                 </p>
                 <button
+                    (click)="uploadService.openFileDialog()"
                     class="bg-[#007fd4] text-white px-3 py-2 rounded text-xs hover:bg-[#005fa3] transition-colors flex items-center gap-1 mx-auto"
                     [pTooltip]="tooltipContent" tooltipPosition="top" positionTop="-10"
                 >
@@ -99,7 +100,7 @@
                         [style]="{ marginLeft: '24px' }"
                     >
                         <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
-                            <i class="pi pi-chevron-down w-4 h-4 text-[#808080]" style="--p-icon-size: 12px; margin-top: 4px;"></i>
+                            <i class="pi pi-chevron-down text-[#808080]" style="--p-icon-size: 12px"></i>
                         </div>
                         <i class="pi pi-folder-open w-5 h-5 text-[#007FD4] shrink-0" style="--p-icon-size: 20px;"></i>
                         <div class="flex-1 min-w-0">
@@ -125,7 +126,7 @@
                             [style]="{ marginLeft: '48px' }"
                         >
                             <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
-                                <i class="pi pi-chevron-down w-4 h-4 text-[#808080]" style="--p-icon-size: 12px; margin-top: 4px;"></i>
+                                <i class="pi pi-chevron-down text-[#808080]" style="--p-icon-size: 12px"></i>
                             </div>
                             <div class="w-4 h-4 shrink-0">
                                 <div class="relative size-full" data-name="Component 1">

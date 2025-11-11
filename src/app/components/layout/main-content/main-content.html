@@ -1,13 +1,23 @@
 <div class="h-full flex flex-col bg-[#252526]">
     <!-- Tab Navigation - Show if we have mappings tabs enabled or open file tabs -->
-    <p-tabs *ngIf="uploadService.openedFiles().length > 0" [value]="this.uploadService.activeFile()">
+    <p-tabs *ngIf="uploadService.openedFiles().length > 0" [value]="uploadService.activeFile()?.name">
         <p-tablist>
-            <p-tab *ngFor="let file of this.uploadService.openedFiles()" [value]="file.name">
+            <p-tab *ngFor="let file of uploadService.openedFiles()" [value]="file.name">
                 <div class="px-3 py-2 border-r border-[#3c3c3c] cursor-pointer text-sm flex items-center gap-2 whitespace-nowrap group relative">
+                    <i *ngIf="file.type === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6]" style="--p-icon-size: 16px"></i>
+                    <div *ngIf="file.type === 'dictionary'" class="w-4 h-4 shrink-0">
+                        <div class="relative size-full" data-name="Component 1">
+                            <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                <g id="Component 1">
+                                    <path d="M2.66667 13V3C2.66667 2.55797 2.84226 2.13405 3.15482 1.82149C3.46738 1.50893 3.89131 1.33333 4.33333 1.33333H13.3333V14.6667H4.33333C3.89131 14.6667 3.46738 14.4911 3.15482 14.1785C2.84226 13.866 2.66667 13.442 2.66667 13ZM2.66667 13C2.66667 12.558 2.84226 12.134 3.15482 11.8215C3.46738 11.5089 3.89131 11.3333 4.33333 11.3333H13.3333" id="Vector" stroke="var(--stroke-0, #DCDCAA)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.33333"></path>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
                     <span class="truncate max-w-[120px]" [title]="file.name">{{file.name}}</span>
                     <button
                         class="ml-1 p-0.5 hover:bg-[#3c3c3c] rounded transition-colors opacity-100"
-                        (click)="this.uploadService.closeFile(file)"
+                        (click)="uploadService.closeFile(file)"
                         title="Close tab"
                     >
                         <i class="pi pi-times w-3 h-3 text-[#cccccc] hover:text-[#ffffff]" style="--p-icon-size: 12px"></i>
@@ -17,10 +27,10 @@
         </p-tablist>
         <div class="flex-1 overflow-hidden">
             <p-tabpanels>
-                <p-tabpanel *ngFor="let file of this.uploadService.openedFiles()" [value]="file.name">
+                <p-tabpanel *ngFor="let file of uploadService.openedFiles()" [value]="file.name">
 
                     <!-- Tab Content - Dictionary -->
-                    <data-dictionary-viewer *ngIf="file.type === 'dictionary'" heading=" " [attr.theme]="isDarkMode ? 'dark' : 'light'" [attr.data]="this.uploadService.openedFiles()[0].text"></data-dictionary-viewer>
+                    <data-dictionary-viewer *ngIf="file.type === 'dictionary'" heading=" " [attr.theme]="isDarkMode ? 'dark' : 'light'" [attr.data]="file.text"></data-dictionary-viewer>
 
                     <!-- Tab Content - Data -->
                     <div *ngIf="file.type === 'data'" class="h-full flex flex-col bg-[#252526]">
@@ -65,6 +75,8 @@
         </div>
     </p-tabs>
 
+    <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
+
     <!-- Content Area - Constrained to available space with proper overflow handling -->
     <div *ngIf="uploadService.openedFiles().length === 0" class="flex-1 overflow-hidden">
 
@@ -97,10 +109,9 @@
 
                         <!-- Source Dataset Option -->
                         <button 
-                            (click)="onUploadSourceData()"
+                            (click)="uploadService.openFileDialog()"
                             class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
                             <div class="flex items-start gap-3 text-left">
                                 <div class="w-8 h-8 bg-[#007fd4] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                                     <i class="pi pi-upload w-4 h-4 text-white" style="--p-icon-size: 16px;"></i>
@@ -167,11 +178,11 @@
         <p class="text-sm text-[#a0a0a0]" style="margin-bottom: calc(var(--spacing) * 4);">Choose whether this file contains actual data records or describes the data structure.</p>
         <div class="space-y-4">
             <p class="text-[#a0a0a0] text-sm">
-                What type of file is "{{uploadedFile?.name}}"?
+                What type of file is "{{uploadService.uploadedFile()?.name}}"?
             </p>
 
             <div class="grid grid-cols-1 gap-3">
-                <app-button (clicked)="onSelectType('dictionary')" class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left" size="md" variant="outline">
+                <app-button (clicked)="uploadService.onSelectType('dictionary')" class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left" size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
                         <i class="pi pi-file w-5 h-5 text-[#4ec9b0] mt-0.5 shrink-0" style="--p-icon-size: 16px;"></i>
                         <div class="text-left">
@@ -183,7 +194,7 @@
                     </div>
                 </app-button>
 
-                <app-button (clicked)="onSelectType('data')" class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left" size="md" variant="outline">
+                <app-button (clicked)="uploadService.onSelectType('data')" class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left" size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
                         <i class="pi pi-table w-5 h-5 text-[#569cd6] mt-0.5 shrink-0" style="--p-icon-size: 16px;"></i>
                         <div class="text-left">
@@ -197,7 +208,7 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-[#3c3c3c]">
-                <app-button (click)="hideDialog()" class="bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] text-[#cccccc]" variant="outline">Cancel</app-button>
+                <app-button (click)="uploadService.hideDialog()" class="bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] text-[#cccccc]" variant="outline">Cancel</app-button>
             </div>
         </div>
     </p-dialog>

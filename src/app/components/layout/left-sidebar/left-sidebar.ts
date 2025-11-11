@@ -1,4 +1,4 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { UploadService } from '../../../services/file-upload.service';
@@ -13,10 +13,31 @@ import { ThemeService } from '../../../services/theme.service';
 export class LeftSidebar {
   hasActiveFilters = false;
   isDarkMode = true;
-  constructor(public uploadService: UploadService, private themeService: ThemeService) {
+  uploadService: UploadService = inject(UploadService);
+
+  constructor(private themeService: ThemeService) {
     effect(() => {
       this.isDarkMode = this.themeService.isDarkMode()();
     });
+  }
+
+  get visible() {
+    return this.uploadService.visible();
+  }
+
+  set visible(value: boolean) {
+    this.uploadService.visible.set(value);
+  }
+  
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.uploadService.setFile(input.files[0]);
+
+      this.uploadService.showDialog();
+    }
+
+    input.value = '';
   }
 
   getDataClass(type: string): string {    
