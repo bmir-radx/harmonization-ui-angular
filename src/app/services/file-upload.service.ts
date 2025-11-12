@@ -6,6 +6,7 @@ export interface UploadedFile {
   type: string;
   data: any[];
   text: string;
+  folder: string;
 }
 
 @Injectable({
@@ -14,6 +15,8 @@ export interface UploadedFile {
 export class UploadService {
   readonly triggerFileDialog = signal(false);
   visible = signal<boolean>(false);
+
+  selectedFolder = signal<string | null>(null);
 
   uploadedFile = signal<File | null>(null);
   uploadedFiles = signal<UploadedFile[]>([]);
@@ -31,6 +34,14 @@ export class UploadService {
     this.triggerFileDialog.set(false);
   }
 
+  selectFolder(name: string) {
+    this.selectedFolder.set(name);
+  }
+
+  clearFolder() {
+    this.selectedFolder.set(null);
+  }
+
   setFile(file: File | null) {
     this.uploadedFile.set(file);
   }
@@ -44,15 +55,15 @@ export class UploadService {
         files.some(f => f.name === file.name) ? files : [...files, file]
     );
     this.activeFile.set(file);
-    console.log(this.activeFile()?.name);
+    console.log('Setting active file: ', this.activeFile()?.name);
   }
 
   closeFile(file: UploadedFile) {
     this.openedFiles.update(files => files.filter(f => f.name !== file.name));
     const files = this.openedFiles();
-    console.log(files);
+    console.log('Closed tabs. Remaining opened files: ', files);
     this.activeFile.set(files.length ? files[files.length - 1] : null);
-    console.log(this.activeFile()?.name);
+    console.log('Setting active file: ', this.activeFile()?.name);
   }
 
   showDialog() {
@@ -82,7 +93,8 @@ export class UploadService {
           name: file.name,
           type: type,
           data: result.data,
-          text: text
+          text: text,
+          folder: this.selectedFolder() ?? file.name
         });
       },
       error: (error) => {

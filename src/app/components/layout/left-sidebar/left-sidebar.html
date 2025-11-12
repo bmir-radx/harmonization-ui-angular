@@ -94,41 +94,24 @@
 
             <!-- Has Uploaded Files -->
             <div *ngIf="uploadService.hasFiles()" class="space-y-1 min-w-max pt-2">
-                <div *ngFor="let file of uploadService.uploadedFiles()">
-                    <div 
-                        class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dataset-item"
-                        [style]="{ marginLeft: '24px' }"
-                    >
-                        <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
-                            <i class="pi pi-chevron-down text-[#808080]" style="--p-icon-size: 12px"></i>
-                        </div>
-                        <i class="pi pi-folder-open w-5 h-5 text-[#007FD4] shrink-0" style="--p-icon-size: 20px;"></i>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-[#cccccc] font-medium truncate">{{file.name}}</div>
-                        </div>
-                    </div>
-
-                    <div *ngIf="file.type === 'data'"
-                        class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-file-item"
-                        (dblclick)="uploadService.openFile(file)"
-                        [style]="{ marginLeft: '48px' }"
-                    >
-                        <i class="pi pi-table w-4 h-4 text-[#569cd6] shrink-0" style="--p-icon-size: 16px;"></i>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-[#cccccc] text-sm truncate">{{file.name}}</div>
-                        </div>
-                    </div>
-
-                    <div *ngIf="file.type === 'dictionary'">
+                <p-tree [value]="getFiles()" selectionMode="single" [(selection)]="selectedFolder" (onNodeSelect)="uploadService.selectFolder($event.node.label!)" (onNodeUnselect)="uploadService.clearFolder()">
+                    <ng-template let-node pTemplate="folder">
                         <div 
-                            class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dictionary-item"
-                            (dblclick)="uploadService.openFile(file)"
-                            [style]="{ marginLeft: '48px' }"
+                            class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dataset-item"
                         >
-                            <div class="w-4 h-4 shrink-0 flex items-center justify-center cursor-pointer rounded" [ngClass]="isDarkMode ? 'hover:bg-[#3c3c3c]' : 'hover:bg-[#f3f4f6]'">
-                                <i class="pi pi-chevron-down text-[#808080]" style="--p-icon-size: 12px"></i>
+                            <i class="pi pi-folder-open w-5 h-5 text-[#007FD4]" style="--p-icon-size: 20px;"></i>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[#cccccc] font-medium truncate">{{node.label}}</div>
                             </div>
-                            <div class="w-4 h-4 shrink-0">
+                        </div>
+                    </ng-template>
+                    <ng-template let-node pTemplate="file">
+                        <div
+                            class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-file-item"
+                            (dblclick)="uploadService.openFile(node.file)"
+                        >
+                            <i *ngIf="node.subtype === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6] shrink-0" style="--p-icon-size: 16px;"></i>
+                            <div *ngIf="node.subtype === 'dictionary'" class="w-4 h-4 shrink-0">
                                 <div class="relative size-full" data-name="Component 1">
                                     <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
                                         <g id="Component 1">
@@ -138,29 +121,30 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="text-[#cccccc] text-sm truncate">{{file.name}}</div>
+                                <div class="text-[#cccccc] text-sm truncate">{{node.label}}</div>
                             </div>
                         </div>
-
-                        <div *ngFor="let row of file.data">
-                            <div 
-                                class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer"
-                                [style]="{ marginLeft: '72px' }"
-                            >
-                                <div class="relative w-4 h-4">
-                                    <div class="relative w-full h-full">
-                                        <div class="box-border content-stretch flex flex-col items-center justify-center relative w-full h-full">
-                                            <div class="font-['Inter:Bold',_sans-serif] font-bold leading-[0] not-italic relative shrink-0 text-[14px] text-center" [ngClass]="getDataClass(row.Datatype)">
-                                                <p class="block leading-[normal] whitespace-pre">{{row.Datatype.toLowerCase() === 'datetime' ? 't' : row.Datatype[0].toLowerCase()}}</p>
-                                            </div>
+                    </ng-template>
+                    <ng-template let-node pTemplate="field">
+                        <div 
+                            class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer"
+                        >
+                            <div class="relative w-4 h-4">
+                                <div class="relative w-full h-full">
+                                    <div class="box-border content-stretch flex flex-col items-center justify-center relative w-full h-full">
+                                        <div class="font-['Inter:Bold',_sans-serif] font-bold leading-[0] not-italic relative shrink-0 text-[14px] text-center" [ngClass]="getDataClass(node.datatype)">
+                                            <p class="block leading-[normal] whitespace-pre">{{node.datatype.toLowerCase() === 'datetime' ? 't' : node.datatype[0].toLowerCase()}}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <span class="text-[#cccccc] flex-1 truncate">{{row.Id}}</span>
                             </div>
+                            <span class="text-[#cccccc] flex-1 truncate">{{node.field}}</span>
                         </div>
-                    </div>
-                </div>
+                    </ng-template>
+                    <ng-template let-node pTemplate="default">
+                        <b>{{ node.label }}</b>
+                    </ng-template>
+                </p-tree>
             </div>
         </div>
     </div>

@@ -1,12 +1,16 @@
 import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
-import { UploadService } from '../../../services/file-upload.service';
+import { TreeModule } from 'primeng/tree';
+import { UploadService, UploadedFile } from '../../../services/file-upload.service';
 import { ThemeService } from '../../../services/theme.service';
+import { TreeNode } from 'primeng/api';
+
+type OutputItem = { label: string; type: string; selectable: boolean; children: { label: string; type: string; selectable: boolean; subtype: string; file: UploadedFile; children?: { selectable: boolean; type: string, datatype: string; field: string }[] }[] };
 
 @Component({
   selector: 'app-left-sidebar',
-  imports: [CommonModule, TooltipModule],
+  imports: [CommonModule, TooltipModule, TreeModule],
   templateUrl: './left-sidebar.html',
   styleUrl: './left-sidebar.scss'
 })
@@ -15,10 +19,35 @@ export class LeftSidebar {
   isDarkMode = true;
   uploadService: UploadService = inject(UploadService);
 
+  files: OutputItem[] = [];
+  selectedFolder!: TreeNode;
+
   constructor(private themeService: ThemeService) {
     effect(() => {
       this.isDarkMode = this.themeService.isDarkMode()();
+
+      this.files = Object.values(
+        this.uploadService.uploadedFiles().reduce<Record<string, OutputItem>>((acc, file) => {
+          if (!acc[file.folder]) {
+            acc[file.folder] = { label: file.folder, type: 'folder', selectable: true, children: [] };
+          }
+          const child = {
+            label: file.name,
+            type: 'file',
+            subtype: file.type,
+            file: file,
+            selectable: false,
+            ...(file.type === 'dictionary' ? { children: file.data.map(curr => ({type: 'field', selectable: false, field: curr.Id, datatype: curr.Datatype})) } : {})
+          }
+          acc[file.folder].children.push(child);
+          return acc;
+        }, {})
+      );
     });
+  }
+
+  getFiles() {
+    return this.files;
   }
 
   get visible() {

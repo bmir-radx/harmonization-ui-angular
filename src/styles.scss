@@ -3250,6 +3250,12 @@
   --p-tabs-tab-hover-border-color: transparent;
   --p-tabs-tab-border-width: 0 1px 1px 0;
   --p-tabs-tab-padding: 0;
+  --p-tree-padding: 0 0 0 24px;
+  --p-tree-indent: 24px;
+  --p-tree-node-padding: 0 10px;
+  --p-tree-node-selected-background: #094771;
+  --p-tree-node-hover-background: #444444;
+  --p-tree-transition-duration: 0.15s;
 }
 
 data-dictionary-viewer {
@@ -3260,6 +3266,10 @@ data-dictionary-viewer .dark {
   --dd-color-body-bg: #1e1e1e;
   --dd-color-input-bg: #121212;
   --dd-color-primary: #007fd4;
+}
+
+i.pi {
+    will-change: transform;
 }
 
 .dark {
