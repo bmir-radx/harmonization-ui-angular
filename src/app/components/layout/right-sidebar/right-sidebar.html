@@ -21,6 +21,15 @@
 
     <input type="file" #fileInput style="display: none" accept=".csv" (change)="onFileSelected($event)">
 
+    <!-- Mappings Button -->
+    <div *ngIf="uploadService.hasValidMappingState()" class="px-3 py-2 border-b border-[#3c3c3c] shrink-0">
+        <button (click)="uploadService.openMappingsTab()"
+            class="w-full bg-[#007fd4] text-white px-3 py-2 rounded text-sm hover:bg-[#005fa3] transition-colors flex items-center gap-2 justify-center">
+            <i class="pi pi-sitemap" style="font-size: 14px;"></i>
+            Mappings
+        </button>
+    </div>
+
     <!-- Content -->
     <div class="flex-1 overflow-auto">
 
