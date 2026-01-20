@@ -8,9 +8,13 @@ import { ThemeService } from '../../../services/theme.service';
 import { UploadService } from '../../../services/file-upload.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+import { TableModule } from 'primeng/table';
+import { SelectModule } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-main-content',
-  imports: [CommonModule, Dialog, TabsModule, SplitterModule, Button],
+  imports: [CommonModule, Dialog, TabsModule, SplitterModule, Button, TableModule, SelectModule, FormsModule],
   templateUrl: './main-content.html',
   styleUrl: './main-content.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

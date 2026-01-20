@@ -38,15 +38,205 @@
                     <div *ngIf="file.type === 'mappings'" class="h-full bg-[#252526]">
                         <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="horizontal">
                             <ng-template #panel>
-                                <div class="h-full w-full bg-[#1e1e1e] p-4 overflow-auto">
-                                    <h3 class="text-[#cccccc] text-lg font-medium mb-4">Source Variables</h3>
-                                    <p class="text-[#808080] text-sm">Source data variables will appear here</p>
+                                <div class="h-full w-full bg-[#1e1e1e] overflow-hidden flex flex-col">
+                                    <!-- Toolbar -->
+                                    <div
+                                        class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#1e1e1e]">
+                                        <div class="flex items-center gap-6">
+                                            <div class="flex items-center gap-2 text-[#cccccc] text-xs">
+                                                <i class="pi pi-table" style="font-size: 10px;"></i>
+                                                <span>{{uploadService.mappingRows().length}} elements</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-[#cccccc] text-xs">
+                                                <i class="pi pi-check text-[#4caf50]" style="font-size: 10px;"></i>
+                                                <span>0 rules</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button
+                                                class="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-2 py-1 rounded-md flex items-center gap-2 text-xs font-semibold shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all">
+                                                <i class="pi pi-sparkles" style="font-size: 10px;"></i>
+                                                AI
+                                            </button>
+                                            <button [disabled]="!uploadService.isReady()"
+                                                class="bg-[#2d2d2d] text-[#555555] px-3 py-1 rounded-md text-xs font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed enabled:bg-[#4caf50] enabled:text-white">
+                                                Ready
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Table Content -->
+                                    <div class="flex-1 overflow-hidden">
+                                        <p-table [value]="uploadService.mappingRows()" [scrollable]="true"
+                                            scrollHeight="100%" class="mappings-table-v2"
+                                            [tableStyle]="{'min-width': '100%'}" dataKey="id">
+                                            <ng-template pTemplate="header">
+                                                <tr>
+                                                    <th class="index-col">#</th>
+                                                    <th>DATA SET</th>
+                                                    <th>SOURCE DATA ELEMENT</th>
+                                                    <th>TARGET DATA ELEMENT</th>
+                                                    <th class="status-col">STATUS</th>
+                                                </tr>
+                                            </ng-template>
+                                            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                                                <tr [class.selected-row]="uploadService.selectedMappingRow()?.id === row.id"
+                                                    class="cursor-pointer"
+                                                    (click)="uploadService.selectMappingRow(row)">
+                                                    <td class="index-col">{{rowIndex + 1}}</td>
+                                                    <td class="font-bold text-[#cccccc]">{{row.dataset}}</td>
+                                                    <td class="text-[#808080]">{{row.sourceElement}}</td>
+                                                    <td>
+                                                        <p-select [options]="uploadService.targetOptions()"
+                                                            [(ngModel)]="row.targetElement"
+                                                            (onChange)="uploadService.updateMappingStatus(rowIndex, $event.value)"
+                                                            (click)="$event.stopPropagation()" optionLabel="label"
+                                                            optionValue="value" placeholder="Search..." [filter]="true"
+                                                            [appendTo]="'body'" [style]="{'width': '100%'}"
+                                                            class="custom-table-select">
+                                                        </p-select>
+                                                    </td>
+                                                    <td class="status-col">
+                                                        <i *ngIf="row.status === 'attention'"
+                                                            class="pi pi-exclamation-triangle text-[#ff9500] text-sm"></i>
+                                                        <i *ngIf="row.status === 'complete'"
+                                                            class="pi pi-check text-[#4caf50] text-sm"></i>
+                                                    </td>
+                                                </tr>
+                                            </ng-template>
+                                        </p-table>
+                                    </div>
                                 </div>
                             </ng-template>
                             <ng-template #panel>
-                                <div class="h-full w-full bg-[#252526] p-4 overflow-auto">
-                                    <h3 class="text-[#cccccc] text-lg font-medium mb-4">Target Variables</h3>
-                                    <p class="text-[#808080] text-sm">Target data variables will appear here</p>
+                                <div class="h-full w-full bg-[#252526] overflow-hidden">
+                                    <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="vertical">
+                                        <ng-template #panel>
+                                            <div class="h-full w-full bg-[#1e1e1e] flex flex-col overflow-hidden">
+                                                <!-- Harmonization Rules Banner -->
+                                                <div
+                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#252526]">
+                                                    <h3 class="text-[#cccccc] text-sm font-medium">Harmonization Rules
+                                                    </h3>
+                                                    <button
+                                                        [disabled]="!uploadService.selectedMappingRow()?.targetElement"
+                                                        class="bg-[#3c3c3c] text-[#808080] px-3 py-1.5 rounded flex items-center gap-2 text-xs font-medium border border-[#4c4c4c] disabled:opacity-50 enabled:text-[#cccccc] enabled:hover:bg-[#4c4c4c]">
+                                                        <i class="pi pi-save" style="font-size: 10px;"></i>
+                                                        Save Rule
+                                                    </button>
+                                                </div>
+
+                                                <!-- Conditional Content: Required State vs Visualization -->
+                                                <div class="flex-1 overflow-hidden">
+
+                                                    <!-- Required State (Image Match) -->
+                                                    <div *ngIf="!uploadService.selectedMappingRow()?.targetElement"
+                                                        class="h-full flex flex-col items-center justify-center p-8 bg-[#1e1e1e]">
+                                                        <div
+                                                            class="w-20 h-20 bg-[#f97316] rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+                                                            <i class="pi pi-exclamation-circle text-white text-4xl"></i>
+                                                        </div>
+                                                        <h3 class="text-[#cccccc] text-xl font-medium mb-3">Target Data
+                                                            Element Required</h3>
+                                                        <p
+                                                            class="text-[#808080] text-sm text-center max-w-md mb-8 leading-relaxed">
+                                                            Please select a target data element for <span
+                                                                class="text-[#cccccc] font-bold">"{{uploadService.selectedMappingRow()?.sourceElement}}"</span>
+                                                            from the dropdown in the Target Data Element column to
+                                                            configure harmonization rules.
+                                                        </p>
+                                                        <div
+                                                            class="px-6 py-3 border border-[#3c3c3c] rounded bg-[#252526] text-[#808080] text-sm">
+                                                            <span class="text-[#cccccc] font-bold">Next step:</span>
+                                                            Click the "Search..." button in the Target Data Element
+                                                            column
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Visualization (When mapping exists) -->
+                                                    <div *ngIf="uploadService.selectedMappingRow()?.targetElement"
+                                                        class="h-full flex flex-col">
+                                                        <div class="p-8 flex items-center justify-between bg-[#1e1e1e]">
+                                                            <!-- Source Block -->
+                                                            <div class="flex flex-col items-center gap-3 flex-1">
+                                                                <div
+                                                                    class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
+                                                                    <div
+                                                                        class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
+                                                                        {{uploadService.selectedMappingRow()?.sourceElement}}
+                                                                    </div>
+                                                                    <div class="text-[#808080] text-xs">(int)</div>
+                                                                    <div class="text-[#cccccc] text-xs mt-2">
+                                                                        {{uploadService.selectedMappingRow()?.dataset}}
+                                                                    </div>
+                                                                </div>
+                                                                <span
+                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Source</span>
+                                                            </div>
+
+                                                            <!-- Arrow & Steps Label -->
+                                                            <div class="flex flex-col items-center gap-3 px-4">
+                                                                <div
+                                                                    class="relative w-40 h-px bg-[#007fd4] flex items-center justify-end">
+                                                                    <div
+                                                                        class="w-2 h-2 border-t-2 border-r-2 border-[#007fd4] rotate-45 -mr-0.5 mt-[-0.5px]">
+                                                                    </div>
+                                                                </div>
+                                                                <span
+                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Steps</span>
+                                                            </div>
+
+                                                            <!-- Target Block -->
+                                                            <div class="flex flex-col items-center gap-3 flex-1">
+                                                                <div
+                                                                    class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
+                                                                    <div
+                                                                        class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
+                                                                        {{uploadService.selectedMappingRow()?.targetElement}}
+                                                                    </div>
+                                                                    <div class="text-[#808080] text-xs">
+                                                                        ({{uploadService.getTargetDetails(uploadService.selectedMappingRow()?.targetElement)?.Type
+                                                                        || 'string'}})</div>
+                                                                    <div class="text-[#cccccc] text-xs mt-2">Target
+                                                                        Schema</div>
+                                                                </div>
+                                                                <span
+                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Target</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Transformation Steps Title Row -->
+                                                        <div
+                                                            class="px-4 py-3 flex items-center justify-between border-t border-[#2d2d2d]">
+                                                            <h4 class="text-[#cccccc] text-sm font-medium">
+                                                                Transformation Steps</h4>
+                                                            <button
+                                                                class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-3 py-1.5 rounded-md flex items-center gap-2 text-xs font-semibold transition-all">
+                                                                <i class="pi pi-plus" style="font-size: 10px;"></i>
+                                                                Add Step
+                                                            </button>
+                                                        </div>
+
+                                                        <!-- Empty Transformation State -->
+                                                        <div
+                                                            class="flex-1 flex flex-col items-center justify-center p-8 opacity-40">
+                                                            <div class="text-[#cccccc] text-sm font-medium mb-1">No
+                                                                transformation steps</div>
+                                                            <div class="text-[#808080] text-xs">Click "Add Step" to
+                                                                create your first transformation</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #panel>
+                                            <div class="h-full w-full p-4 border-t border-[#3c3c3c] overflow-auto">
+                                                <h3 class="text-[#cccccc] text-lg font-medium mb-4">Mapping Details</h3>
+                                                <p class="text-[#808080] text-sm">Details for the selected mapping will
+                                                    appear here</p>
+                                            </div>
+                                        </ng-template>
+                                    </p-splitter>
                                 </div>
                             </ng-template>
                         </p-splitter>

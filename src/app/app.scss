@@ -5,3 +5,100 @@
 ::ng-deep .dark .p-splitter-gutter:hover {
     background-color: #007fd4;
 }
+
+::ng-deep .mappings-table-v2 {
+    .p-datatable-thead>tr>th {
+        background: #1e1e1e !important;
+        color: #888888 !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        padding: 10px 16px !important;
+        border-bottom: 1px solid #2d2d2d !important;
+        border-top: 1px solid #2d2d2d !important;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .p-datatable-tbody>tr {
+        background: #1e1e1e !important;
+        border-bottom: 1px solid #2d2d2d !important;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #252526 !important;
+        }
+
+        &.selected-row {
+            background: #243447 !important; // Dark blue selection from image
+
+            td {
+                color: #ffffff !important;
+            }
+        }
+
+        td {
+            padding: 8px 16px !important;
+            color: #cccccc;
+            font-size: 13px;
+            border: none !important;
+        }
+    }
+
+    .index-col {
+        width: 60px !important;
+        text-align: left !important;
+    }
+
+    .status-col {
+        width: 100px !important;
+        text-align: center !important;
+    }
+}
+
+::ng-deep .custom-table-select {
+    background: #232323 !important;
+    border: 1px solid #3c3c3c !important;
+    border-radius: 4px !important;
+    height: 32px !important;
+    width: 100% !important;
+
+    .p-select-label {
+        color: #888888 !important;
+        font-size: 12px !important;
+        padding-left: 32px !important;
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        &::before {
+            content: "\e908"; // PrimeIcon Search
+            font-family: 'primeicons';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #808080;
+            font-size: 12px;
+        }
+    }
+}
+
+::ng-deep .p-select-overlay {
+    background: #1e1e1e !important;
+    border: 1px solid #3c3c3c !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+
+    .p-select-option {
+        color: #cccccc !important;
+        font-size: 12px !important;
+
+        &:hover {
+            background: #2d2d30 !important;
+        }
+
+        &.p-highlight {
+            background: #007fd4 !important;
+            color: white !important;
+        }
+    }
+}

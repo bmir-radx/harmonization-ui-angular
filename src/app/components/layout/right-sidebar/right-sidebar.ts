@@ -26,12 +26,16 @@ export class RightSidebar {
         type: 'file',
         data: file,
         expanded: true,
-        children: file.data.length > 0 ? Object.keys(file.data[0]).map(key => ({
-          label: key,
-          type: 'field',
-          selectable: false,
-          data: { getType: () => 'string' } // Placeholder if type isn't known, or extract from valid rows
-        })) : []
+        children: file.data.map(element => {
+          const name = element['Variable Name'] || element['Variable name'] || element['variable_name'] ||
+            element['Id'] || element['ID'] || element['id'] || element['name'] || element['Name'];
+          return {
+            label: name || 'Unnamed Element',
+            type: 'field',
+            selectable: true,
+            data: element
+          };
+        })
       }));
     });
   }
