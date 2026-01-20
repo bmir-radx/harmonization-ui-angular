@@ -1,0 +1,38 @@
+:host ::ng-deep {
+    .p-tabs {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .p-tablist {
+        flex-shrink: 0;
+    }
+
+    .p-tabpanel {
+        height: 100%;
+        padding: 0;
+    }
+
+    .p-tabpanels {
+        flex: 1;
+        overflow: hidden;
+        background: transparent;
+        padding: 0;
+    }
+
+    .p-splitter {
+        background: transparent;
+        border: none;
+    }
+
+    .p-splitter-gutter {
+        background: #3c3c3c !important;
+        width: 4px !important;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #007fd4 !important;
+        }
+    }
+}

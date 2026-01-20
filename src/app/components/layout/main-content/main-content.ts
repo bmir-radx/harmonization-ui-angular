@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef, effect, inject } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { Dialog } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
+import { SplitterModule } from 'primeng/splitter';
 import { Button } from '../../ui/button.component';
 import { ThemeService } from '../../../services/theme.service';
 import { UploadService } from '../../../services/file-upload.service';
@@ -9,7 +10,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 @Component({
   selector: 'app-main-content',
-  imports: [CommonModule, Dialog, TabsModule, Button],
+  imports: [CommonModule, Dialog, TabsModule, SplitterModule, Button],
   templateUrl: './main-content.html',
   styleUrl: './main-content.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -43,7 +44,7 @@ export class MainContent {
   onUploadSourceData() {
     this.fileInput.nativeElement.click();
   }
-  
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
