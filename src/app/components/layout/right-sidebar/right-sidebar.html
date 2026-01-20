@@ -4,11 +4,14 @@
     <div class="px-3 py-3 border-b border-[#3c3c3c] shrink-0">
         <div class="flex items-center justify-between">
             <h2 class="text-sm font-medium text-[#cccccc] truncate mr-2">Target Data Dictionary</h2>
-            <button class="p-1 text-[#007fd4] hover:bg-[#3c3c3c] hover:border-[#007fd4] border border-transparent rounded transition-colors shrink-0" [pTooltip]="tooltipContent" tooltipPosition="bottom" positionTop="50" positionLeft="30">
+            <button (click)="fileInput.click()"
+                class="p-1 text-[#007fd4] hover:bg-[#3c3c3c] hover:border-[#007fd4] border border-transparent rounded transition-colors shrink-0"
+                [pTooltip]="tooltipContent" tooltipPosition="bottom" positionTop="50" positionLeft="30">
                 <i class="pi pi-upload w-4 h-4" style="--p-icon-size: 16px;"></i>
             </button>
             <ng-template #tooltipContent>
-                <div class="tooltip bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance">
+                <div
+                    class="tooltip bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance">
                     <p>Upload Target Dictionary</p>
                     <p class="text-xs text-muted-foreground">Supports CSV, Excel (.xlsx), JSON</p>
                 </div>
@@ -16,33 +19,22 @@
         </div>
     </div>
 
-    <!-- Mappings Trigger Button -->
-
-    <!-- Search and Controls Section -->
+    <input type="file" #fileInput style="display: none" accept=".csv" (change)="onFileSelected($event)">
 
     <!-- Content -->
     <div class="flex-1 overflow-auto">
 
-        <!-- Empty State - Fixed width to prevent overflow -->
-        <div class="text-center py-4 px-3">
+        <!-- Empty State -->
+        <div *ngIf="uploadService.targetFiles().length === 0" class="text-center py-4 px-3">
             <div class="w-10 h-10 bg-[#3c3c3c] rounded-full flex items-center justify-center mx-auto mb-3">
                 <div class="w-5 h-5">
                     <div className="relative size-full" data-name="Component 1">
-                        <svg
-                            className="block size-full"
-                            fill="none"
-                            preserveAspectRatio="none"
-                            viewBox="0 0 16 16"
-                        >
+                        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
                             <g id="Component 1">
-                            <path
-                                d="M2.66667 13V3C2.66667 2.55797 2.84226 2.13405 3.15482 1.82149C3.46738 1.50893 3.89131 1.33333 4.33333 1.33333H13.3333V14.6667H4.33333C3.89131 14.6667 3.46738 14.4911 3.15482 14.1785C2.84226 13.866 2.66667 13.442 2.66667 13ZM2.66667 13C2.66667 12.558 2.84226 12.134 3.15482 11.8215C3.46738 11.5089 3.89131 11.3333 4.33333 11.3333H13.3333"
-                                id="Vector"
-                                stroke="var(--stroke-0, #DCDCAA)"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="1.33333"
-                            />
+                                <path
+                                    d="M2.66667 13V3C2.66667 2.55797 2.84226 2.13405 3.15482 1.82149C3.46738 1.50893 3.89131 1.33333 4.33333 1.33333H13.3333V14.6667H4.33333C3.89131 14.6667 3.46738 14.4911 3.15482 14.1785C2.84226 13.866 2.66667 13.442 2.66667 13ZM2.66667 13C2.66667 12.558 2.84226 12.134 3.15482 11.8215C3.46738 11.5089 3.89131 11.3333 4.33333 11.3333H13.3333"
+                                    id="Vector" stroke="var(--stroke-0, #DCDCAA)" strokeLinecap="round"
+                                    strokeLinejoin="round" strokeWidth="1.33333" />
                             </g>
                         </svg>
                     </div>
@@ -52,20 +44,58 @@
             <p class="text-[#808080] text-xs mb-3 leading-relaxed">
                 Create or upload target data dictionary
             </p>
-            
+
             <div class="space-y-2">
-                <button class="w-full bg-[#4CAF50] text-white px-2 py-1.5 rounded text-xs hover:bg-[#45a049] hover:border-[#4CAF50] border border-transparent transition-colors flex items-center gap-1 justify-center">
+                <button (click)="fileInput.click()"
+                    class="w-full bg-[#4CAF50] text-white px-2 py-1.5 rounded text-xs hover:bg-[#45a049] hover:border-[#4CAF50] border border-transparent transition-colors flex items-center gap-1 justify-center">
                     <i class="pi pi-upload w-3 h-3" style="--p-icon-size: 12px;"></i>
                     Upload
                 </button>
-                
-                <button class="w-full bg-[#007fd4] text-white px-2 py-1.5 rounded text-xs hover:bg-[#005fa3] hover:border-[#007fd4] border border-transparent transition-colors flex items-center gap-1 justify-center">
+
+                <button
+                    class="w-full bg-[#007fd4] text-white px-2 py-1.5 rounded text-xs hover:bg-[#005fa3] hover:border-[#007fd4] border border-transparent transition-colors flex items-center gap-1 justify-center">
                     <i class="pi pi-plus-circle w-3 h-3" style="--p-icon-size: 12px;"></i>
                     Construct
                 </button>
             </div>
         </div>
 
-    </div>
+        <!-- Has Uploaded Files -->
+        <div *ngIf="uploadService.targetFiles().length > 0" class="space-y-1 min-w-max pt-2">
+            <p-tree [value]="files" selectionMode="single" [(selection)]="selectedNode">
+                <ng-template let-node pTemplate="file">
+                    <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer hover:bg-[#2a2d2e]"
+                        (dblclick)="uploadService.openFile(node.data)">
+                        <div class="w-4 h-4 shrink-0">
+                            <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
+                                <path
+                                    d="M2.66667 13V3C2.66667 2.55797 2.84226 2.13405 3.15482 1.82149C3.46738 1.50893 3.89131 1.33333 4.33333 1.33333H13.3333V14.6667H4.33333C3.89131 14.6667 3.46738 14.4911 3.15482 14.1785C2.84226 13.866 2.66667 13.442 2.66667 13ZM2.66667 13C2.66667 12.558 2.84226 12.134 3.15482 11.8215C3.46738 11.5089 3.89131 11.3333 4.33333 11.3333H13.3333"
+                                    stroke="#DCDCAA" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.33333"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[#cccccc] text-sm truncate">{{node.label}}</div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template let-node pTemplate="field">
+                    <div
+                        class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer hover:bg-[#2a2d2e]">
+                        <div class="relative w-4 h-4">
+                            <div class="relative w-full h-full">
+                                <div class="box-border flex flex-col items-center justify-center w-full h-full">
+                                    <div class="font-bold text-[14px] text-center text-[#4ec9b0]">
+                                        <p class="block whitespace-pre">s</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[#cccccc] flex-1 truncate">{{node.label}}</span>
+                    </div>
+                </ng-template>
+            </p-tree>
+        </div>
 
+    </div>
 </div>

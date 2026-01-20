@@ -102,4 +102,32 @@ export class UploadService {
       }
     });
   }
+
+  // Target Data Dictionary Management
+  targetFiles = signal<UploadedFile[]>([]);
+
+  addTargetFile(file: UploadedFile) {
+    this.targetFiles.update(files => [...files, file]);
+  }
+
+  async parseTargetCSV(file: File): Promise<void> {
+    const text = await file.text();
+
+    Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (result) => {
+        this.addTargetFile({
+          name: file.name,
+          type: 'dictionary',
+          data: result.data,
+          text: text,
+          folder: file.name // Default to filename as folder/group
+        });
+      },
+      error: (error) => {
+        console.error('Error parsing Target CSV:', error);
+      }
+    });
+  }
 }
