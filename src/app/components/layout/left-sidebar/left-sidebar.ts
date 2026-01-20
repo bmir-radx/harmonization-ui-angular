@@ -6,7 +6,7 @@ import { UploadService, UploadedFile } from '../../../services/file-upload.servi
 import { ThemeService } from '../../../services/theme.service';
 import { TreeNode } from 'primeng/api';
 
-type OutputItem = { label: string; type: string; selectable: boolean; children: { label: string; type: string; selectable: boolean; subtype: string; file: UploadedFile; children?: { selectable: boolean; type: string, datatype: string; field: string }[] }[] };
+type OutputItem = { label: string; type: string; selectable: boolean; expanded?: boolean; children: { label: string; type: string; selectable: boolean; expanded?: boolean; subtype: string; file: UploadedFile; children?: { selectable: boolean; type: string, datatype: string; field: string }[] }[] };
 
 @Component({
   selector: 'app-left-sidebar',
@@ -29,7 +29,7 @@ export class LeftSidebar {
       this.files = Object.values(
         this.uploadService.uploadedFiles().reduce<Record<string, OutputItem>>((acc, file) => {
           if (!acc[file.folder]) {
-            acc[file.folder] = { label: file.folder, type: 'folder', selectable: true, children: [] };
+            acc[file.folder] = { label: file.folder, type: 'folder', selectable: true, expanded: true, children: [] };
           }
           const child = {
             label: file.name,
@@ -37,7 +37,8 @@ export class LeftSidebar {
             subtype: file.type,
             file: file,
             selectable: false,
-            ...(file.type === 'dictionary' ? { children: file.data.map(curr => ({type: 'field', selectable: false, field: curr.Id, datatype: curr.Datatype})) } : {})
+            expanded: true,
+            ...(file.type === 'dictionary' ? { children: file.data.map(curr => ({ type: 'field', selectable: false, field: curr.Id, datatype: curr.Datatype })) } : {})
           }
           acc[file.folder].children.push(child);
           return acc;
@@ -57,7 +58,7 @@ export class LeftSidebar {
   set visible(value: boolean) {
     this.uploadService.visible.set(value);
   }
-  
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -69,7 +70,7 @@ export class LeftSidebar {
     input.value = '';
   }
 
-  getDataClass(type: string): string {    
+  getDataClass(type: string): string {
     const dataType = type.toLowerCase();
 
     switch (dataType) {
@@ -114,6 +115,6 @@ export class LeftSidebar {
       default:
         return 'text-[#606060]';
     }
-    
+
   }
 }
