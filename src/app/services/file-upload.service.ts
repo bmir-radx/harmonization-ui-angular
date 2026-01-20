@@ -52,7 +52,7 @@ export class UploadService {
 
   openFile(file: UploadedFile) {
     this.openedFiles.update(files =>
-        files.some(f => f.name === file.name) ? files : [...files, file]
+      files.some(f => f.name === file.name) ? files : [...files, file]
     );
     this.activeFile.set(file);
     console.log('Setting active file: ', this.activeFile()?.name);
@@ -86,9 +86,9 @@ export class UploadService {
     const text = await file.text();
 
     Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => {
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
         this.addFile({
           name: file.name,
           type: type,
@@ -114,9 +114,9 @@ export class UploadService {
     const text = await file.text();
 
     Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => {
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
         this.addTargetFile({
           name: file.name,
           type: 'dictionary',
@@ -129,5 +129,32 @@ export class UploadService {
         console.error('Error parsing Target CSV:', error);
       }
     });
+  }
+
+  // Mappings Tab Management
+  hasValidMappingState = computed(() => {
+    const hasTarget = this.targetFiles().length > 0;
+    const hasSourceGroup = this.uploadedFiles().some(f => {
+      // Check if there are other files in the same folder
+      const folderFiles = this.uploadedFiles().filter(sf => sf.folder === f.folder);
+      const hasDictionary = folderFiles.some(sf => sf.type === 'dictionary');
+      const hasData = folderFiles.some(sf => sf.type === 'data');
+      return hasDictionary && hasData;
+    });
+
+    return hasTarget && hasSourceGroup;
+  });
+
+  openMappingsTab() {
+    // Create a virtual file for the Mappings tab
+    const mappingsFile: UploadedFile = {
+      name: 'Mappings',
+      type: 'mappings',
+      data: [],
+      text: '',
+      folder: 'system'
+    };
+
+    this.openFile(mappingsFile);
   }
 }

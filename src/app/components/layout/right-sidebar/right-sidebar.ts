@@ -14,6 +14,7 @@ type OutputItem = { label: string; type: string; selectable: boolean; children: 
   styleUrl: './right-sidebar.scss'
 })
 export class RightSidebar {
+  hasActiveFilters = false;
   uploadService: UploadService = inject(UploadService);
 
   files: TreeNode[] = [];
