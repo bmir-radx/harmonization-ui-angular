@@ -157,4 +157,45 @@ export class UploadService {
 
     this.openFile(mappingsFile);
   }
+
+  loadTestData() {
+    // 1. Mock Target Dictionary
+    const targetData = [
+      { "Variable Name": "t_age", "Label": "Target Age", "Type": "Integer" },
+      { "Variable Name": "t_gender", "Label": "Target Gender", "Type": "String" }
+    ];
+    this.addTargetFile({
+      name: 'target_dict.csv',
+      type: 'dictionary',
+      data: targetData,
+      text: Papa.unparse(targetData),
+      folder: 'target_dict.csv'
+    });
+
+    // 2. Mock Source Dictionary
+    const sourceDictData = [
+      { "Id": "s_dob", "Label": "Date of Birth", "Datatype": "Date" },
+      { "Id": "s_sex", "Label": "Sex", "Datatype": "String" }
+    ];
+    this.addFile({
+      name: 'source_dict.csv',
+      type: 'dictionary',
+      data: sourceDictData,
+      text: Papa.unparse(sourceDictData),
+      folder: 'Source Dataset A'
+    });
+
+    // 3. Mock Source Data
+    const sourceDataData = [
+      { "s_dob": "1990-01-01", "s_sex": "M" },
+      { "s_dob": "1992-05-20", "s_sex": "F" }
+    ];
+    this.addFile({
+      name: 'source_data.csv',
+      type: 'data',
+      data: sourceDataData,
+      text: Papa.unparse(sourceDataData),
+      folder: 'Source Dataset A'
+    });
+  }
 }
