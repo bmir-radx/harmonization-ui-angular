@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../services/theme.service';
 import { ProjectService, Project } from '../../../services/project.service';
 import { HistoryService, HistoryItem } from '../../../services/history.service';
+import { UploadService } from '../../../services/file-upload.service';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
 
 @Component({
-  selector: 'app-header-bar',
-  imports: [CommonModule, Menubar],
-  templateUrl: './header-bar.html',
-  styleUrl: './header-bar.scss'
+    selector: 'app-header-bar',
+    imports: [CommonModule, Menubar],
+    templateUrl: './header-bar.html',
+    styleUrl: './header-bar.scss'
 })
 export class HeaderBar {
     isDarkMode = true;
@@ -20,7 +21,7 @@ export class HeaderBar {
     leftMenu: MenuItem[] | undefined;
     rightMenu: MenuItem[] | undefined;
 
-    constructor(private projectService: ProjectService, private historyService: HistoryService, private themeService: ThemeService) {
+    constructor(private projectService: ProjectService, private historyService: HistoryService, private themeService: ThemeService, private uploadService: UploadService) {
         effect(() => {
             this.currentProject = this.projectService.currentProject();
             this.projectHistory = this.historyService.projectHistory();
@@ -103,6 +104,14 @@ export class HeaderBar {
                         label: 'Import Data...',
                         icon: 'pi pi-upload',
                         shortcut: 'Ctrl+I'
+                    },
+                    {
+                        label: 'Load Test Data',
+                        icon: 'pi pi-bolt',
+                        shortcut: 'Ctrl+Shift+T',
+                        command: () => {
+                            this.uploadService.loadTestData();
+                        }
                     },
                     {
                         separator: true
