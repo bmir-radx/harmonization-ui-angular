@@ -37,7 +37,7 @@
                     <!-- Tab Content - Mappings -->
                     <div *ngIf="file.type === 'mappings'" class="h-full bg-[#252526]">
                         <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="horizontal">
-                            <ng-template #panel>
+                            <ng-template pTemplate="panel">
                                 <div class="h-full w-full bg-[#1e1e1e] overflow-hidden flex flex-col">
                                     <!-- Toolbar -->
                                     <div
@@ -108,10 +108,10 @@
                                     </div>
                                 </div>
                             </ng-template>
-                            <ng-template #panel>
+                            <ng-template pTemplate="panel">
                                 <div class="h-full w-full bg-[#252526] overflow-hidden">
                                     <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="vertical">
-                                        <ng-template #panel>
+                                        <ng-template pTemplate="panel">
                                             <div class="h-full w-full bg-[#1e1e1e] flex flex-col overflow-hidden">
                                                 <!-- Harmonization Rules Banner -->
                                                 <div
@@ -210,15 +210,41 @@
                                                             class="px-4 py-3 flex items-center justify-between border-t border-[#2d2d2d]">
                                                             <h4 class="text-[#cccccc] text-sm font-medium">
                                                                 Transformation Steps</h4>
-                                                            <button
+                                                            <button (click)="uploadService.addTransformationStep()"
+                                                                type="button"
                                                                 class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-3 py-1.5 rounded-md flex items-center gap-2 text-xs font-semibold transition-all">
                                                                 <i class="pi pi-plus" style="font-size: 10px;"></i>
                                                                 Add Step
                                                             </button>
                                                         </div>
 
+                                                        <!-- Transformation Steps List -->
+                                                        <div *ngIf="uploadService.selectedMappingRow()?.steps?.length > 0"
+                                                            class="flex-1 overflow-auto p-4 flex flex-col gap-3">
+                                                            <div *ngFor="let step of uploadService.selectedMappingRow().steps; let i = index"
+                                                                class="transformation-step-box group">
+                                                                <div class="flex items-center gap-4 flex-1">
+                                                                    <div class="step-number-circle">
+                                                                        {{i + 1}}
+                                                                    </div>
+                                                                    <div class="flex flex-col">
+                                                                        <span
+                                                                            class="text-[#cccccc] text-sm font-bold">Step
+                                                                            {{i + 1}}</span>
+                                                                        <span class="text-[#808080] text-xs">Click to
+                                                                            configure</span>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    (click)="$event.stopPropagation(); uploadService.removeTransformationStep(i)"
+                                                                    class="text-[#808080] hover:text-[#ffffff] transition-colors p-1">
+                                                                    <i class="pi pi-times text-xs"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
                                                         <!-- Empty Transformation State -->
-                                                        <div
+                                                        <div *ngIf="!uploadService.selectedMappingRow()?.steps || uploadService.selectedMappingRow()?.steps?.length === 0"
                                                             class="flex-1 flex flex-col items-center justify-center p-8 opacity-40">
                                                             <div class="text-[#cccccc] text-sm font-medium mb-1">No
                                                                 transformation steps</div>
@@ -229,7 +255,7 @@
                                                 </div>
                                             </div>
                                         </ng-template>
-                                        <ng-template #panel>
+                                        <ng-template pTemplate="panel">
                                             <div class="h-full w-full p-4 border-t border-[#3c3c3c] overflow-auto">
                                                 <h3 class="text-[#cccccc] text-lg font-medium mb-4">Mapping Details</h3>
                                                 <p class="text-[#808080] text-sm">Details for the selected mapping will

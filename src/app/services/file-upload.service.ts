@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, untracked } from '@angular/core';
 import Papa from 'papaparse';
 
 export interface UploadedFile {
@@ -222,15 +222,17 @@ export class UploadService {
               dataset: file.folder,
               sourceElement: element['Id'] || element['Variable Name'] || element['name'] || 'Unknown',
               targetElement: null,
-              status: 'attention'
+              status: 'attention',
+              steps: []
             });
           });
         }
       });
       this.mappingRows.set(rows);
 
-      // Default select first row
-      if (rows.length > 0 && !this.selectedMappingRow()) {
+      // Default select first row - use untracked to avoid re-running this effect when selection changes
+      const currentSelected = untracked(() => this.selectedMappingRow());
+      if (rows.length > 0 && !currentSelected) {
         this.selectMappingRow(rows[0]);
       }
     });
@@ -241,6 +243,54 @@ export class UploadService {
 
   selectMappingRow(row: any) {
     this.selectedMappingRow.set(row);
+  }
+
+  addTransformationStep() {
+    const selected = this.selectedMappingRow();
+    if (!selected) return;
+
+    let updatedSelectedRow = null;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selected.id) {
+          updatedSelectedRow = {
+            ...row,
+            steps: [...(row.steps || []), { id: Date.now() }]
+          };
+          return updatedSelectedRow;
+        }
+        return row;
+      });
+    });
+
+    if (updatedSelectedRow) {
+      this.selectedMappingRow.set(updatedSelectedRow);
+    }
+  }
+
+  removeTransformationStep(stepIndex: number) {
+    const selected = this.selectedMappingRow();
+    if (!selected) return;
+
+    let updatedSelectedRow = null;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selected.id) {
+          updatedSelectedRow = {
+            ...row,
+            steps: row.steps.filter((_: any, i: number) => i !== stepIndex)
+          };
+          return updatedSelectedRow;
+        }
+        return row;
+      });
+    });
+
+    if (updatedSelectedRow) {
+      this.selectedMappingRow.set(updatedSelectedRow);
+    }
   }
 
   // Helper to get target element details
