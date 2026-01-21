@@ -258,10 +258,48 @@
                                             </div>
                                         </ng-template>
                                         <ng-template pTemplate="panel">
-                                            <div class="h-full w-full p-4 border-t border-[#3c3c3c] overflow-auto">
-                                                <h3 class="text-[#cccccc] text-lg font-medium mb-4">Mapping Details</h3>
-                                                <p class="text-[#808080] text-sm">Details for the selected mapping will
-                                                    appear here</p>
+                                            <div class="h-full w-full bg-[#1e1e1e] flex flex-col overflow-hidden">
+                                                <!-- Step Configuration Header -->
+                                                <div
+                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center gap-2 bg-[#252526]">
+                                                    <i class="pi pi-cog text-[#cccccc] text-sm"></i>
+                                                    <h3 class="text-[#cccccc] text-sm font-medium">Step Configuration
+                                                    </h3>
+                                                </div>
+
+                                                <!-- Step Configuration Content -->
+                                                <div class="flex-1 overflow-auto">
+                                                    <!-- Initial State: No Target Selected -->
+                                                    <div *ngIf="!uploadService.selectedMappingRow()?.targetElement"
+                                                        class="h-full flex flex-col items-center justify-center p-8">
+                                                        <div class="w-16 h-16 bg-[#ff5f33] rounded-full mb-6"></div>
+                                                        <h4 class="text-[#cccccc] text-lg font-medium mb-2">Target
+                                                            Required</h4>
+                                                        <p
+                                                            class="text-[#808080] text-sm text-center max-w-xs leading-relaxed">
+                                                            Select a target data element first to configure
+                                                            transformation steps
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- Secondary State: Target Selected but No Step Selected -->
+                                                    <div *ngIf="uploadService.selectedMappingRow()?.targetElement && !uploadService.selectedMappingRow()?.selectedStepId"
+                                                        class="h-full flex flex-col items-center justify-center p-8 opacity-40">
+                                                        <i class="pi pi-mouse text-[#808080] text-4xl mb-4"></i>
+                                                        <h4 class="text-[#cccccc] text-sm font-medium mb-1">No step
+                                                            selected</h4>
+                                                        <p class="text-[#808080] text-xs">Select a transformation step
+                                                            to configure its rules</p>
+                                                    </div>
+
+                                                    <!-- Active Step Configuration Placeholder -->
+                                                    <div *ngIf="uploadService.selectedMappingRow()?.selectedStepId"
+                                                        class="p-4">
+                                                        <p class="text-[#808080] text-sm">Configuration for step
+                                                            {{uploadService.selectedMappingRow().selectedStepId}}
+                                                            appearing here...</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </ng-template>
                                     </p-splitter>
