@@ -222,7 +222,9 @@
                                                         <div *ngIf="uploadService.selectedMappingRow()?.steps?.length > 0"
                                                             class="flex-1 overflow-auto p-4 flex flex-col gap-3">
                                                             <div *ngFor="let step of uploadService.selectedMappingRow().steps; let i = index"
-                                                                class="transformation-step-box group">
+                                                                class="transformation-step-box group"
+                                                                [class.active]="uploadService.selectedMappingRow().selectedStepId === step.id"
+                                                                (click)="uploadService.selectTransformationStep(step.id)">
                                                                 <div class="flex items-center gap-4 flex-1">
                                                                     <div class="step-number-circle">
                                                                         {{i + 1}}

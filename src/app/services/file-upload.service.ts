@@ -223,7 +223,8 @@ export class UploadService {
               sourceElement: element['Id'] || element['Variable Name'] || element['name'] || 'Unknown',
               targetElement: null,
               status: 'attention',
-              steps: []
+              steps: [],
+              selectedStepId: null
             });
           });
         }
@@ -245,18 +246,36 @@ export class UploadService {
     this.selectedMappingRow.set(row);
   }
 
+  selectTransformationStep(stepId: number | null) {
+    const selected = this.selectedMappingRow();
+    if (!selected) return;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selected.id) {
+          const updatedRow = { ...row, selectedStepId: stepId };
+          this.selectedMappingRow.set(updatedRow);
+          return updatedRow;
+        }
+        return row;
+      });
+    });
+  }
+
   addTransformationStep() {
     const selected = this.selectedMappingRow();
     if (!selected) return;
 
     let updatedSelectedRow = null;
+    const newStepId = Date.now();
 
     this.mappingRows.update(rows => {
       return rows.map(row => {
         if (row.id === selected.id) {
           updatedSelectedRow = {
             ...row,
-            steps: [...(row.steps || []), { id: Date.now() }]
+            steps: [...(row.steps || []), { id: newStepId }],
+            selectedStepId: newStepId
           };
           return updatedSelectedRow;
         }
@@ -278,9 +297,13 @@ export class UploadService {
     this.mappingRows.update(rows => {
       return rows.map(row => {
         if (row.id === selected.id) {
+          const steps = row.steps.filter((_: any, i: number) => i !== stepIndex);
+          const wasSelected = row.selectedStepId === row.steps[stepIndex]?.id;
+
           updatedSelectedRow = {
             ...row,
-            steps: row.steps.filter((_: any, i: number) => i !== stepIndex)
+            steps: steps,
+            selectedStepId: wasSelected ? (steps.length > 0 ? steps[steps.length - 1].id : null) : row.selectedStepId
           };
           return updatedSelectedRow;
         }
