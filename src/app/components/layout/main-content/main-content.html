@@ -292,12 +292,68 @@
                                                             to configure its rules</p>
                                                     </div>
 
-                                                    <!-- Active Step Configuration Placeholder -->
+                                                    <!-- Active Step Configuration -->
                                                     <div *ngIf="uploadService.selectedMappingRow()?.selectedStepId"
-                                                        class="p-4">
-                                                        <p class="text-[#808080] text-sm">Configuration for step
-                                                            {{uploadService.selectedMappingRow().selectedStepId}}
-                                                            appearing here...</p>
+                                                        class="p-6 flex flex-col gap-6">
+                                                        <div class="flex flex-col gap-1">
+                                                            <h4 class="text-[#cccccc] text-base font-semibold">Configure
+                                                                Step
+                                                                {{getStepIndex(uploadService.selectedMappingRow(),
+                                                                uploadService.selectedMappingRow().selectedStepId) + 1}}
+                                                            </h4>
+                                                        </div>
+
+                                                        <div class="flex flex-col gap-2">
+                                                            <label
+                                                                class="text-[#cccccc] text-sm font-medium">Primitive</label>
+                                                            <p-select [options]="transformationOptions"
+                                                                [ngModel]="currentStep()?.transformation"
+                                                                (onChange)="updateTransformation($event.value)"
+                                                                placeholder="Select transformation..."
+                                                                [style]="{'width': '100%'}" [appendTo]="'body'"
+                                                                class="custom-table-select step-config-select">
+                                                            </p-select>
+                                                        </div>
+
+                                                        <!-- Parameters Section (Conditional based on selection) -->
+                                                        <div *ngIf="currentStep()?.transformation === 'Truncate'"
+                                                            class="flex flex-col gap-6 animate-fade-in">
+                                                            <div class="flex flex-col gap-4">
+                                                                <h5
+                                                                    class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
+                                                                    Parameters</h5>
+                                                                <div class="flex flex-col gap-2">
+                                                                    <label
+                                                                        class="text-[#cccccc] text-sm font-medium">Max
+                                                                        length</label>
+                                                                    <input type="number"
+                                                                        [ngModel]="currentStep()?.params?.max_length"
+                                                                        (ngModelChange)="updateParam('max_length', $event)"
+                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors"
+                                                                        placeholder="">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex flex-col gap-4">
+                                                                <h5
+                                                                    class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
+                                                                    Example</h5>
+                                                                <div
+                                                                    class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto">
+                                                                    <span class="text-[#4ec9b0]">Truncate</span><span
+                                                                        class="text-[#cccccc]">(</span><span
+                                                                        class="text-[#ce9178]">"94305-2005"</span><span
+                                                                        class="text-[#cccccc]">) &rarr; </span>
+                                                                    <span class="text-[#ce9178]">"{{'94305-2005' |
+                                                                        slice:0:(currentStep()?.params?.max_length ||
+                                                                        0)}}"</span>
+                                                                    <span class="text-[#808080] ml-2">params:
+                                                                        &#123;length:
+                                                                        {{currentStep()?.params?.max_length ||
+                                                                        0}}&#125;</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -307,6 +363,7 @@
                             </ng-template>
                         </p-splitter>
                     </div>
+
 
                     <!-- Tab Content - Dictionary -->
                     <data-dictionary-viewer *ngIf="file.type === 'dictionary'" heading=" "
@@ -395,6 +452,12 @@
                     <h3 class="text-[#cccccc] font-medium mb-4">Choose your starting point:</h3>
 
                     <div class="flex flex-col gap-4">
+
+                        <!-- Debug Option -->
+                        <button (click)="uploadService.loadTestData()"
+                            class="bg-[#2d2d30] border border-[#ff5f33] text-[#ff5f33] rounded-lg p-2 mb-4 hover:bg-[#3c3c3c]">
+                            Load Test Data (Debug)
+                        </button>
 
                         <!-- Source Dataset Option -->
                         <button (click)="uploadService.openFileDialog()"

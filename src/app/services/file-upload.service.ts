@@ -231,31 +231,33 @@ export class UploadService {
       });
       this.mappingRows.set(rows);
 
-      // Default select first row - use untracked to avoid re-running this effect when selection changes
-      const currentSelected = untracked(() => this.selectedMappingRow());
-      if (rows.length > 0 && !currentSelected) {
-        this.selectMappingRow(rows[0]);
+      // Default select first row
+      const currentSelectedId = untracked(() => this.selectedRowId());
+      if (rows.length > 0 && !currentSelectedId) {
+        this.selectedRowId.set(rows[0].id);
       }
     });
   }
 
   // Selected mapping for the rules engine
-  selectedMappingRow = signal<any | null>(null);
+  selectedRowId = signal<number | null>(null);
+
+  selectedMappingRow = computed(() => {
+    const id = this.selectedRowId();
+    if (id === null) return null;
+    return this.mappingRows().find(r => r.id === id) || null;
+  });
 
   selectMappingRow(row: any) {
-    this.selectedMappingRow.set(row);
+    this.selectedRowId.set(row ? row.id : null);
   }
 
   selectTransformationStep(stepId: number | null) {
-    const selected = this.selectedMappingRow();
-    if (!selected) return;
-
     this.mappingRows.update(rows => {
+      const selectedId = this.selectedRowId();
       return rows.map(row => {
-        if (row.id === selected.id) {
-          const updatedRow = { ...row, selectedStepId: stepId };
-          this.selectedMappingRow.set(updatedRow);
-          return updatedRow;
+        if (row.id === selectedId) {
+          return { ...row, selectedStepId: stepId };
         }
         return row;
       });
@@ -263,29 +265,70 @@ export class UploadService {
   }
 
   addTransformationStep() {
-    const selected = this.selectedMappingRow();
-    if (!selected) return;
+    const selectedId = this.selectedRowId();
+    if (selectedId === null) return;
 
-    let updatedSelectedRow = null;
     const newStepId = Date.now();
 
     this.mappingRows.update(rows => {
       return rows.map(row => {
-        if (row.id === selected.id) {
-          updatedSelectedRow = {
+        if (row.id === selectedId) {
+          return {
             ...row,
-            steps: [...(row.steps || []), { id: newStepId }],
+            steps: [...(row.steps || []), { id: newStepId, params: {} }],
             selectedStepId: newStepId
           };
-          return updatedSelectedRow;
         }
         return row;
       });
     });
+  }
 
-    if (updatedSelectedRow) {
-      this.selectedMappingRow.set(updatedSelectedRow);
-    }
+  updateTransformation(transformation: string) {
+    const selectedId = this.selectedRowId();
+    const row = this.selectedMappingRow();
+    const stepId = row?.selectedStepId;
+    if (selectedId === null || !stepId) return;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selectedId) {
+          const updatedSteps = row.steps.map((step: any) => {
+            if (step.id === stepId) {
+              return { ...step, transformation, params: {} };
+            }
+            return step;
+          });
+          return { ...row, steps: updatedSteps };
+        }
+        return row;
+      });
+    });
+  }
+
+  updateParam(key: string, value: any) {
+    const selectedId = this.selectedRowId();
+    const row = this.selectedMappingRow();
+    const stepId = row?.selectedStepId;
+    if (selectedId === null || !stepId) return;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selectedId) {
+          const updatedSteps = row.steps.map((step: any) => {
+            if (step.id === stepId) {
+              return {
+                ...step,
+                params: { ...(step.params || {}), [key]: value }
+              };
+            }
+            return step;
+          });
+          return { ...row, steps: updatedSteps };
+        }
+        return row;
+      });
+    });
   }
 
   removeTransformationStep(stepIndex: number) {
@@ -312,7 +355,7 @@ export class UploadService {
     });
 
     if (updatedSelectedRow) {
-      this.selectedMappingRow.set(updatedSelectedRow);
+      // Propagation is automatic via computed selectedMappingRow
     }
   }
 
@@ -337,9 +380,8 @@ export class UploadService {
         status: value ? 'complete' : 'attention'
       };
 
-      // Also update selected row if it's the one being edited
-      if (this.selectedMappingRow()?.id === newRows[rowIndex].id) {
-        this.selectedMappingRow.set(newRows[rowIndex]);
+      if (this.selectedRowId() === newRows[rowIndex].id) {
+        // Internal re-propagation isn't needed with computed selectedMappingRow
       }
 
       return newRows;

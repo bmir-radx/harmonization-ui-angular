@@ -1,8 +1,7 @@
-import { Component, ViewChild, ElementRef, effect, inject } from '@angular/core';
+import { Component, ViewChild, ElementRef, effect, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Dialog } from 'primeng/dialog';
-import { TabsModule } from 'primeng/tabs';
-import { SplitterModule } from 'primeng/splitter';
+
 import { Button } from '../../ui/button.component';
 import { ThemeService } from '../../../services/theme.service';
 import { UploadService } from '../../../services/file-upload.service';
@@ -11,10 +10,21 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
+import { TabsModule } from 'primeng/tabs';
+import { SplitterModule } from 'primeng/splitter';
 
 @Component({
   selector: 'app-main-content',
-  imports: [CommonModule, Dialog, TabsModule, SplitterModule, Button, TableModule, SelectModule, FormsModule],
+  imports: [
+    CommonModule,
+    Dialog,
+    TabsModule,
+    SplitterModule,
+    Button,
+    TableModule,
+    SelectModule,
+    FormsModule
+  ],
   templateUrl: './main-content.html',
   styleUrl: './main-content.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -62,5 +72,36 @@ export class MainContent {
 
   getHeaders(data: string[]) {
     return Object.keys(data[0]);
+  }
+
+  transformationOptions = [
+    'Convert Units',
+    'Truncate',
+    'Cast',
+    'Enum To Enum',
+    'Bin',
+    'Reduce',
+    'Convert Date',
+    'Round',
+    'Threshold'
+  ];
+
+  getStepIndex(row: any, stepId: number): number {
+    if (!row || !row.steps) return -1;
+    return row.steps.findIndex((s: any) => s.id === stepId);
+  }
+
+  currentStep = computed(() => {
+    const selected = this.uploadService.selectedMappingRow();
+    if (!selected || !selected.selectedStepId) return null;
+    return selected.steps.find((s: any) => s.id === selected.selectedStepId);
+  });
+
+  updateTransformation(transformation: string) {
+    this.uploadService.updateTransformation(transformation);
+  }
+
+  updateParam(key: string, value: any) {
+    this.uploadService.updateParam(key, value);
   }
 }
