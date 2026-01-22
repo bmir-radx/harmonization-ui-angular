@@ -315,42 +315,66 @@
                                                             </p-select>
                                                         </div>
 
-                                                        <!-- Parameters Section (Conditional based on selection) -->
-                                                        <div *ngIf="currentStep()?.transformation === 'Truncate'"
-                                                            class="flex flex-col gap-6 animate-fade-in">
+                                                        <!-- Parameters Section (Generic) -->
+                                                        <div *ngIf="activeConfig"
+                                                            class="flex flex-col gap-6 animate-fade-in mt-6">
+                                                            <!-- Parameters -->
                                                             <div class="flex flex-col gap-4">
                                                                 <h5
                                                                     class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
                                                                     Parameters</h5>
-                                                                <div class="flex flex-col gap-2">
+
+                                                                <div *ngIf="activeConfig.params.length === 0"
+                                                                    class="text-[#808080] text-sm italic">
+                                                                    No parameters required.
+                                                                </div>
+
+                                                                <div *ngFor="let param of activeConfig.params"
+                                                                    class="flex flex-col gap-2">
                                                                     <label
-                                                                        class="text-[#cccccc] text-sm font-medium">Max
-                                                                        length</label>
-                                                                    <input type="number"
-                                                                        [ngModel]="currentStep()?.params?.max_length"
-                                                                        (ngModelChange)="updateParam('max_length', $event)"
+                                                                        class="text-[#cccccc] text-sm font-medium">{{param.label}}</label>
+
+                                                                    <!-- Text/Number Input -->
+                                                                    <input
+                                                                        *ngIf="param.type === 'text' || param.type === 'number'"
+                                                                        [type]="param.type"
+                                                                        [ngModel]="currentStep()?.params?.[param.key]"
+                                                                        (ngModelChange)="updateParam(param.key, $event)"
                                                                         class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors"
-                                                                        placeholder="">
+                                                                        [placeholder]="param.placeholder || ''">
+
+                                                                    <!-- Select Input -->
+                                                                    <p-select *ngIf="param.type === 'select'"
+                                                                        [options]="param.options"
+                                                                        [ngModel]="currentStep()?.params?.[param.key]"
+                                                                        (onChange)="updateParam(param.key, $event.value)"
+                                                                        [placeholder]="param.placeholder || 'Select...'"
+                                                                        [style]="{'width': '100%'}" [appendTo]="'body'"
+                                                                        class="custom-table-select step-config-select">
+                                                                    </p-select>
                                                                 </div>
                                                             </div>
 
+                                                            <!-- Example -->
                                                             <div class="flex flex-col gap-4">
                                                                 <h5
                                                                     class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
                                                                     Example</h5>
                                                                 <div
                                                                     class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto">
-                                                                    <span class="text-[#4ec9b0]">Truncate</span><span
-                                                                        class="text-[#cccccc]">(</span><span
-                                                                        class="text-[#ce9178]">"94305-2005"</span><span
-                                                                        class="text-[#cccccc]">) &rarr; </span>
-                                                                    <span class="text-[#ce9178]">"{{'94305-2005' |
-                                                                        slice:0:(currentStep()?.params?.max_length ||
-                                                                        0)}}"</span>
-                                                                    <span class="text-[#808080] ml-2">params:
-                                                                        &#123;length:
-                                                                        {{currentStep()?.params?.max_length ||
-                                                                        0}}&#125;</span>
+                                                                    <ng-container
+                                                                        *ngIf="activeConfig.example(currentStep()?.params) as ex">
+                                                                        <span
+                                                                            class="text-[#4ec9b0]">{{activeConfig.name.replace('
+                                                                            ', '')}}</span><span
+                                                                            class="text-[#cccccc]">(</span><span
+                                                                            class="text-[#ce9178]">{{ex.input}}</span><span
+                                                                            class="text-[#cccccc]">) &rarr; </span>
+                                                                        <span
+                                                                            class="text-[#ce9178]">{{ex.output}}</span>
+                                                                        <span
+                                                                            class="text-[#808080] ml-2">{{ex.context}}</span>
+                                                                    </ng-container>
                                                                 </div>
                                                             </div>
                                                         </div>
