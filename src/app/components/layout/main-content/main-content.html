@@ -231,8 +231,8 @@
                                                                     </div>
                                                                     <div class="flex flex-col">
                                                                         <span
-                                                                            class="text-[#cccccc] text-sm font-bold">Step
-                                                                            {{i + 1}}</span>
+                                                                            class="text-[#cccccc] text-sm font-bold">{{step.transformation
+                                                                            || 'Step ' + (i + 1)}}</span>
                                                                         <span class="text-[#808080] text-xs">Click to
                                                                             configure</span>
                                                                     </div>
@@ -294,7 +294,7 @@
 
                                                     <!-- Active Step Configuration -->
                                                     <div *ngIf="uploadService.selectedMappingRow()?.selectedStepId"
-                                                        class="p-6 flex flex-col gap-6">
+                                                        class="px-4 py-4 flex flex-col gap-4">
                                                         <div class="flex flex-col gap-1">
                                                             <h4 class="text-[#cccccc] text-base font-semibold">Configure
                                                                 Step
@@ -317,7 +317,7 @@
 
                                                         <!-- Parameters Section (Generic) -->
                                                         <div *ngIf="activeConfig"
-                                                            class="flex flex-col gap-6 animate-fade-in mt-6">
+                                                            class="flex flex-col gap-4 animate-fade-in mt-4">
                                                             <!-- Parameters -->
                                                             <div class="flex flex-col gap-4">
                                                                 <h5
@@ -361,19 +361,14 @@
                                                                     class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
                                                                     Example</h5>
                                                                 <div
-                                                                    class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto">
+                                                                    class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
                                                                     <ng-container
                                                                         *ngIf="activeConfig.example(currentStep()?.params) as ex">
-                                                                        <span
-                                                                            class="text-[#4ec9b0]">{{activeConfig.name.replace('
-                                                                            ', '')}}</span><span
-                                                                            class="text-[#cccccc]">(</span><span
-                                                                            class="text-[#ce9178]">{{ex.input}}</span><span
-                                                                            class="text-[#cccccc]">) &rarr; </span>
-                                                                        <span
-                                                                            class="text-[#ce9178]">{{ex.output}}</span>
-                                                                        <span
-                                                                            class="text-[#808080] ml-2">{{ex.context}}</span>
+                                                                        <span>{{activeConfig.name.replace(' ',
+                                                                            '')}}</span><span>(</span><span>{{ex.input}}</span><span>)
+                                                                            &rarr; </span>
+                                                                        <span>{{ex.output}}</span>
+                                                                        <span class="ml-2">{{ex.context}}</span>
                                                                     </ng-container>
                                                                 </div>
                                                             </div>

@@ -80,37 +80,37 @@ export class MainContent {
         { key: 'source', label: 'Source unit', type: 'text', placeholder: 'meters' },
         { key: 'target', label: 'Target unit', type: 'text', placeholder: 'kilometers' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `1000`,
         output: `1`,
-        context: `params: {source: ${params?.source || 'meters'}, target: ${params?.target || 'kilometers'}}`
+        context: `params: {source: 'meters', target: 'kilometers'}`
       })
     },
     'Truncate': {
       params: [
         { key: 'max_length', label: 'Max length', type: 'number', placeholder: '10' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `"94305-2005"`,
-        output: `"{{'94305-2005' | slice:0:${params?.max_length || 0}}}"`,
-        context: `params: {length: ${params?.max_length || 0}}`
+        output: `"94305"`,
+        context: `params: {length: 5}`
       })
     },
     'Cast': {
       params: [
         { key: 'type', label: 'Target Type', type: 'select', options: ['String', 'Integer', 'Float', 'Boolean', 'Date'] }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `"123"`,
         output: `123`,
-        context: `as ${params?.type || 'Type'}`
+        context: `as Integer`
       })
     },
     'Enum To Enum': {
       params: [
         { key: 'mapping', label: 'Mapping JSON', type: 'text', placeholder: '{"A": "B"}' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `"A"`,
         output: `"B"`,
         context: ` using mapping`
@@ -120,50 +120,50 @@ export class MainContent {
       params: [
         { key: 'bin_size', label: 'Bin Size', type: 'number', placeholder: '10' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `25`,
         output: `20`,
-        context: `bin size: ${params?.bin_size || 10}`
+        context: `bin size: 10`
       })
     },
     'Reduce': {
       params: [
         { key: 'strategy', label: 'Strategy', type: 'select', options: ['Mean', 'Sum', 'Min', 'Max'] }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `[1,2,3]`,
         output: `2`,
-        context: `using ${params?.strategy || 'Mean'}`
+        context: `using Mean`
       })
     },
     'Convert Date': {
       params: [
         { key: 'format', label: 'Output Format', type: 'text', placeholder: 'YYYY-MM-DD' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `"01/01/2020"`,
         output: `"2020-01-01"`,
-        context: `format: ${params?.format || 'YYYY-MM-DD'}`
+        context: `format: YYYY-MM-DD`
       })
     },
     'Round': {
       params: [
         { key: 'decimals', label: 'Decimals', type: 'number', placeholder: '2' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `10.567`,
         output: `10.57`,
-        context: `decimals: ${params?.decimals || 2}`
+        context: `decimals: 2`
       })
     },
     'Threshold': {
       params: [
         { key: 'value', label: 'Threshold', type: 'number', placeholder: '50' }
       ],
-      example: (params: any) => ({
+      example: () => ({
         input: `42`,
         output: `false`,
-        context: `threshold: ${params?.value || 50}`
+        context: `threshold: 50`
       })
     }
   };
