@@ -1,5 +1,6 @@
-import { Injectable, signal, computed, effect, untracked } from '@angular/core';
+import { Injectable, signal, computed, effect, untracked, inject } from '@angular/core';
 import Papa from 'papaparse';
+import { HarmonizationApiService } from './harmonization-api.service';
 
 export interface UploadedFile {
   name: string;
@@ -37,6 +38,61 @@ export class UploadService {
 
   resetFileDialog() {
     this.triggerFileDialog.set(false);
+  }
+
+  private harmonizationApi = inject(HarmonizationApiService);
+
+  async runHarmonization() {
+    console.log('Starting harmonization...');
+
+    // TODO: In a real app, these paths would come from user input or file upload response
+    const params = {
+      data_file_path: '/tmp/source_data.csv',
+      rules_file_path: '/tmp/rules.json',
+      replay_log_file_path: '/tmp/replay.log',
+      output_file_path: '/tmp/output.csv',
+      mode: 'all' as const,
+      overwrite: true
+    };
+
+    this.harmonizationApi.harmonize(params).subscribe({
+      next: (response) => {
+        console.log('Harmonization response:', response);
+        if (response.job_id) {
+          this.pollJob(response.job_id);
+        }
+      },
+      error: (err) => console.error('Harmonization error:', err)
+    });
+  }
+
+  pollJob(jobId: string) {
+    const interval = setInterval(() => {
+      this.harmonizationApi.getJob(jobId).subscribe({
+        next: (res) => {
+          console.log('Job status:', res);
+          // Check for terminal status (success or error)
+          // The API returns status: 'success' in the envelope,
+          // but the result object inside might have its own status.
+          // Adjusting based on standard patterns, assume result.status is the job status
+          const jobStatus = res.result?.status || res.status;
+
+          if (jobStatus === 'completed' || jobStatus === 'failed' || jobStatus === 'error' || res.status === 'success') {
+            // For now stopping on 'success' envelope or explicit completion
+            // Refine this based on actual API response structure for jobs
+            if (res.result?.status === 'completed' || res.result?.status === 'failed') {
+              clearInterval(interval);
+            }
+            // If the RPC call itself succeeded and we have a result, we might be done depending on how get_job works.
+            // Usually get_job returns current status.
+          }
+        },
+        error: (err) => {
+          console.error('Polling error:', err);
+          clearInterval(interval);
+        }
+      });
+    }, 1000);
   }
 
   selectFolder(name: string) {

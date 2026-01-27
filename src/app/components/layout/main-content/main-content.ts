@@ -92,8 +92,8 @@ export class MainContent {
       ],
       example: () => ({
         input: `"94305-2005"`,
-        output: `"94305"`,
-        context: `params: {length: 5}`
+        output: `"943"`,
+        context: `params: {length: 3}`
       })
     },
     'Cast': {
