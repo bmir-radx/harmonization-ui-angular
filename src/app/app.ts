@@ -42,7 +42,6 @@ export class App implements OnInit {
       description: 'Auto-created for testing'
     });
 
-    // Auto-load test data for testing purposes
-    this.uploadService.loadTestData();
+
   }
 }
