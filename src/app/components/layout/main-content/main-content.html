@@ -119,10 +119,10 @@
                                                     class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#252526]">
                                                     <h3 class="text-[#cccccc] text-sm font-medium">Harmonization Rules
                                                     </h3>
-                                                    <button
+                                                    <button (click)="uploadService.saveCurrentRule()"
                                                         [disabled]="!uploadService.selectedMappingRow()?.targetElement"
-                                                        class="bg-[#3c3c3c] text-[#808080] px-3 py-1.5 rounded flex items-center gap-2 text-xs font-medium border border-[#4c4c4c] disabled:opacity-50 enabled:text-[#cccccc] enabled:hover:bg-[#4c4c4c]">
-                                                        <i class="pi pi-save" style="font-size: 10px;"></i>
+                                                        class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-3 py-1.5 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm">
+                                                        <i class="pi pi-check" style="font-size: 10px;"></i>
                                                         Save Rule
                                                     </button>
                                                 </div>

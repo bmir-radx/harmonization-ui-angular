@@ -433,14 +433,44 @@ export class UploadService {
       newRows[rowIndex] = {
         ...newRows[rowIndex],
         targetElement: value,
-        status: value ? 'complete' : 'attention'
+        // Status remains 'attention' until manually saved
+        status: newRows[rowIndex].status === 'complete' ? 'complete' : 'attention'
       };
-
-      if (this.selectedRowId() === newRows[rowIndex].id) {
-        // Internal re-propagation isn't needed with computed selectedMappingRow
-      }
-
       return newRows;
+    });
+  }
+
+  saveCurrentRule() {
+    const selectedId = this.selectedRowId();
+    if (selectedId === null) return;
+
+    this.mappingRows.update(rows => {
+      return rows.map(row => {
+        if (row.id === selectedId) {
+          // Validate if target is selected
+          if (!row.targetElement) return row;
+
+          // Construct and log the harmonization rule
+          const operations = (row.steps || []).map((step: any) => ({
+            operation: step.transformation,
+            ...step.params
+          }));
+
+          const rule = {
+            source: row.sourceElement,
+            target: row.targetElement,
+            operations: operations
+          };
+
+          console.log('Constructed Harmonization Rule:', rule);
+
+          return {
+            ...row,
+            status: 'complete'
+          };
+        }
+        return row;
+      });
     });
   }
 
