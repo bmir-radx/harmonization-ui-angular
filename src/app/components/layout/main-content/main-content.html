@@ -310,6 +310,7 @@
                                                             <p-select [options]="transformationOptions"
                                                                 [ngModel]="currentStep()?.transformation"
                                                                 (onChange)="updateTransformation($event.value)"
+                                                                optionLabel="label" optionValue="value"
                                                                 placeholder="Select transformation..."
                                                                 [style]="{'width': '100%'}" [appendTo]="'body'"
                                                                 class="custom-table-select step-config-select">
@@ -353,6 +354,24 @@
                                                                         [style]="{'width': '100%'}" [appendTo]="'body'"
                                                                         class="custom-table-select step-config-select">
                                                                     </p-select>
+
+                                                                    <!-- Textarea Input -->
+                                                                    <textarea *ngIf="param.type === 'textarea'"
+                                                                        [ngModel]="currentStep()?.params?.[param.key]"
+                                                                        (ngModelChange)="updateParam(param.key, $event)"
+                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors min-h-[80px]"
+                                                                        [placeholder]="param.placeholder || ''"></textarea>
+
+                                                                    <!-- Boolean Input (Checkbox) -->
+                                                                    <div *ngIf="param.type === 'boolean'"
+                                                                        class="flex items-center gap-2">
+                                                                        <input type="checkbox"
+                                                                            [ngModel]="currentStep()?.params?.[param.key]"
+                                                                            (ngModelChange)="updateParam(param.key, $event)"
+                                                                            class="w-4 h-4 rounded border-[#3c3c3c] bg-[#2d2d2d] text-[#007fd4] focus:ring-[#007fd4] focus:ring-offset-[#1e1e1e]">
+                                                                        <span
+                                                                            class="text-[#808080] text-sm">{{param.label}}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
 

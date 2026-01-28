@@ -75,101 +75,173 @@ export class MainContent {
   }
 
   primitiveConfigs: Record<string, any> = {
-    'Convert Units': {
+    'bin': {
+      label: 'Bin',
       params: [
-        { key: 'source', label: 'Source unit', type: 'text', placeholder: 'meters' },
-        { key: 'target', label: 'Target unit', type: 'text', placeholder: 'kilometers' }
+        { key: 'bins', label: 'Bins (JSON)', type: 'textarea', placeholder: '[{"label": 1, "start": 0, "end": 10}]' }
       ],
       example: () => ({
-        input: `1000`,
+        input: `5`,
         output: `1`,
-        context: `params: {source: 'meters', target: 'kilometers'}`
+        context: `bins: [{label: 1, start: 0, end: 10}]`
       })
     },
-    'Truncate': {
+    'cast': {
+      label: 'Cast',
       params: [
-        { key: 'max_length', label: 'Max length', type: 'number', placeholder: '10' }
-      ],
-      example: () => ({
-        input: `"94305-2005"`,
-        output: `"943"`,
-        context: `params: {length: 3}`
-      })
-    },
-    'Cast': {
-      params: [
-        { key: 'type', label: 'Target Type', type: 'select', options: ['String', 'Integer', 'Float', 'Boolean', 'Date'] }
+        { key: 'target', label: 'Target Type', type: 'select', options: ['integer', 'string', 'decimal', 'boolean', 'float'] }
       ],
       example: () => ({
         input: `"123"`,
         output: `123`,
-        context: `as Integer`
+        context: `target: 'integer'`
       })
     },
-    'Enum To Enum': {
+    'convert_date': {
+      label: 'Convert Date',
       params: [
-        { key: 'mapping', label: 'Mapping JSON', type: 'text', placeholder: '{"A": "B"}' }
+        { key: 'source_format', label: 'Source Format', type: 'text', placeholder: '%Y-%m-%d' },
+        { key: 'target_format', label: 'Target Format', type: 'text', placeholder: '%m/%d/%Y' }
+      ],
+      example: () => ({
+        input: `"2020-01-01"`,
+        output: `"01/01/2020"`,
+        context: `format: %Y-%m-%d -> %m/%d/%Y`
+      })
+    },
+    'convert_units': {
+      label: 'Convert Units',
+      params: [
+        { key: 'source_unit', label: 'Source Unit', type: 'text', placeholder: 'meters' },
+        { key: 'target_unit', label: 'Target Unit', type: 'text', placeholder: 'feet' }
+      ],
+      example: () => ({
+        input: `1`,
+        output: `3.28084`,
+        context: `meters -> feet`
+      })
+    },
+    'enum_to_enum': {
+      label: 'Enum To Enum',
+      params: [
+        { key: 'mapping', label: 'Mapping (JSON)', type: 'textarea', placeholder: '{"A": "B", "1": "2"}' },
+        { key: 'default', label: 'Default Value', type: 'text', placeholder: 'Optional' },
+        { key: 'strict', label: 'Strict', type: 'boolean' }
       ],
       example: () => ({
         input: `"A"`,
         output: `"B"`,
-        context: ` using mapping`
+        context: `mapping: {"A": "B"}`
       })
     },
-    'Bin': {
+    'format_number': {
+      label: 'Format Number',
       params: [
-        { key: 'bin_size', label: 'Bin Size', type: 'number', placeholder: '10' }
+        { key: 'precision', label: 'Precision', type: 'number', placeholder: '2' }
       ],
       example: () => ({
-        input: `25`,
-        output: `20`,
-        context: `bin size: 10`
+        input: `10.567`,
+        output: `"10.57"`,
+        context: `precision: 2`
       })
     },
-    'Reduce': {
+    'normalize_text': {
+      label: 'Normalize Text',
       params: [
-        { key: 'strategy', label: 'Strategy', type: 'select', options: ['Mean', 'Sum', 'Min', 'Max'] }
+        { key: 'normalization', label: 'Normalization', type: 'select', options: ['strip', 'lower', 'upper', 'remove_accents', 'remove_punctuation', 'remove_special_characters'] }
+      ],
+      example: () => ({
+        input: `" Hello "`,
+        output: `"hello"`,
+        context: `strip, lower`
+      })
+    },
+    'offset': {
+      label: 'Offset',
+      params: [
+        { key: 'offset', label: 'Offset Value', type: 'number', placeholder: '5' }
+      ],
+      example: () => ({
+        input: `10`,
+        output: `15`,
+        context: `offset: 5`
+      })
+    },
+    'reduce': {
+      label: 'Reduce',
+      params: [
+        { key: 'reduction', label: 'Reduction Strategy', type: 'select', options: ['mean', 'sum', 'min', 'max'] }
       ],
       example: () => ({
         input: `[1,2,3]`,
         output: `2`,
-        context: `using Mean`
+        context: `using mean`
       })
     },
-    'Convert Date': {
+    'round': {
+      label: 'Round',
       params: [
-        { key: 'format', label: 'Output Format', type: 'text', placeholder: 'YYYY-MM-DD' }
+        { key: 'precision', label: 'Precision', type: 'number', placeholder: '0' }
       ],
       example: () => ({
-        input: `"01/01/2020"`,
-        output: `"2020-01-01"`,
-        context: `format: YYYY-MM-DD`
+        input: `10.5`,
+        output: `11`,
+        context: `precision: 0`
       })
     },
-    'Round': {
+    'scale': {
+      label: 'Scale',
       params: [
-        { key: 'decimals', label: 'Decimals', type: 'number', placeholder: '2' }
+        { key: 'scaling_factor', label: 'Scaling Factor', type: 'number', placeholder: '1.5' }
       ],
       example: () => ({
-        input: `10.567`,
-        output: `10.57`,
-        context: `decimals: 2`
+        input: `10`,
+        output: `15`,
+        context: `factor: 1.5`
       })
     },
-    'Threshold': {
+    'substitute': {
+      label: 'Substitute',
       params: [
-        { key: 'value', label: 'Threshold', type: 'number', placeholder: '50' }
+        { key: 'expression', label: 'Regex Expression', type: 'text', placeholder: 'pattern' },
+        { key: 'substitution', label: 'Replacement', type: 'text', placeholder: 'replacement' }
       ],
       example: () => ({
-        input: `42`,
-        output: `false`,
-        context: `threshold: 50`
+        input: `"Hello World"`,
+        output: `"Hi World"`,
+        context: `s/Hello/Hi/`
+      })
+    },
+    'threshold': {
+      label: 'Threshold',
+      params: [
+        { key: 'lower', label: 'Lower Bound', type: 'number', placeholder: '0' },
+        { key: 'upper', label: 'Upper Bound', type: 'number', placeholder: '100' }
+      ],
+      example: () => ({
+        input: `150`,
+        output: `100`,
+        context: `bounds: [0, 100]`
+      })
+    },
+    'truncate': {
+      label: 'Truncate',
+      params: [
+        { key: 'max_length', label: 'Max Length', type: 'number', placeholder: '10' }
+      ],
+      example: () => ({
+        input: `"Long string"`,
+        output: `"Long st..."`,
+        context: `max: 8`
       })
     }
   };
 
   get transformationOptions() {
-    return Object.keys(this.primitiveConfigs);
+    return Object.entries(this.primitiveConfigs).map(([key, config]) => ({
+      label: config.label,
+      value: key
+    }));
   }
 
   get activeConfig() {
