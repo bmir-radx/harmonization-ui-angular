@@ -1,6 +1,5 @@
 import { Component, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './services/theme.service';
 import { ProjectService } from './services/project.service';
 import { UploadService } from './services/file-upload.service';
@@ -14,7 +13,7 @@ import { RightSidebar } from './components/layout/right-sidebar/right-sidebar';
 @Component({
   selector: 'app-root',
   imports: [
-    RouterOutlet, CommonModule, SplitterModule, ProjectSelectionModal,
+    CommonModule, SplitterModule, ProjectSelectionModal,
     HeaderBar, MainContent, LeftSidebar, RightSidebar
   ],
   templateUrl: './app.html',

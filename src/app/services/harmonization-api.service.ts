@@ -34,9 +34,8 @@ export interface RpcResponse {
 })
 export class HarmonizationApiService {
     private http = inject(HttpClient);
-    // Assuming the backend is running on localhost:8000. 
-    // This should ideally be in environment config, but hardcoding for this task as requested.
-    private apiUrl = 'http://localhost:8000/api';
+    // Use relative path for proxy
+    private apiUrl = '/api';
 
     harmonize(params: HarmonizeParams): Observable<RpcResponse> {
         const request: RpcRequest = {
