@@ -45,6 +45,30 @@ export class UploadService {
   async runHarmonization() {
     console.log('Starting harmonization...');
 
+    // Construct and log rules
+    const rules: Record<string, Record<string, any>> = {};
+
+    this.mappingRows()
+      .filter(row => row.status === 'complete')
+      .forEach(row => {
+        const operations = (row.steps || []).map((step: any) => ({
+          operation: step.transformation,
+          ...step.params
+        }));
+
+        if (!rules[row.sourceElement]) {
+          rules[row.sourceElement] = {};
+        }
+
+        rules[row.sourceElement][row.targetElement] = {
+          source: row.sourceElement,
+          target: row.targetElement,
+          operations: operations
+        };
+      });
+
+    console.log('Constructed Harmonization Rules:', JSON.stringify(rules, null, 2));
+
     // TODO: In a real app, these paths would come from user input or file upload response
     const params = {
       data_file_path: '/tmp/source_data.csv',
