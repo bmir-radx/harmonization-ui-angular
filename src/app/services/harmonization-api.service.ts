@@ -19,7 +19,7 @@ export interface HarmonizeParams {
 
 export interface RpcRequest {
     method: string;
-    params: HarmonizeParams | { job_id: string };
+    params: HarmonizeParams | { job_id: string } | { path: string; content: string };
 }
 
 export interface RpcResponse {
@@ -49,6 +49,14 @@ export class HarmonizationApiService {
         const request: RpcRequest = {
             method: 'get_job',
             params: { job_id: jobId }
+        };
+        return this.http.post<RpcResponse>(this.apiUrl, request);
+    }
+
+    saveFile(path: string, content: string): Observable<RpcResponse> {
+        const request: RpcRequest = {
+            method: 'save_file',
+            params: { path, content }
         };
         return this.http.post<RpcResponse>(this.apiUrl, request);
     }

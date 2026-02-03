@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, effect, untracked, inject } from '@angular/core';
 import Papa from 'papaparse';
 import { HarmonizationApiService } from './harmonization-api.service';
+import { firstValueFrom } from 'rxjs';
 
 export interface UploadedFile {
   name: string;
@@ -8,6 +9,7 @@ export interface UploadedFile {
   data: any[];
   text: string;
   folder: string;
+  path?: string;
 }
 
 export interface TargetOption {
@@ -47,6 +49,7 @@ export class UploadService {
 
     // Construct and log rules
     const rules: Record<string, Record<string, any>> = {};
+    const pairs: { source: string; target: string }[] = [];
 
     this.mappingRows()
       .filter(row => row.status === 'complete')
@@ -65,29 +68,66 @@ export class UploadService {
           target: row.targetElement,
           operations: operations
         };
+
+        pairs.push({
+          source: row.sourceElement,
+          target: row.targetElement
+        });
       });
 
     console.log('Constructed Harmonization Rules:', JSON.stringify(rules, null, 2));
 
-    // TODO: In a real app, these paths would come from user input or file upload response
-    const params = {
-      data_file_path: '/tmp/source_data.csv',
-      rules_file_path: '/tmp/rules.json',
-      replay_log_file_path: '/tmp/replay.log',
-      output_file_path: '/tmp/output.csv',
-      mode: 'all' as const,
-      overwrite: true
-    };
+    // Find source data file
+    // Find source data file - Prefer the most recently added one
+    // We reverse a copy of the array to find the last uploaded file
+    const sourceFile = [...this.uploadedFiles()].reverse().find(f => f.type === 'data');
+    if (!sourceFile) {
+      console.error('No source data file found.');
+      return;
+    }
 
-    this.harmonizationApi.harmonize(params).subscribe({
-      next: (response) => {
-        console.log('Harmonization response:', response);
-        if (response.job_id) {
-          this.pollJob(response.job_id);
-        }
-      },
-      error: (err) => console.error('Harmonization error:', err)
-    });
+    // Use the file path if available (Electron), otherwise default to local development temp path
+    const basePath = '/Users/mete/HARMONIZATION/harmonization-ui-angular/tmp';
+    const sourceDataPath = sourceFile.path || `${basePath}/${sourceFile.name}`;
+    const rulesPath = `${basePath}/rules.json`;
+
+    console.log('Starting harmonization job...');
+    console.log('Data Path:', sourceDataPath);
+    console.log('Rules Path:', rulesPath);
+
+    try {
+      if ((window as any).electron) {
+        console.log('Electron detected. Saving rules to disk...');
+        await (window as any).electron.saveFile(rulesPath, JSON.stringify(rules, null, 2));
+      } else {
+        console.warn('Electron not detected. Cannot save rules file to disk.');
+      }
+
+      const params = {
+        data_file_path: sourceDataPath,
+        rules_file_path: rulesPath,
+        replay_log_file_path: `${basePath}/replay.log`,
+        output_file_path: `${basePath}/output.csv`,
+        mode: 'pairs' as const,
+        pairs: pairs,
+        overwrite: true
+      };
+
+      this.harmonizationApi.harmonize(params).subscribe({
+        next: (response) => {
+          console.log('Harmonization response:', response);
+          if (response.job_id) {
+            this.pollJob(response.job_id);
+          } else {
+            console.log('Command finished immediately', response);
+          }
+        },
+        error: (err) => console.error('Harmonization error:', err)
+      });
+    } catch (err) {
+      console.error('Error during harmonization preparation:', err);
+    }
+
   }
 
   pollJob(jobId: string) {
@@ -179,7 +219,8 @@ export class UploadService {
           type: type,
           data: result.data,
           text: text,
-          folder: this.selectedFolder() ?? file.name
+          folder: this.selectedFolder() ?? file.name,
+          path: (file as any).path
         });
       },
       error: (error) => {
@@ -207,7 +248,8 @@ export class UploadService {
           type: 'dictionary',
           data: result.data,
           text: text,
-          folder: file.name // Default to filename as folder/group
+          folder: file.name, // Default to filename as folder/group
+          path: (file as any).path
         });
       },
       error: (error) => {
