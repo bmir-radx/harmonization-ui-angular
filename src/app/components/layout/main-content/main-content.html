@@ -64,7 +64,7 @@
                                             </button>
                                             <button [disabled]="!uploadService.isReady()"
                                                 (click)="uploadService.runHarmonization()"
-                                                class="bg-[#2d2d2d] text-[#555555] px-3 py-1 rounded-md text-xs font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed enabled:bg-[#4caf50] enabled:text-white">
+                                                class="bg-[#2d2d2d] text-[#555555] px-3 py-1.5 rounded text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed enabled:bg-[#007fd4] enabled:text-white">
                                                 Ready
                                             </button>
                                         </div>
@@ -95,10 +95,9 @@
                                                         <p-select [options]="uploadService.targetOptions()"
                                                             [(ngModel)]="row.targetElement"
                                                             (onChange)="uploadService.updateMappingStatus(rowIndex, $event.value)"
-                                                            (click)="$event.stopPropagation()" optionLabel="label"
-                                                            optionValue="value" placeholder="Search..." [filter]="true"
-                                                            [appendTo]="'body'" [style]="{'width': '100%'}"
-                                                            class="custom-table-select">
+                                                            optionLabel="label" optionValue="value"
+                                                            placeholder="Search..." [filter]="true" [appendTo]="'body'"
+                                                            [style]="{'width': '100%'}" class="custom-table-select">
                                                         </p-select>
                                                     </td>
                                                     <td class="status-col">
