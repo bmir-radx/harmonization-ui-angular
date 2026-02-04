@@ -57,3 +57,17 @@ ipcMain.handle('save-file', async (event, filePath, content) => {
         throw error;
     }
 });
+
+// IPC Handler to read files from disk
+ipcMain.handle('read-file', async (event, filePath) => {
+    try {
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`File not found: ${filePath}`);
+        }
+        const content = fs.readFileSync(filePath, 'utf8');
+        return content;
+    } catch (error) {
+        console.error('Error reading file:', error);
+        throw error;
+    }
+});

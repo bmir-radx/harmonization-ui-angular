@@ -4,6 +4,7 @@ import { ThemeService } from './services/theme.service';
 import { ProjectService } from './services/project.service';
 import { UploadService } from './services/file-upload.service';
 import { SplitterModule } from 'primeng/splitter';
+import { ToastModule } from 'primeng/toast';
 import { ProjectSelectionModal } from './components/layout/project-selection-modal/project-selection-modal';
 import { HeaderBar } from './components/layout/header-bar/header-bar';
 import { MainContent } from './components/layout/main-content/main-content';
@@ -13,7 +14,7 @@ import { RightSidebar } from './components/layout/right-sidebar/right-sidebar';
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule, SplitterModule, ProjectSelectionModal,
+    CommonModule, SplitterModule, ToastModule, ProjectSelectionModal,
     HeaderBar, MainContent, LeftSidebar, RightSidebar
   ],
   templateUrl: './app.html',
