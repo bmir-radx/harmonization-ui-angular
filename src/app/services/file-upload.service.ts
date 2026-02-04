@@ -267,28 +267,40 @@ export class UploadService {
       return;
     }
 
-    // Use the file path if available (Electron), otherwise default to local development temp path
-    const basePath = '/Users/mete/HARMONIZATION/harmonization-ui-angular/tmp';
+    // Determine working directory from source file path if available
+    let basePath = '/Users/mete/HARMONIZATION/harmonization-ui-angular/tmp';
+    if (sourceFile.path) {
+      // Assume '/' separator for Mac
+      const lastSlash = sourceFile.path.lastIndexOf('/');
+      if (lastSlash !== -1) {
+        basePath = sourceFile.path.substring(0, lastSlash);
+      }
+    }
+
     const sourceDataPath = sourceFile.path || `${basePath}/${sourceFile.name}`;
     const rulesPath = `${basePath}/rules.json`;
+    const outputPath = `${basePath}/output.csv`;
+    const replayLogPath = `${basePath}/replay.log`;
 
     console.log('Starting harmonization job...');
+    console.log('Base Working Directory:', basePath);
     console.log('Data Path:', sourceDataPath);
     console.log('Rules Path:', rulesPath);
+    console.log('Output Path:', outputPath);
 
     try {
       if ((window as any).electron) {
         console.log('Electron detected. Saving rules to disk...');
         await (window as any).electron.saveFile(rulesPath, JSON.stringify(rules, null, 2));
       } else {
-        console.warn('Electron not detected. Cannot save rules file to disk.');
+        console.warn('Electron not detected. Rules file cannot be saved to disk directly.');
       }
 
       const params = {
         data_file_path: sourceDataPath,
         rules_file_path: rulesPath,
-        replay_log_file_path: `${basePath}/replay.log`,
-        output_file_path: `${basePath}/output.csv`,
+        replay_log_file_path: replayLogPath,
+        output_file_path: outputPath,
         mode: 'pairs' as const,
         pairs: pairs,
         overwrite: true
@@ -298,7 +310,7 @@ export class UploadService {
         next: (response) => {
           console.log('Harmonization response:', response);
           if (response.job_id) {
-            this.pollJob(response.job_id);
+            this.pollJob(response.job_id, outputPath);
           } else {
             console.log('Command finished immediately', response);
           }
@@ -311,7 +323,7 @@ export class UploadService {
 
   }
 
-  pollJob(jobId: string) {
+  pollJob(jobId: string, outputPath: string) {
     this.messageService.add({ severity: 'info', summary: 'Job Started', detail: 'Harmonization job submitted. Waiting for completion...' });
 
     const interval = setInterval(() => {
@@ -327,9 +339,6 @@ export class UploadService {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed successfully.' });
 
             // Read output file via Electron
-            const basePath = '/Users/mete/HARMONIZATION/harmonization-ui-angular/tmp';
-            const outputPath = `${basePath}/output.csv`;
-
             if ((window as any).electron) {
               try {
                 console.log('Reading output file from:', outputPath);
@@ -435,13 +444,20 @@ export class UploadService {
       header: true,
       skipEmptyLines: true,
       complete: (result) => {
+        let filePath = (file as any).path;
+        if (!filePath && (window as any).electron?.getFilePath) {
+          filePath = (window as any).electron.getFilePath(file);
+        }
+
+        console.log('Parsed CSV File:', file.name, 'Final Path:', filePath);
+
         this.addFile({
           name: file.name,
           type: type,
           data: result.data,
           text: text,
           folder: this.selectedFolder() ?? file.name,
-          path: (file as any).path
+          path: filePath
         });
       },
       error: (error) => {
@@ -464,13 +480,18 @@ export class UploadService {
       header: true,
       skipEmptyLines: true,
       complete: (result) => {
+        let filePath = (file as any).path;
+        if (!filePath && (window as any).electron?.getFilePath) {
+          filePath = (window as any).electron.getFilePath(file);
+        }
+
         this.addTargetFile({
           name: file.name,
           type: 'dictionary',
           data: result.data,
           text: text,
           folder: file.name, // Default to filename as folder/group
-          path: (file as any).path
+          path: filePath
         });
       },
       error: (error) => {
