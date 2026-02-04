@@ -310,7 +310,7 @@ export class UploadService {
         next: (response) => {
           console.log('Harmonization response:', response);
           if (response.job_id) {
-            this.pollJob(response.job_id, outputPath);
+            this.pollJob(response.job_id, outputPath, sourceFile!.folder);
           } else {
             console.log('Command finished immediately', response);
           }
@@ -323,7 +323,7 @@ export class UploadService {
 
   }
 
-  pollJob(jobId: string, outputPath: string) {
+  pollJob(jobId: string, outputPath: string, targetFolder: string) {
     this.messageService.add({ severity: 'info', summary: 'Job Started', detail: 'Harmonization job submitted. Waiting for completion...' });
 
     const interval = setInterval(() => {
@@ -338,8 +338,11 @@ export class UploadService {
             console.log('Job completed successfully');
             this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed successfully.' });
 
-            // Read output file via Electron
+            // Read results via Electron
             if ((window as any).electron) {
+              const basePath = outputPath.substring(0, outputPath.lastIndexOf('/'));
+
+              // 1. Read Output CSV
               try {
                 console.log('Reading output file from:', outputPath);
                 const csvContent = await (window as any).electron.readFile(outputPath);
@@ -354,26 +357,52 @@ export class UploadService {
                       type: 'data', // Treat as data to show in table
                       data: result.data as any[],
                       text: csvContent,
-                      folder: 'Output'
+                      folder: targetFolder,
+                      path: outputPath
                     };
 
-                    // Add to uploaded files
-                    this.uploadedFiles.update(files => [...files, newFile]);
-
-                    // Open the file in a new tab
+                    this.addFile(newFile);
                     this.openFile(newFile);
-
-                    this.messageService.add({ severity: 'info', summary: 'Result Loaded', detail: 'Output file opened in new tab.' });
                   }
                 });
               } catch (e) {
                 console.error('Error reading output file:', e);
-                this.messageService.add({ severity: 'error', summary: 'Read Error', detail: 'Could not read output file from disk.' });
               }
-            } else {
-              console.warn('Electron not detected, cannot read output file automatically.');
-            }
 
+              // 2. Read replay.log
+              const logPath = `${basePath}/replay.log`;
+              try {
+                const logContent = await (window as any).electron.readFile(logPath);
+                this.addFile({
+                  name: 'replay.log',
+                  type: 'text',
+                  data: [],
+                  text: logContent,
+                  folder: targetFolder,
+                  path: logPath
+                });
+              } catch (e) {
+                console.log('replay.log not found');
+              }
+
+              // 3. Read rules.json
+              const rulesPath = `${basePath}/rules.json`;
+              try {
+                const rulesContent = await (window as any).electron.readFile(rulesPath);
+                this.addFile({
+                  name: 'rules.json',
+                  type: 'json',
+                  data: [],
+                  text: rulesContent,
+                  folder: targetFolder,
+                  path: rulesPath
+                });
+              } catch (e) {
+                console.log('rules.json not found');
+              }
+
+              this.messageService.add({ severity: 'info', summary: 'Results Loaded', detail: 'Output and logs added to dataset.' });
+            }
           } else if (jobStatus === 'failed' || jobStatus === 'error') {
             clearInterval(interval);
             console.error('Job failed:', res);
@@ -456,7 +485,7 @@ export class UploadService {
           type: type,
           data: result.data,
           text: text,
-          folder: this.selectedFolder() ?? file.name,
+          folder: this.selectedFolder() ?? this.getNextDatasetName(),
           path: filePath
         });
       },
@@ -490,7 +519,7 @@ export class UploadService {
           type: 'dictionary',
           data: result.data,
           text: text,
-          folder: file.name, // Default to filename as folder/group
+          folder: this.selectedFolder() ?? this.getNextDatasetName(),
           path: filePath
         });
       },
@@ -826,4 +855,25 @@ export class UploadService {
     console.log('Target options computed:', result.length, 'options');
     return result;
   });
+
+  getNextDatasetName(): string {
+    const folders = new Set<string>();
+    this.uploadedFiles().forEach(f => folders.add(f.folder));
+    this.targetFiles().forEach(f => folders.add(f.folder));
+
+    const datasetFolders = Array.from(folders).filter(f => f && f.startsWith('Dataset '));
+
+    if (datasetFolders.length === 0) return 'Dataset 1';
+
+    let max = 0;
+    datasetFolders.forEach(name => {
+      const parts = name.split(' ');
+      if (parts.length > 1) {
+        const num = parseInt(parts[1]);
+        if (!isNaN(num) && num > max) max = num;
+      }
+    });
+
+    return `Dataset ${max + 1}`;
+  }
 }
