@@ -98,22 +98,11 @@
                                                             (onChange)="uploadService.updateMappingStatus(rowIndex, $event.value)"
                                                             optionLabel="label" optionValue="value"
                                                             placeholder="Search..." [filter]="true"
-                                                            filterPlaceholder="Search targets..." [appendTo]="'body'"
+                                                            filterPlaceholder="Search Targets..." [appendTo]="'body'"
                                                             [style]="{'width': '100%'}" class="custom-table-select">
 
                                                             <ng-template pTemplate="selectedItem" let-selectedOption>
-                                                                <div
-                                                                    class="flex items-center gap-2 w-full text-xs -ml-1">
-                                                                    <span
-                                                                        class="font-mono font-bold w-3 flex justify-center uppercase"
-                                                                        [ngClass]="{
-                                                                            'text-[#4caf50]': (selectedOption.type || '').toLowerCase().includes('string') || (selectedOption.type || '').toLowerCase().startsWith('s'),
-                                                                            'text-[#569cd6]': (selectedOption.type || '').toLowerCase().includes('int') || (selectedOption.type || '').toLowerCase().includes('number') || (selectedOption.type || '').toLowerCase().startsWith('n') || (selectedOption.type || '').toLowerCase().startsWith('i'),
-                                                                            'text-[#ff9500]': (selectedOption.type || '').toLowerCase().includes('date') || (selectedOption.type || '').toLowerCase().startsWith('d'),
-                                                                            'text-[#ce9178]': (selectedOption.type || '').toLowerCase().includes('bool') || (selectedOption.type || '').toLowerCase().startsWith('b')
-                                                                        }">
-                                                                        {{ (selectedOption.type?.charAt(0) || 's') }}
-                                                                    </span>
+                                                                <div class="flex items-center w-full text-xs">
                                                                     <span class="truncate text-[#cccccc]">{{
                                                                         selectedOption.value }}</span>
                                                                 </div>
@@ -122,14 +111,9 @@
                                                             <ng-template pTemplate="item" let-option>
                                                                 <div class="flex items-center gap-3 w-full py-1">
                                                                     <span
-                                                                        class="font-mono font-bold text-xs w-3 flex justify-center uppercase"
-                                                                        [ngClass]="{
-                                                                            'text-[#4caf50]': (option.type || '').toLowerCase().includes('string') || (option.type || '').toLowerCase().startsWith('s'),
-                                                                            'text-[#569cd6]': (option.type || '').toLowerCase().includes('int') || (option.type || '').toLowerCase().includes('number') || (option.type || '').toLowerCase().startsWith('n') || (option.type || '').toLowerCase().startsWith('i'),
-                                                                            'text-[#ff9500]': (option.type || '').toLowerCase().includes('date') || (option.type || '').toLowerCase().startsWith('d'),
-                                                                            'text-[#ce9178]': (option.type || '').toLowerCase().includes('bool') || (option.type || '').toLowerCase().startsWith('b')
-                                                                          }">
-                                                                        {{ (option.type?.charAt(0) || 's') }}
+                                                                        class="font-mono font-bold w-3 flex justify-center"
+                                                                        [ngClass]="getDataClass(option.type)">
+                                                                        {{ getDataChar(option.type) }}
                                                                     </span>
                                                                     <span class="truncate text-xs text-[#cccccc]">{{
                                                                         option.value }}</span>
