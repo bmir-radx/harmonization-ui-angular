@@ -9,9 +9,9 @@
                         style="--p-icon-size: 16px"></i>
                     <i *ngIf="file.type === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6]"
                         style="--p-icon-size: 16px"></i>
-                    <i *ngIf="file.type === 'json'" class="pi pi-code w-4 h-4 text-[#ce9178]"
+                    <i *ngIf="file.type === 'json'" class="pi pi-code w-4 h-4 text-[#569cd6]"
                         style="--p-icon-size: 16px"></i>
-                    <i *ngIf="file.type === 'text'" class="pi pi-file-edit w-4 h-4 text-[#cccccc]"
+                    <i *ngIf="file.type === 'text'" class="pi pi-file-edit w-4 h-4 text-[#569cd6]"
                         style="--p-icon-size: 16px"></i>
                     <div *ngIf="file.type === 'dictionary'" class="w-4 h-4 shrink-0">
                         <div class="relative size-full" data-name="Component 1">
@@ -64,7 +64,7 @@
                                             </button>
                                             <button [disabled]="!uploadService.isReady()"
                                                 (click)="uploadService.runHarmonization()"
-                                                class="bg-[#2d2d2d] text-[#555555] px-3 py-1.5 rounded text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed enabled:bg-[#007fd4] enabled:text-white">
+                                                class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm disabled:bg-[#3c3c3c] disabled:text-[#808080] enabled:bg-[#007fd4] enabled:text-white enabled:hover:bg-[#005fa3] disabled:cursor-not-allowed">
                                                 Ready
                                             </button>
                                         </div>
@@ -82,6 +82,7 @@
                                                     <th>SOURCE DATA ELEMENT</th>
                                                     <th>TARGET DATA ELEMENT</th>
                                                     <th class="status-col">STATUS</th>
+                                                    <th class="actions-col w-[80px]">ACTIONS</th>
                                                 </tr>
                                             </ng-template>
                                             <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
@@ -96,8 +97,44 @@
                                                             [(ngModel)]="row.targetElement"
                                                             (onChange)="uploadService.updateMappingStatus(rowIndex, $event.value)"
                                                             optionLabel="label" optionValue="value"
-                                                            placeholder="Search..." [filter]="true" [appendTo]="'body'"
+                                                            placeholder="Search..." [filter]="true"
+                                                            filterPlaceholder="Search targets..." [appendTo]="'body'"
                                                             [style]="{'width': '100%'}" class="custom-table-select">
+
+                                                            <ng-template pTemplate="selectedItem" let-selectedOption>
+                                                                <div
+                                                                    class="flex items-center gap-2 w-full text-xs -ml-1">
+                                                                    <span
+                                                                        class="font-mono font-bold w-3 flex justify-center uppercase"
+                                                                        [ngClass]="{
+                                                                            'text-[#4caf50]': (selectedOption.type || '').toLowerCase().includes('string') || (selectedOption.type || '').toLowerCase().startsWith('s'),
+                                                                            'text-[#569cd6]': (selectedOption.type || '').toLowerCase().includes('int') || (selectedOption.type || '').toLowerCase().includes('number') || (selectedOption.type || '').toLowerCase().startsWith('n') || (selectedOption.type || '').toLowerCase().startsWith('i'),
+                                                                            'text-[#ff9500]': (selectedOption.type || '').toLowerCase().includes('date') || (selectedOption.type || '').toLowerCase().startsWith('d'),
+                                                                            'text-[#ce9178]': (selectedOption.type || '').toLowerCase().includes('bool') || (selectedOption.type || '').toLowerCase().startsWith('b')
+                                                                        }">
+                                                                        {{ (selectedOption.type?.charAt(0) || 's') }}
+                                                                    </span>
+                                                                    <span class="truncate text-[#cccccc]">{{
+                                                                        selectedOption.value }}</span>
+                                                                </div>
+                                                            </ng-template>
+
+                                                            <ng-template pTemplate="item" let-option>
+                                                                <div class="flex items-center gap-3 w-full py-1">
+                                                                    <span
+                                                                        class="font-mono font-bold text-xs w-3 flex justify-center uppercase"
+                                                                        [ngClass]="{
+                                                                            'text-[#4caf50]': (option.type || '').toLowerCase().includes('string') || (option.type || '').toLowerCase().startsWith('s'),
+                                                                            'text-[#569cd6]': (option.type || '').toLowerCase().includes('int') || (option.type || '').toLowerCase().includes('number') || (option.type || '').toLowerCase().startsWith('n') || (option.type || '').toLowerCase().startsWith('i'),
+                                                                            'text-[#ff9500]': (option.type || '').toLowerCase().includes('date') || (option.type || '').toLowerCase().startsWith('d'),
+                                                                            'text-[#ce9178]': (option.type || '').toLowerCase().includes('bool') || (option.type || '').toLowerCase().startsWith('b')
+                                                                          }">
+                                                                        {{ (option.type?.charAt(0) || 's') }}
+                                                                    </span>
+                                                                    <span class="truncate text-xs text-[#cccccc]">{{
+                                                                        option.value }}</span>
+                                                                </div>
+                                                            </ng-template>
                                                         </p-select>
                                                     </td>
                                                     <td class="status-col">
@@ -105,6 +142,22 @@
                                                             class="pi pi-exclamation-triangle text-[#ff9500] text-sm"></i>
                                                         <i *ngIf="row.status === 'complete'"
                                                             class="pi pi-check text-[#4caf50] text-sm"></i>
+                                                    </td>
+                                                    <td class="actions-col">
+                                                        <div class="flex items-center gap-1">
+                                                            <button
+                                                                (click)="$event.stopPropagation(); uploadService.duplicateMappingRow(row)"
+                                                                class="p-1 text-[#808080] hover:text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors"
+                                                                title="Duplicate mapping for one-to-many">
+                                                                <i class="pi pi-copy text-sm"></i>
+                                                            </button>
+                                                            <button *ngIf="row.isDuplicate"
+                                                                (click)="$event.stopPropagation(); uploadService.removeMappingRow(row)"
+                                                                class="p-1 text-[#808080] hover:text-[#ff3b30] hover:bg-[#3c3c3c] rounded transition-colors"
+                                                                title="Remove duplicated row">
+                                                                <i class="pi pi-trash text-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </ng-template>

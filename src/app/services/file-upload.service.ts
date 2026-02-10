@@ -16,6 +16,7 @@ export interface UploadedFile {
 export interface TargetOption {
   label: string;
   value: string;
+  type?: string;
 }
 
 @Injectable({
@@ -604,30 +605,48 @@ export class UploadService {
     // Initialize mapping rows whenever uploadedFiles change
     effect(() => {
       const files = this.uploadedFiles();
-      const rows: any[] = [];
-      let counter = 1;
+      const currentRows = untracked(() => this.mappingRows());
+
+      const newRows: any[] = [];
+      // Calculate maxId once to avoid overlapping IDs for new rows
+      let maxId = currentRows.reduce((max, r) => Math.max(max, r.id), 0);
 
       files.forEach(file => {
         if (file.type === 'dictionary') {
           file.data.forEach(element => {
-            rows.push({
-              id: counter++,
-              dataset: file.folder,
-              sourceElement: element['Id'] || element['Variable Name'] || element['name'] || 'Unknown',
-              targetElement: null,
-              status: 'attention',
-              steps: [],
-              selectedStepId: null
-            });
+            const varName = element['Id'] || element['Variable Name'] || element['name'] || 'Unknown';
+            const dataset = file.folder;
+
+            // Find existing rows for this specific variable in this dataset
+            // This preserves their current target selections, steps, and any duplicates
+            const existing = currentRows.filter(r => r.sourceElement === varName && r.dataset === dataset);
+
+            if (existing.length > 0) {
+              newRows.push(...existing);
+            } else {
+              // New variable found in dictionary, add a default row
+              newRows.push({
+                id: ++maxId,
+                dataset: dataset,
+                sourceElement: varName,
+                targetElement: null,
+                status: 'attention',
+                steps: [],
+                selectedStepId: null
+              });
+            }
           });
         }
       });
-      this.mappingRows.set(rows);
 
-      // Default select first row
+      // Avoid setting if identical to prevent circular triggers or redundant UI refreshes
+      // (Simplified check: if length is same and all IDs exist, it's likely fine)
+      this.mappingRows.set(newRows);
+
+      // Default select first row if nothing selected or selection lost
       const currentSelectedId = untracked(() => this.selectedRowId());
-      if (rows.length > 0 && !currentSelectedId) {
-        this.selectedRowId.set(rows[0].id);
+      if (newRows.length > 0 && (!currentSelectedId || !newRows.find(r => r.id === currentSelectedId))) {
+        this.selectedRowId.set(newRows[0].id);
       }
     });
   }
@@ -786,6 +805,45 @@ export class UploadService {
     });
   }
 
+  duplicateMappingRow(row: any) {
+    this.mappingRows.update(rows => {
+      const index = rows.findIndex(r => r.id === row.id);
+      if (index === -1) return rows;
+
+      const maxId = rows.reduce((max, r) => Math.max(max, r.id), 0);
+      const newRow = {
+        ...row,
+        id: maxId + 1,
+        targetElement: null,
+        status: 'attention',
+        steps: [],
+        selectedStepId: null,
+        isDuplicate: true
+      };
+
+      const newRows = [...rows];
+      newRows.splice(index + 1, 0, newRow);
+      return newRows;
+    });
+  }
+
+  removeMappingRow(row: any) {
+    this.mappingRows.update(rows => {
+      const newRows = rows.filter(r => r.id !== row.id);
+
+      // If we removed the selected row, select something else
+      if (this.selectedRowId() === row.id) {
+        if (newRows.length > 0) {
+          this.selectedRowId.set(newRows[0].id);
+        } else {
+          this.selectedRowId.set(null);
+        }
+      }
+
+      return newRows;
+    });
+  }
+
   saveCurrentRule() {
     const selectedId = this.selectedRowId();
     if (selectedId === null) return;
@@ -836,11 +894,13 @@ export class UploadService {
           const name = element['Variable Name'] || element['Variable name'] || element['variable_name'] ||
             element['Id'] || element['ID'] || element['id'] || element['name'] || element['Name'];
           const label = element['Label'] || element['label'] || element['Description'] || element['description'] || name;
+          const type = element['Type'] || element['type'] || element['Datatype'] || element['datatype'] || 'String';
 
           if (name) {
             options.push({
               label: `${name}${label && label !== name ? ' - ' + label : ''}`,
-              value: name
+              value: name,
+              type: type
             });
           }
         });
