@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <h2 class="text-base font-medium text-[#cccccc] truncate">Source Datasets</h2>
 
-            <button (click)="uploadService.openFileDialog()"
+            <button (click)="datasetService.openFileDialog()"
                 class="p-1 text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors shrink-0"
                 [pTooltip]="tooltipContent" tooltipPosition="bottom" positionTop="10">
                 <i class="pi pi-upload w-4 h-4" style="--p-icon-size: 16px;"></i>
@@ -57,7 +57,7 @@
         <div class="min-w-max">
 
             <!-- Empty State -->
-            <div *ngIf="!uploadService.hasFiles()" class="text-center py-8 px-3">
+            <div *ngIf="!datasetService.hasFiles()" class="text-center py-8 px-3">
                 <div class="w-12 h-12 bg-[#3c3c3c] rounded-full flex items-center justify-center mx-auto mb-3">
                     <i class="pi pi-database w-6 h-6 text-[#007fd4]" style="--p-icon-size: 24px;"></i>
                 </div>
@@ -65,7 +65,7 @@
                 <p class="text-[#808080] text-xs mb-4 break-words leading-relaxed px-1">
                     Upload your source data files to get started
                 </p>
-                <button (click)="uploadService.openFileDialog()"
+                <button (click)="datasetService.openFileDialog()"
                     class="bg-[#007fd4] text-white px-3 py-2 rounded text-xs hover:bg-[#005fa3] transition-colors flex items-center gap-1 mx-auto"
                     [pTooltip]="tooltipContent" tooltipPosition="top" positionTop="-10">
                     <i class="pi pi-upload w-3 h-3" style="--p-icon-size: 12px;"></i>
@@ -82,10 +82,10 @@
             </ng-template>
 
             <!-- Has Uploaded Files -->
-            <div *ngIf="uploadService.hasFiles()" class="space-y-1 min-w-max pt-2">
+            <div *ngIf="datasetService.hasFiles()" class="space-y-1 min-w-max pt-2">
                 <p-tree [value]="getFiles()" selectionMode="single" [(selection)]="selectedFolder"
-                    (onNodeSelect)="uploadService.selectFolder($event.node.label!)"
-                    (onNodeUnselect)="uploadService.clearFolder()">
+                    (onNodeSelect)="datasetService.selectFolder($event.node.label!)"
+                    (onNodeUnselect)="datasetService.clearFolder()">
                     <ng-template let-node pTemplate="folder">
                         <div class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dataset-item">
                             <i class="pi pi-folder-open w-5 h-5 text-[#007FD4]" style="--p-icon-size: 20px;"></i>
@@ -96,7 +96,7 @@
                     </ng-template>
                     <ng-template let-node pTemplate="file">
                         <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-file-item"
-                            (dblclick)="uploadService.openFile(node.file)">
+                            (dblclick)="datasetService.openFile(node.file)">
                             <i *ngIf="node.subtype === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6] shrink-0"
                                 style="--p-icon-size: 16px;"></i>
                             <i *ngIf="node.subtype === 'json'" class="pi pi-code w-4 h-4 text-[#569cd6] shrink-0"

@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, effect } from '@angular/core';
+import { Component, OnInit, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from './services/theme.service';
 import { ProjectService } from './services/project.service';
-import { UploadService } from './services/file-upload.service';
+import { DatasetService } from './services/dataset.service';
+import { MappingService } from './services/mapping.service';
 import { SplitterModule } from 'primeng/splitter';
 import { ToastModule } from 'primeng/toast';
 import { ProjectSelectionModal } from './components/layout/project-selection-modal/project-selection-modal';
@@ -23,11 +24,10 @@ import { RightSidebar } from './components/layout/right-sidebar/right-sidebar';
 export class App implements OnInit {
   protected readonly title = signal('data-harmonization-angular');
 
-  constructor(
-    private projectService: ProjectService,
-    private themeService: ThemeService,
-    private uploadService: UploadService
-  ) { }
+  projectService = inject(ProjectService);
+  themeService = inject(ThemeService);
+  datasetService = inject(DatasetService);
+  mappingService = inject(MappingService);
 
   get project() {
     return this.projectService.currentProject;
@@ -41,7 +41,6 @@ export class App implements OnInit {
       name: 'Test Project',
       description: 'Auto-created for testing'
     });
-
-
   }
 }
+

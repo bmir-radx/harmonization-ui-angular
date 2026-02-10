@@ -1,9 +1,9 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../services/theme.service';
 import { ProjectService, Project } from '../../../services/project.service';
 import { HistoryService, HistoryItem } from '../../../services/history.service';
-import { UploadService } from '../../../services/file-upload.service';
+import { DatasetService } from '../../../services/dataset.service';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
 
@@ -21,7 +21,12 @@ export class HeaderBar {
     leftMenu: MenuItem[] | undefined;
     rightMenu: MenuItem[] | undefined;
 
-    constructor(private projectService: ProjectService, private historyService: HistoryService, private themeService: ThemeService, private uploadService: UploadService) {
+    datasetService = inject(DatasetService);
+    projectService = inject(ProjectService);
+    historyService = inject(HistoryService);
+    themeService = inject(ThemeService);
+
+    constructor() {
         effect(() => {
             this.currentProject = this.projectService.currentProject();
             this.projectHistory = this.historyService.projectHistory();
@@ -110,7 +115,7 @@ export class HeaderBar {
                         icon: 'pi pi-bolt',
                         shortcut: 'Ctrl+Shift+T',
                         command: () => {
-                            this.uploadService.loadTestData();
+                            this.datasetService.loadTestData();
                         }
                     },
                     {
@@ -206,6 +211,7 @@ export class HeaderBar {
             }
         ]
     }
+
 
     buildRightMenu(): MenuItem[] {
         return [

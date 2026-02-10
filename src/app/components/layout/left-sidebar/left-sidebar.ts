@@ -2,11 +2,26 @@ import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
-import { UploadService, UploadedFile } from '../../../services/file-upload.service';
+import { DatasetService } from '../../../services/dataset.service';
 import { ThemeService } from '../../../services/theme.service';
 import { TreeNode } from 'primeng/api';
+import { UploadedFile } from '../../../models/mapping.model';
 
-type OutputItem = { label: string; type: string; selectable: boolean; expanded?: boolean; children: { label: string; type: string; selectable: boolean; expanded?: boolean; subtype: string; file: UploadedFile; children?: { selectable: boolean; type: string, datatype: string; field: string }[] }[] };
+type OutputItem = {
+  label: string;
+  type: string;
+  selectable: boolean;
+  expanded?: boolean;
+  children: {
+    label: string;
+    type: string;
+    selectable: boolean;
+    expanded?: boolean;
+    subtype: string;
+    file: UploadedFile;
+    children?: { selectable: boolean; type: string, datatype: string; field: string }[]
+  }[]
+};
 
 @Component({
   selector: 'app-left-sidebar',
@@ -17,7 +32,7 @@ type OutputItem = { label: string; type: string; selectable: boolean; expanded?:
 export class LeftSidebar {
   hasActiveFilters = false;
   isDarkMode = true;
-  uploadService: UploadService = inject(UploadService);
+  datasetService = inject(DatasetService);
 
   files: OutputItem[] = [];
   selectedFolder!: TreeNode;
@@ -27,7 +42,7 @@ export class LeftSidebar {
       this.isDarkMode = this.themeService.isDarkMode()();
 
       this.files = Object.values(
-        this.uploadService.uploadedFiles().reduce<Record<string, OutputItem>>((acc, file) => {
+        this.datasetService.uploadedFiles().reduce<Record<string, OutputItem>>((acc, file) => {
           if (!acc[file.folder]) {
             acc[file.folder] = { label: file.folder, type: 'folder', selectable: true, expanded: true, children: [] };
           }
@@ -52,26 +67,25 @@ export class LeftSidebar {
   }
 
   get visible() {
-    return this.uploadService.visible();
+    return this.datasetService.visible();
   }
 
   set visible(value: boolean) {
-    this.uploadService.visible.set(value);
+    this.datasetService.visible.set(value);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.uploadService.setFile(input.files[0]);
-
-      this.uploadService.showDialog();
+      this.datasetService.setFile(input.files[0]);
+      this.datasetService.showDialog();
     }
 
     input.value = '';
   }
 
   getDataClass(type: string): string {
-    const dataType = type.toLowerCase();
+    const dataType = (type || '').toLowerCase();
 
     switch (dataType) {
       case 'string':
@@ -115,6 +129,6 @@ export class LeftSidebar {
       default:
         return 'text-[#606060]';
     }
-
   }
 }
+

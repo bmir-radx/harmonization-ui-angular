@@ -4,7 +4,9 @@ import { Dialog } from 'primeng/dialog';
 
 import { Button } from '../../ui/button.component';
 import { ThemeService } from '../../../services/theme.service';
-import { UploadService } from '../../../services/file-upload.service';
+import { DatasetService } from '../../../services/dataset.service';
+import { MappingService } from '../../../services/mapping.service';
+import { PRIMITIVE_CONFIGS } from '../../../constants/transformations';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { TableModule } from 'primeng/table';
@@ -32,25 +34,27 @@ import { SplitterModule } from 'primeng/splitter';
 export class MainContent {
   isDarkMode = true;
 
-  uploadService: UploadService = inject(UploadService);
+  datasetService = inject(DatasetService);
+  mappingService = inject(MappingService);
+  themeService = inject(ThemeService);
 
-  constructor(private themeService: ThemeService) {
+  constructor() {
     effect(() => {
       this.isDarkMode = this.themeService.isDarkMode()();
 
-      if (this.uploadService.triggerFileDialog()) {
+      if (this.datasetService.triggerFileDialog()) {
         this.onUploadSourceData();
-        this.uploadService.resetFileDialog();
+        this.datasetService.resetFileDialog();
       }
     });
   }
 
   get visible() {
-    return this.uploadService.visible();
+    return this.datasetService.visible();
   }
 
   set visible(value: boolean) {
-    this.uploadService.visible.set(value);
+    this.datasetService.visible.set(value);
   }
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -62,20 +66,30 @@ export class MainContent {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.uploadService.setFile(input.files[0]);
-
-      this.uploadService.showDialog();
+      this.datasetService.setFile(input.files[0]);
+      this.datasetService.showDialog();
     }
 
     input.value = '';
   }
 
+  onSelectType(type: string): void {
+    const file = this.datasetService.uploadedFile();
+    if (file) {
+      this.datasetService.parseCSV(file, type);
+    }
+
+    this.datasetService.hideDialog();
+  }
+
+
   getHeaders(data: string[]) {
+    if (!data || data.length === 0) return [];
     return Object.keys(data[0]);
   }
 
   get transformationOptions() {
-    return Object.entries(this.uploadService.primitiveConfigs).map(([key, config]) => ({
+    return Object.entries(PRIMITIVE_CONFIGS).map(([key, config]) => ({
       label: config.label,
       value: key
     }));
@@ -84,27 +98,28 @@ export class MainContent {
   get activeConfig() {
     const step = this.currentStep();
     if (!step) return null;
-    const config = this.uploadService.primitiveConfigs[step.transformation];
+    const config = PRIMITIVE_CONFIGS[step.transformation];
     return config ? { ...config, name: step.transformation } : null;
   }
 
-  getStepIndex(row: any, stepId: number): number {
-    if (!row || !row.steps) return -1;
+  getStepIndex(row: any, stepId: number | null | undefined): number {
+    if (!row || !row.steps || stepId === null || stepId === undefined) return -1;
     return row.steps.findIndex((s: any) => s.id === stepId);
   }
 
+
   currentStep = computed(() => {
-    const selected = this.uploadService.selectedMappingRow();
+    const selected = this.mappingService.selectedMappingRow();
     if (!selected || !selected.selectedStepId) return null;
     return selected.steps.find((s: any) => s.id === selected.selectedStepId);
   });
 
   updateTransformation(transformation: string) {
-    this.uploadService.updateTransformation(transformation);
+    this.mappingService.updateTransformation(transformation);
   }
 
   updateParam(key: string, value: any) {
-    this.uploadService.updateParam(key, value);
+    this.mappingService.updateParam(key, value);
   }
 
   getDataClass(type: string): string {
@@ -159,3 +174,4 @@ export class MainContent {
     return dataType === 'datetime' ? 't' : (dataType.charAt(0) || 's').toLowerCase();
   }
 }
+

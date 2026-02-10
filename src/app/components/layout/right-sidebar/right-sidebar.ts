@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
-import { UploadService, UploadedFile } from '../../../services/file-upload.service';
-
-type OutputItem = { label: string; type: string; selectable: boolean; children: { label: string; type: string; selectable: boolean; subtype: string; file: UploadedFile; children?: { selectable: boolean; type: string, datatype: string; field: string }[] }[] };
+import { DatasetService } from '../../../services/dataset.service';
+import { UploadedFile } from '../../../models/mapping.model';
 
 @Component({
   selector: 'app-right-sidebar',
@@ -14,19 +13,19 @@ type OutputItem = { label: string; type: string; selectable: boolean; children: 
   styleUrl: './right-sidebar.scss'
 })
 export class RightSidebar {
-  uploadService: UploadService = inject(UploadService);
+  datasetService = inject(DatasetService);
 
   files: TreeNode[] = [];
   selectedNode!: TreeNode;
 
   constructor() {
     effect(() => {
-      this.files = this.uploadService.targetFiles().map(file => ({
+      this.files = this.datasetService.targetFiles().map(file => ({
         label: file.name,
         type: 'file',
         data: file,
         expanded: true,
-        children: file.data.map(element => {
+        children: (file.data || []).map(element => {
           const name = element['Variable Name'] || element['Variable name'] || element['variable_name'] ||
             element['Id'] || element['ID'] || element['id'] || element['name'] || element['Name'];
           return {
@@ -43,14 +42,13 @@ export class RightSidebar {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.uploadService.parseTargetCSV(input.files[0]);
+      this.datasetService.parseTargetCSV(input.files[0]);
     }
     input.value = '';
   }
 
   getDataClass(type: string): string {
-    // Defaulting to string color for now as we might not have types in target dictionary implementation yet
-    // or reusing logic if available.
     return 'text-[#4ec9b0]';
   }
 }
+

@@ -21,7 +21,7 @@ function createWindow() {
         win.webContents.openDevTools();
     } else {
         // In production, load the built index.html
-        win.loadFile(path.join(__dirname, '../dist/harmonization-ui-angular/browser/index.html'));
+        win.loadFile(path.join(__dirname, '../dist/data-harmonization-angular/browser/index.html'));
     }
 }
 

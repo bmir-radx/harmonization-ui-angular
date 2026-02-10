@@ -1,8 +1,8 @@
 <div class="h-full flex flex-col bg-[#252526]">
     <!-- Tab Navigation - Show if we have mappings tabs enabled or open file tabs -->
-    <p-tabs *ngIf="uploadService.openedFiles().length > 0" [value]="uploadService.activeFile()?.name">
+    <p-tabs *ngIf="datasetService.openedFiles().length > 0" [value]="datasetService.activeFile()?.name">
         <p-tablist>
-            <p-tab *ngFor="let file of uploadService.openedFiles()" [value]="file.name">
+            <p-tab *ngFor="let file of datasetService.openedFiles()" [value]="file.name">
                 <div
                     class="px-3 py-2 border-r border-[#3c3c3c] cursor-pointer text-sm flex items-center gap-2 whitespace-nowrap group relative">
                     <i *ngIf="file.type === 'mappings'" class="pi pi-sitemap w-4 h-4 text-[#ff9500]"
@@ -27,7 +27,7 @@
                     </div>
                     <span class="truncate max-w-[120px]" [title]="file.name">{{file.name}}</span>
                     <button class="ml-1 p-0.5 hover:bg-[#3c3c3c] rounded transition-colors opacity-100"
-                        (click)="uploadService.closeFile(file)" title="Close tab">
+                        (click)="datasetService.closeFile(file)" title="Close tab">
                         <i class="pi pi-times w-3 h-3 text-[#cccccc] hover:text-[#ffffff]"
                             style="--p-icon-size: 12px;"></i>
                     </button>
@@ -36,7 +36,7 @@
         </p-tablist>
         <div class="flex-1 overflow-hidden">
             <p-tabpanels>
-                <p-tabpanel *ngFor="let file of uploadService.openedFiles()" [value]="file.name">
+                <p-tabpanel *ngFor="let file of datasetService.openedFiles()" [value]="file.name">
 
                     <!-- Tab Content - Mappings -->
                     <div *ngIf="file.type === 'mappings'" class="h-full bg-[#252526]">
@@ -49,7 +49,7 @@
                                         <div class="flex items-center gap-6">
                                             <div class="flex items-center gap-2 text-[#cccccc] text-xs">
                                                 <i class="pi pi-table" style="font-size: 10px;"></i>
-                                                <span>{{uploadService.mappingRows().length}} elements</span>
+                                                <span>{{mappingService.mappingRows().length}} elements</span>
                                             </div>
                                             <div class="flex items-center gap-2 text-[#cccccc] text-xs">
                                                 <i class="pi pi-check text-[#4caf50]" style="font-size: 10px;"></i>
@@ -62,8 +62,8 @@
                                                 <i class="pi pi-sparkles" style="font-size: 10px;"></i>
                                                 AI
                                             </button>
-                                            <button [disabled]="!uploadService.isReady()"
-                                                (click)="uploadService.runHarmonization()"
+                                            <button [disabled]="!mappingService.isReady()"
+                                                (click)="mappingService.runHarmonization()"
                                                 class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm disabled:bg-[#3c3c3c] disabled:text-[#808080] enabled:bg-[#007fd4] enabled:text-white enabled:hover:bg-[#005fa3] disabled:cursor-not-allowed">
                                                 Ready
                                             </button>
@@ -72,7 +72,7 @@
 
                                     <!-- Table Content -->
                                     <div class="flex-1 overflow-hidden">
-                                        <p-table [value]="uploadService.mappingRows()" [scrollable]="true"
+                                        <p-table [value]="mappingService.mappingRows()" [scrollable]="true"
                                             scrollHeight="100%" class="mappings-table-v2"
                                             [tableStyle]="{'min-width': '100%'}" dataKey="id">
                                             <ng-template pTemplate="header">
@@ -86,16 +86,16 @@
                                                 </tr>
                                             </ng-template>
                                             <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                                                <tr [class.selected-row]="uploadService.selectedMappingRow()?.id === row.id"
+                                                <tr [class.selected-row]="mappingService.selectedMappingRow()?.id === row.id"
                                                     class="cursor-pointer"
-                                                    (click)="uploadService.selectMappingRow(row)">
+                                                    (click)="mappingService.selectMappingRow(row)">
                                                     <td class="index-col">{{rowIndex + 1}}</td>
                                                     <td class="font-bold text-[#cccccc]">{{row.dataset}}</td>
                                                     <td class="text-[#808080]">{{row.sourceElement}}</td>
                                                     <td>
-                                                        <p-select [options]="uploadService.targetOptions()"
+                                                        <p-select [options]="mappingService.targetOptions()"
                                                             [(ngModel)]="row.targetElement"
-                                                            (onChange)="uploadService.updateMappingStatus(rowIndex, $event.value)"
+                                                            (onChange)="mappingService.updateMappingStatus(rowIndex, $event.value)"
                                                             optionLabel="label" optionValue="value"
                                                             placeholder="Search..." [filter]="true"
                                                             filterPlaceholder="Search Targets..." [appendTo]="'body'"
@@ -130,13 +130,13 @@
                                                     <td class="actions-col">
                                                         <div class="flex items-center gap-1">
                                                             <button
-                                                                (click)="$event.stopPropagation(); uploadService.duplicateMappingRow(row)"
+                                                                (click)="$event.stopPropagation(); mappingService.duplicateMappingRow(row)"
                                                                 class="p-1 text-[#808080] hover:text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors"
                                                                 title="Duplicate mapping for one-to-many">
                                                                 <i class="pi pi-copy text-sm"></i>
                                                             </button>
                                                             <button *ngIf="row.isDuplicate"
-                                                                (click)="$event.stopPropagation(); uploadService.removeMappingRow(row)"
+                                                                (click)="$event.stopPropagation(); mappingService.removeMappingRow(row)"
                                                                 class="p-1 text-[#808080] hover:text-[#ff3b30] hover:bg-[#3c3c3c] rounded transition-colors"
                                                                 title="Remove duplicated row">
                                                                 <i class="pi pi-trash text-sm"></i>
@@ -159,8 +159,8 @@
                                                     class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#252526]">
                                                     <h3 class="text-[#cccccc] text-sm font-medium">Harmonization Rules
                                                     </h3>
-                                                    <button (click)="uploadService.saveCurrentRule()"
-                                                        [disabled]="!uploadService.selectedMappingRow()?.targetElement"
+                                                    <button (click)="mappingService.saveCurrentRule()"
+                                                        [disabled]="!mappingService.selectedMappingRow()?.targetElement"
                                                         class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-3 py-1.5 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm">
                                                         <i class="pi pi-check" style="font-size: 10px;"></i>
                                                         Save Rule
@@ -171,7 +171,7 @@
                                                 <div class="flex-1 overflow-hidden">
 
                                                     <!-- Required State (Image Match) -->
-                                                    <div *ngIf="!uploadService.selectedMappingRow()?.targetElement"
+                                                    <div *ngIf="!mappingService.selectedMappingRow()?.targetElement"
                                                         class="h-full flex flex-col items-center justify-center p-8 bg-[#1e1e1e]">
                                                         <div
                                                             class="w-20 h-20 bg-[#f97316] rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(249,115,22,0.2)]">
@@ -182,7 +182,7 @@
                                                         <p
                                                             class="text-[#808080] text-sm text-center max-w-md mb-8 leading-relaxed">
                                                             Please select a target data element for <span
-                                                                class="text-[#cccccc] font-bold">"{{uploadService.selectedMappingRow()?.sourceElement}}"</span>
+                                                                class="text-[#cccccc] font-bold">"{{mappingService.selectedMappingRow()?.sourceElement}}"</span>
                                                             from the dropdown in the Target Data Element column to
                                                             configure harmonization rules.
                                                         </p>
@@ -195,7 +195,7 @@
                                                     </div>
 
                                                     <!-- Visualization (When mapping exists) -->
-                                                    <div *ngIf="uploadService.selectedMappingRow()?.targetElement"
+                                                    <div *ngIf="mappingService.selectedMappingRow()?.targetElement"
                                                         class="h-full flex flex-col">
                                                         <div class="p-8 flex items-center justify-between bg-[#1e1e1e]">
                                                             <!-- Source Block -->
@@ -204,11 +204,11 @@
                                                                     class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
                                                                     <div
                                                                         class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
-                                                                        {{uploadService.selectedMappingRow()?.sourceElement}}
+                                                                        {{mappingService.selectedMappingRow()?.sourceElement}}
                                                                     </div>
                                                                     <div class="text-[#808080] text-xs">(int)</div>
                                                                     <div class="text-[#cccccc] text-xs mt-2">
-                                                                        {{uploadService.selectedMappingRow()?.dataset}}
+                                                                        {{mappingService.selectedMappingRow()?.dataset}}
                                                                     </div>
                                                                 </div>
                                                                 <span
@@ -233,10 +233,11 @@
                                                                     class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
                                                                     <div
                                                                         class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
-                                                                        {{uploadService.selectedMappingRow()?.targetElement}}
+                                                                        {{mappingService.selectedMappingRow()?.targetElement}}
                                                                     </div>
                                                                     <div class="text-[#808080] text-xs">
-                                                                        ({{uploadService.getTargetDetails(uploadService.selectedMappingRow()?.targetElement)?.Type
+                                                                        ({{mappingService.getTargetDetails(mappingService.selectedMappingRow()?.targetElement
+                                                                        || '')?.Type
                                                                         || 'string'}})</div>
                                                                     <div class="text-[#cccccc] text-xs mt-2">Target
                                                                         Schema</div>
@@ -251,7 +252,7 @@
                                                             class="px-4 py-3 flex items-center justify-between border-t border-[#2d2d2d]">
                                                             <h4 class="text-[#cccccc] text-sm font-medium">
                                                                 Transformation Steps</h4>
-                                                            <button (click)="uploadService.addTransformationStep()"
+                                                            <button (click)="mappingService.addTransformationStep()"
                                                                 type="button"
                                                                 class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-3 py-1.5 rounded-md flex items-center gap-2 text-xs font-semibold transition-all">
                                                                 <i class="pi pi-plus" style="font-size: 10px;"></i>
@@ -260,12 +261,12 @@
                                                         </div>
 
                                                         <!-- Transformation Steps List -->
-                                                        <div *ngIf="uploadService.selectedMappingRow()?.steps?.length > 0"
+                                                        <div *ngIf="(mappingService.selectedMappingRow()?.steps?.length ?? 0) > 0"
                                                             class="flex-1 overflow-auto p-4 flex flex-col gap-3">
-                                                            <div *ngFor="let step of uploadService.selectedMappingRow().steps; let i = index"
+                                                            <div *ngFor="let step of mappingService.selectedMappingRow()?.steps; let i = index"
                                                                 class="transformation-step-box group"
-                                                                [class.active]="uploadService.selectedMappingRow().selectedStepId === step.id"
-                                                                (click)="uploadService.selectTransformationStep(step.id)">
+                                                                [class.active]="mappingService.selectedMappingRow()?.selectedStepId === step.id"
+                                                                (click)="mappingService.selectTransformationStep(step.id)">
                                                                 <div class="flex items-center gap-4 flex-1">
                                                                     <div class="step-number-circle">
                                                                         {{i + 1}}
@@ -279,7 +280,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <button
-                                                                    (click)="$event.stopPropagation(); uploadService.removeTransformationStep(i)"
+                                                                    (click)="$event.stopPropagation(); mappingService.removeTransformationStep(i)"
                                                                     class="text-[#808080] hover:text-[#ffffff] transition-colors p-1">
                                                                     <i class="pi pi-times text-xs"></i>
                                                                 </button>
@@ -287,7 +288,7 @@
                                                         </div>
 
                                                         <!-- Empty Transformation State -->
-                                                        <div *ngIf="!uploadService.selectedMappingRow()?.steps || uploadService.selectedMappingRow()?.steps?.length === 0"
+                                                        <div *ngIf="!mappingService.selectedMappingRow()?.steps || mappingService.selectedMappingRow()?.steps?.length === 0"
                                                             class="flex-1 flex flex-col items-center justify-center p-8 opacity-40">
                                                             <div class="text-[#cccccc] text-sm font-medium mb-1">No
                                                                 transformation steps</div>
@@ -311,7 +312,7 @@
                                                 <!-- Step Configuration Content -->
                                                 <div class="flex-1 overflow-auto">
                                                     <!-- Initial State: No Target Selected -->
-                                                    <div *ngIf="!uploadService.selectedMappingRow()?.targetElement"
+                                                    <div *ngIf="!mappingService.selectedMappingRow()?.targetElement"
                                                         class="h-full flex flex-col items-center justify-center p-8">
                                                         <div class="w-16 h-16 bg-[#ff5f33] rounded-full mb-6"></div>
                                                         <h4 class="text-[#cccccc] text-lg font-medium mb-2">Target
@@ -324,7 +325,7 @@
                                                     </div>
 
                                                     <!-- Secondary State: Target Selected but No Step Selected -->
-                                                    <div *ngIf="uploadService.selectedMappingRow()?.targetElement && !uploadService.selectedMappingRow()?.selectedStepId"
+                                                    <div *ngIf="mappingService.selectedMappingRow()?.targetElement && !mappingService.selectedMappingRow()?.selectedStepId"
                                                         class="h-full flex flex-col items-center justify-center p-8 opacity-40">
                                                         <i class="pi pi-mouse text-[#808080] text-4xl mb-4"></i>
                                                         <h4 class="text-[#cccccc] text-sm font-medium mb-1">No step
@@ -334,13 +335,14 @@
                                                     </div>
 
                                                     <!-- Active Step Configuration -->
-                                                    <div *ngIf="uploadService.selectedMappingRow()?.selectedStepId"
+                                                    <div *ngIf="mappingService.selectedMappingRow()?.selectedStepId"
                                                         class="px-4 py-4 flex flex-col gap-4">
                                                         <div class="flex flex-col gap-1">
                                                             <h4 class="text-[#cccccc] text-base font-semibold">Configure
                                                                 Step
-                                                                {{getStepIndex(uploadService.selectedMappingRow(),
-                                                                uploadService.selectedMappingRow().selectedStepId) + 1}}
+                                                                {{getStepIndex(mappingService.selectedMappingRow(),
+                                                                mappingService.selectedMappingRow()?.selectedStepId) +
+                                                                1}}
                                                             </h4>
                                                         </div>
 
@@ -422,8 +424,7 @@
                                                                     Example</h5>
                                                                 <div
                                                                     class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
-                                                                    <ng-container
-                                                                        *ngIf="activeConfig.example(currentStep()?.params) as ex">
+                                                                    <ng-container *ngIf="activeConfig.example() as ex">
                                                                         <span>{{activeConfig.name.replace(' ',
                                                                             '')}}</span><span>(</span><span>{{ex.input}}</span><span>)
                                                                             &rarr; </span>
@@ -507,7 +508,7 @@
     <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
 
     <!-- Content Area - Constrained to available space with proper overflow handling -->
-    <div *ngIf="uploadService.openedFiles().length === 0" class="flex-1 overflow-hidden">
+    <div *ngIf="datasetService.openedFiles().length === 0" class="flex-1 overflow-hidden">
 
         <!-- EmptyState component -->
         <div class="h-full flex items-center justify-center bg-[#252526] p-8">
@@ -538,13 +539,13 @@
                     <div class="flex flex-col gap-4">
 
                         <!-- Debug Option -->
-                        <button (click)="uploadService.loadTestData()"
+                        <button (click)="datasetService.loadTestData()"
                             class="bg-[#2d2d30] border border-[#ff5f33] text-[#ff5f33] rounded-lg p-2 mb-4 hover:bg-[#3c3c3c]">
                             Load Test Data (Debug)
                         </button>
 
                         <!-- Source Dataset Option -->
-                        <button (click)="uploadService.openFileDialog()"
+                        <button (click)="datasetService.openFileDialog()"
                             class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
                             <div class="flex items-start gap-3 text-left">
                                 <div
@@ -617,11 +618,11 @@
             contains actual data records or describes the data structure.</p>
         <div class="space-y-4">
             <p class="text-[#a0a0a0] text-sm">
-                What type of file is "{{uploadService.uploadedFile()?.name}}"?
+                What type of file is "{{datasetService.uploadedFile()?.name}}"?
             </p>
 
             <div class="grid grid-cols-1 gap-3">
-                <app-button (clicked)="uploadService.onSelectType('dictionary')"
+                <app-button (clicked)="onSelectType('dictionary')"
                     class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left"
                     size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
@@ -635,7 +636,7 @@
                     </div>
                 </app-button>
 
-                <app-button (clicked)="uploadService.onSelectType('data')"
+                <app-button (clicked)="onSelectType('data')"
                     class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left"
                     size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
@@ -651,7 +652,7 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-4 border-t border-[#3c3c3c]">
-                <app-button (click)="uploadService.hideDialog()"
+                <app-button (click)="datasetService.hideDialog()"
                     class="bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] text-[#cccccc]"
                     variant="outline">Cancel</app-button>
             </div>
