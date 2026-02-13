@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -70,4 +70,22 @@ ipcMain.handle('read-file', async (event, filePath) => {
         console.error('Error reading file:', error);
         throw error;
     }
+});
+
+// IPC Handler for Save Dialog
+ipcMain.handle('show-save-dialog', async () => {
+    return await dialog.showSaveDialog({
+        title: 'Save Harmonization Project',
+        defaultPath: 'project.harm',
+        filters: [{ name: 'Harmonization Project', extensions: ['harm'] }]
+    });
+});
+
+// IPC Handler for Open Dialog
+ipcMain.handle('show-open-dialog', async () => {
+    return await dialog.showOpenDialog({
+        title: 'Open Harmonization Project',
+        filters: [{ name: 'Harmonization Project', extensions: ['harm'] }],
+        properties: ['openFile']
+    });
 });

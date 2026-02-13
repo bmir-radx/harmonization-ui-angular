@@ -46,3 +46,14 @@ export interface MappingRow {
     steps: TransformationStep[];
     selectedStepId: number | null;
 }
+
+export interface ProjectState {
+    projectName: string;
+    uploadedFiles: UploadedFile[];
+    targetFiles: UploadedFile[];
+    mappingRows: MappingRow[];
+    openedFiles: UploadedFile[];
+    activeFileName: string | null;
+    lastModified: string;
+    version: string;
+}

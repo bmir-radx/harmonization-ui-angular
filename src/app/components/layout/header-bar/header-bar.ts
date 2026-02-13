@@ -4,6 +4,7 @@ import { ThemeService } from '../../../services/theme.service';
 import { ProjectService, Project } from '../../../services/project.service';
 import { HistoryService, HistoryItem } from '../../../services/history.service';
 import { DatasetService } from '../../../services/dataset.service';
+import { PersistenceService } from '../../../services/persistence.service';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
 
@@ -25,6 +26,7 @@ export class HeaderBar {
     projectService = inject(ProjectService);
     historyService = inject(HistoryService);
     themeService = inject(ThemeService);
+    persistenceService = inject(PersistenceService);
 
     constructor() {
         effect(() => {
@@ -61,7 +63,8 @@ export class HeaderBar {
                     {
                         label: 'Open Project',
                         sublabel: 'Open an existing project',
-                        icon: 'pi pi-folder-open'
+                        icon: 'pi pi-folder-open',
+                        command: () => this.persistenceService.loadProjectWithDialog()
                     },
                     {
                         label: 'Get from Version Control',
@@ -95,7 +98,8 @@ export class HeaderBar {
                     {
                         label: 'Open Project...',
                         icon: 'pi pi-folder-open',
-                        shortcut: 'Ctrl+O'
+                        shortcut: 'Ctrl+O',
+                        command: () => this.persistenceService.loadProjectWithDialog()
                     },
                     {
                         separator: true
@@ -124,12 +128,14 @@ export class HeaderBar {
                     {
                         label: 'Save Project',
                         icon: 'pi pi-save',
-                        shortcut: 'Ctrl+S'
+                        shortcut: 'Ctrl+S',
+                        command: () => this.persistenceService.saveProjectWithDialog()
                     },
                     {
                         label: 'Save Project As...',
                         icon: 'pi pi-folder-plus',
-                        shortcut: 'Ctrl+Shift+S'
+                        shortcut: 'Ctrl+Shift+S',
+                        command: () => this.persistenceService.saveProjectWithDialog()
                     },
                     {
                         separator: true
