@@ -411,15 +411,6 @@
                                                                         <div class="flex items-center justify-between">
                                                                             <label
                                                                                 class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
-                                                                            <button (click)="addEnumMapping()"
-                                                                                class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-2 py-1 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm group active:scale-95"
-                                                                                pTooltip="Add another mapping row"
-                                                                                tooltipPosition="top"
-                                                                                tooltipStyleClass="custom-tooltip">
-                                                                                <i class="pi pi-plus"
-                                                                                    style="font-size: 8px;"></i>
-                                                                                Add
-                                                                            </button>
                                                                         </div>
 
                                                                         <div class="space-y-2">
@@ -474,12 +465,24 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <!-- Empty State -->
-                                                                            <div *ngIf="enumMappings().length === 0"
-                                                                                class="text-center py-4 border border-dashed border-[#3c3c3c] rounded text-[#808080] text-[10px]">
-                                                                                No mappings defined. Click "Add Mapping"
-                                                                                to start.
+                                                                            <!-- Add Mapping Row (Aligned with delete icons) -->
+                                                                            <div class="flex justify-end pt-1 pr-[6px]">
+                                                                                <button (click)="addEnumMapping()"
+                                                                                    class="bg-[#007fd4] hover:bg-[#005fa3] text-white w-7 h-7 rounded flex items-center justify-center transition-all shadow-sm active:scale-95"
+                                                                                    pTooltip="Add another mapping row"
+                                                                                    tooltipPosition="top"
+                                                                                    tooltipStyleClass="custom-tooltip">
+                                                                                    <i class="pi pi-plus"
+                                                                                        style="font-size: 10px;"></i>
+                                                                                </button>
                                                                             </div>
+                                                                        </div>
+
+                                                                        <!-- Empty State -->
+                                                                        <div *ngIf="enumMappings().length === 0"
+                                                                            class="text-center py-4 border border-dashed border-[#3c3c3c] rounded text-[#808080] text-[10px]">
+                                                                            No mappings defined. Click "Add Mapping"
+                                                                            to start.
                                                                         </div>
                                                                     </div>
 
