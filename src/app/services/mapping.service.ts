@@ -268,11 +268,38 @@ export class MappingService {
     }
 
     getTargetDetails(variableName: string) {
+        if (!variableName) return null;
+
+        const searchName = String(variableName).trim();
         for (const file of this.datasetService.targetFiles()) {
-            const match = file.data.find(d =>
-                (d['Variable Name'] || d['Variable name'] || d['variable_name'] || d['Id'] || d['name']) === variableName
-            );
+            if (!file.data || !Array.isArray(file.data)) continue;
+
+            const match = file.data.find(d => {
+                const keys = ['Variable Name', 'Variable name', 'variable_name', 'Variable', 'variable', 'Id', 'ID', 'id', 'name', 'Name', 'Field Name', 'Field name', 'Label'];
+                return keys.some(k => {
+                    const val = d[k];
+                    return val && String(val).trim() === searchName;
+                });
+            });
             if (match) return match;
+        }
+        return null;
+    }
+    getSourceDetails(variableName: string, dataset: string) {
+        if (!variableName || !dataset) return null;
+
+        const searchName = String(variableName).trim();
+        for (const file of this.datasetService.uploadedFiles()) {
+            if (file.folder === dataset && file.type === 'dictionary' && file.data && Array.isArray(file.data)) {
+                const match = file.data.find(d => {
+                    const keys = ['Variable Name', 'Variable name', 'variable_name', 'Variable', 'variable', 'Id', 'ID', 'id', 'name', 'Name', 'Field Name', 'Field name', 'Label'];
+                    return keys.some(k => {
+                        const val = d[k];
+                        return val && String(val).trim() === searchName;
+                    });
+                });
+                if (match) return match;
+            }
         }
         return null;
     }
@@ -295,6 +322,25 @@ export class MappingService {
         completedRows.forEach(row => {
             const operations = row.steps.map(step => {
                 const combinedParams = { ...(step.params || {}) };
+
+                // For enum_to_enum, ensure mapping is a clean object (no __empty_ keys)
+                if (step.transformation === 'enum_to_enum' && combinedParams['mapping']) {
+                    let mapping = combinedParams['mapping'];
+                    if (typeof mapping === 'string') {
+                        try { mapping = JSON.parse(mapping); } catch (e) { }
+                    }
+
+                    if (typeof mapping === 'object' && mapping !== null) {
+                        const cleanMapping: Record<string, string> = {};
+                        Object.entries(mapping).forEach(([key, val]) => {
+                            if (!key.startsWith('__empty_')) {
+                                cleanMapping[key] = String(val);
+                            }
+                        });
+                        combinedParams['mapping'] = cleanMapping;
+                    }
+                }
+
                 return { operation: step.transformation, ...combinedParams };
             });
 

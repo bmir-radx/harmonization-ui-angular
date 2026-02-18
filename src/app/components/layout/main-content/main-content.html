@@ -353,7 +353,7 @@
                                                         <div class="flex flex-col gap-2">
                                                             <label
                                                                 class="text-[#cccccc] text-sm font-medium">Primitive</label>
-                                                            <p-select [options]="transformationOptions"
+                                                            <p-select [options]="transformationOptions()"
                                                                 [ngModel]="currentStep()?.transformation"
                                                                 (onChange)="updateTransformation($event.value)"
                                                                 optionLabel="label" optionValue="value"
@@ -364,7 +364,7 @@
                                                         </div>
 
                                                         <!-- Parameters Section (Generic) -->
-                                                        <div *ngIf="activeConfig"
+                                                        <div *ngIf="activeConfig()"
                                                             class="flex flex-col gap-4 animate-fade-in mt-4">
                                                             <!-- Parameters -->
                                                             <div class="flex flex-col gap-4">
@@ -372,14 +372,15 @@
                                                                     class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
                                                                     Parameters</h5>
 
-                                                                <div *ngIf="activeConfig.params.length === 0"
+                                                                <div *ngIf="activeConfig()?.params?.length === 0"
                                                                     class="text-[#808080] text-sm italic">
                                                                     No parameters required.
                                                                 </div>
 
-                                                                <div *ngFor="let param of activeConfig.params"
+                                                                <div *ngFor="let param of activeConfig()?.params"
                                                                     class="flex flex-col gap-2">
                                                                     <label
+                                                                        *ngIf="currentStep()?.transformation !== 'enum_to_enum' || param.key !== 'mapping'"
                                                                         class="text-[#cccccc] text-sm font-medium">{{param.label}}</label>
 
                                                                     <!-- Text/Number Input -->
@@ -401,12 +402,58 @@
                                                                         class="custom-table-select step-config-select">
                                                                     </p-select>
 
-                                                                    <!-- Textarea Input -->
-                                                                    <textarea *ngIf="param.type === 'textarea'"
-                                                                        [ngModel]="currentStep()?.params?.[param.key]"
-                                                                        (ngModelChange)="updateParam(param.key, $event)"
-                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors min-h-[80px]"
-                                                                        [placeholder]="param.placeholder || ''"></textarea>
+                                                                    <!-- Custom Enum to Enum Parameter -->
+                                                                    <div *ngIf="currentStep()?.transformation === 'enum_to_enum' && param.key === 'mapping'"
+                                                                        class="flex flex-col gap-3">
+                                                                        <div class="flex items-center justify-between">
+                                                                            <label
+                                                                                class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
+                                                                            <button (click)="addEnumMapping()"
+                                                                                class="p-1 px-2 flex items-center justify-center bg-[#2d3139] hover:bg-[#3d4451] border border-[#444c56] rounded text-[#cccccc] transition-all active:scale-95"
+                                                                                pTooltip="Add another mapping row"
+                                                                                tooltipPosition="left">
+                                                                                <i
+                                                                                    class="pi pi-plus text-[10px] text-[#007fd4]"></i>
+                                                                            </button>
+                                                                        </div>
+
+                                                                        <div class="space-y-2">
+                                                                            <!-- List of current mappings -->
+                                                                            <div *ngFor="let mapping of enumMappings(); let i = index"
+                                                                                class="grid grid-cols-[1fr,1fr,auto] gap-3 items-center group">
+
+                                                                                <p-select [options]="sourceEnums()"
+                                                                                    [ngModel]="mapping.source"
+                                                                                    (ngModelChange)="updateEnumMapping(i, 'source', $event)"
+                                                                                    optionLabel="label"
+                                                                                    optionValue="value"
+                                                                                    placeholder="Source..."
+                                                                                    class="w-full" appendTo="body">
+                                                                                </p-select>
+
+                                                                                <p-select [options]="targetEnums()"
+                                                                                    [ngModel]="mapping.target"
+                                                                                    (ngModelChange)="updateEnumMapping(i, 'target', $event)"
+                                                                                    optionLabel="label"
+                                                                                    optionValue="value"
+                                                                                    placeholder="Target..."
+                                                                                    class="w-full" appendTo="body">
+                                                                                </p-select>
+
+                                                                                <button (click)="removeEnumMapping(i)"
+                                                                                    class="p-1.5 text-[#606060] hover:text-[#f85149] rounded transition-colors">
+                                                                                    <i class="pi pi-trash text-xs"></i>
+                                                                                </button>
+                                                                            </div>
+
+                                                                            <!-- Empty State -->
+                                                                            <div *ngIf="enumMappings().length === 0"
+                                                                                class="text-center py-4 border border-dashed border-[#3c3c3c] rounded text-[#808080] text-[10px]">
+                                                                                No mappings defined. Click "Add Mapping"
+                                                                                to start.
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
                                                                     <!-- Boolean Input (Checkbox) -->
                                                                     <div *ngIf="param.type === 'boolean'"
@@ -418,23 +465,33 @@
                                                                         <span
                                                                             class="text-[#808080] text-sm">{{param.label}}</span>
                                                                     </div>
-                                                                </div>
-                                                            </div>
 
-                                                            <!-- Example -->
-                                                            <div class="flex flex-col gap-4">
-                                                                <h5
-                                                                    class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
-                                                                    Example</h5>
-                                                                <div
-                                                                    class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
-                                                                    <ng-container *ngIf="activeConfig.example() as ex">
-                                                                        <span>{{activeConfig.name.replace(' ',
-                                                                            '')}}</span><span>(</span><span>{{ex.input}}</span><span>)
-                                                                            &rarr; </span>
-                                                                        <span>{{ex.output}}</span>
-                                                                        <span class="ml-2">{{ex.context}}</span>
-                                                                    </ng-container>
+                                                                    <!-- Default Textarea Input (if not mapping) -->
+                                                                    <textarea
+                                                                        *ngIf="param.type === 'textarea' && (currentStep()?.transformation !== 'enum_to_enum' || param.key !== 'mapping')"
+                                                                        [ngModel]="currentStep()?.params?.[param.key]"
+                                                                        (ngModelChange)="updateParam(param.key, $event)"
+                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors min-h-[80px]"
+                                                                        [placeholder]="param.placeholder || ''"></textarea>
+
+                                                                </div>
+
+                                                                <!-- Example -->
+                                                                <div class="flex flex-col gap-4 mt-6">
+                                                                    <h5
+                                                                        class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
+                                                                        Example</h5>
+                                                                    <div
+                                                                        class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
+                                                                        <ng-container
+                                                                            *ngIf="activeConfig()?.example?.() as ex">
+                                                                            <span>{{activeConfig()?.name?.replace?.(' ',
+                                                                                '')}}</span><span>(</span><span>{{ex.input}}</span><span>)
+                                                                                &rarr; </span>
+                                                                            <span>{{ex.output}}</span>
+                                                                            <span class="ml-2">{{ex.context}}</span>
+                                                                        </ng-container>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -447,7 +504,6 @@
                             </ng-template>
                         </p-splitter>
                     </div>
-
 
                     <!-- Tab Content - Dictionary -->
                     <data-dictionary-viewer *ngIf="file.type === 'dictionary'" heading=" "
@@ -474,7 +530,7 @@
                                                         </button>
                                                     </div>
 
-                                                    <div class="relative shrink-0" ref={filterRef}>
+                                                    <div class="relative shrink-0">
                                                         <button
                                                             class="p-1 rounded hover:bg-[#4c4c4c] transition-colors text-[#808080]">
                                                             <i class="pi pi-filter w-4 h-4"
@@ -511,7 +567,7 @@
 
     <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
 
-    <!-- Content Area - Constrained to available space with proper overflow handling -->
+    <!-- Empty State - Show if no files are opened -->
     <div *ngIf="datasetService.openedFiles().length === 0" class="flex-1 overflow-hidden">
 
         <!-- EmptyState component -->

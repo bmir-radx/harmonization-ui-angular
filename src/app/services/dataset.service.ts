@@ -195,7 +195,7 @@ export class DatasetService {
     loadTestData() {
         const targetData = [
             { "Variable Name": "t_age", "Label": "Target Age", "Type": "Integer" },
-            { "Variable Name": "t_gender", "Label": "Target Gender", "Type": "String" }
+            { "Variable Name": "t_gender", "Label": "Target Gender", "Type": "String", "Enumerations": "1=Male, 2=Female" }
         ];
         this.addTargetFile({
             name: 'target_dict.csv',
@@ -219,7 +219,9 @@ export class DatasetService {
 
         const sourceDataData = [
             { "s_dob": "1990-01-01", "s_sex": "M" },
-            { "s_dob": "1992-05-20", "s_sex": "F" }
+            { "s_dob": "1992-05-20", "s_sex": "F" },
+            { "s_dob": "1985-11-12", "s_sex": "M" },
+            { "s_dob": "1998-03-05", "s_sex": "Other" }
         ];
         this.addFile({
             name: 'source_data.csv',
