@@ -13,6 +13,10 @@
                         style="--p-icon-size: 16px"></i>
                     <i *ngIf="file.type === 'text'" class="pi pi-file-edit w-4 h-4 text-[#569cd6]"
                         style="--p-icon-size: 16px"></i>
+                    <i *ngIf="file.type === 'rules'" class="pi pi-code w-4 h-4 text-[#569cd6]"
+                        style="--p-icon-size: 16px"></i>
+                    <i *ngIf="file.type === 'replay'" class="pi pi-history w-4 h-4 text-[#569cd6]"
+                        style="--p-icon-size: 16px"></i>
                     <div *ngIf="file.type === 'dictionary'" class="w-4 h-4 shrink-0">
                         <div class="relative size-full" data-name="Component 1">
                             <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
@@ -495,8 +499,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Tab Content - JSON or Text -->
-                    <div *ngIf="file.type === 'json' || file.type === 'text'"
+                    <!-- Tab Content - JSON or Text or Rules or Replay -->
+                    <div *ngIf="file.type === 'json' || file.type === 'text' || file.type === 'rules' || file.type === 'replay'"
                         class="h-full bg-[#1e1e1e] overflow-auto p-6 font-mono text-sm text-[#d4d4d4] selection:bg-[#264f78]">
                         <pre class="whitespace-pre-wrap leading-relaxed">{{file.text}}</pre>
                     </div>

@@ -436,7 +436,14 @@ export class MappingService {
                 try {
                     const rulesText = await (window as any).electron.readFile(resultPaths.rulesPath);
                     if (rulesText) {
-                        this.datasetService.addFileFromText('rules.json', rulesText, 'rules', targetFolder, resultPaths.rulesPath, false);
+                        let formattedText = rulesText;
+                        try {
+                            const rulesObj = JSON.parse(rulesText);
+                            formattedText = JSON.stringify(rulesObj, null, 2);
+                        } catch (e) {
+                            console.warn('Could not parse rules.json for formatting provided raw content instead.');
+                        }
+                        this.datasetService.addFileFromText('rules.json', formattedText, 'rules', targetFolder, resultPaths.rulesPath, false);
                         console.log('Added rules.json');
                     }
                 } catch (e) {

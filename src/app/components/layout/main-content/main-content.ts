@@ -76,7 +76,25 @@ export class MainContent {
   onSelectType(type: string): void {
     const file = this.datasetService.uploadedFile();
     if (file) {
-      this.datasetService.parseCSV(file, type);
+      if (file.name.toLowerCase().endsWith('.json') || type === 'rules' || type === 'json') {
+        file.text().then(text => {
+          let formatted = text;
+          try {
+            formatted = JSON.stringify(JSON.parse(text), null, 2);
+          } catch (e) {
+            console.warn('Could not prettify JSON', e);
+          }
+          this.datasetService.addFileFromText(
+            file.name,
+            formatted,
+            type,
+            this.datasetService.selectedFolder() ?? this.datasetService.getNextDatasetName(),
+            (file as any).path
+          );
+        });
+      } else {
+        this.datasetService.parseCSV(file, type);
+      }
     }
 
     this.datasetService.hideDialog();
