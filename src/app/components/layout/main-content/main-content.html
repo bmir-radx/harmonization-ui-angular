@@ -136,13 +136,16 @@
                                                             <button
                                                                 (click)="$event.stopPropagation(); mappingService.duplicateMappingRow(row)"
                                                                 class="p-1 text-[#808080] hover:text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors"
-                                                                title="Duplicate mapping for one-to-many">
+                                                                pTooltip="Duplicate mapping for one-to-many"
+                                                                tooltipPosition="top"
+                                                                tooltipStyleClass="custom-tooltip">
                                                                 <i class="pi pi-copy text-sm"></i>
                                                             </button>
                                                             <button *ngIf="row.isDuplicate"
                                                                 (click)="$event.stopPropagation(); mappingService.removeMappingRow(row)"
                                                                 class="p-1 text-[#808080] hover:text-[#ff3b30] hover:bg-[#3c3c3c] rounded transition-colors"
-                                                                title="Remove duplicated row">
+                                                                pTooltip="Remove duplicated row" tooltipPosition="top"
+                                                                tooltipStyleClass="custom-tooltip">
                                                                 <i class="pi pi-trash text-sm"></i>
                                                             </button>
                                                         </div>
@@ -409,41 +412,66 @@
                                                                             <label
                                                                                 class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
                                                                             <button (click)="addEnumMapping()"
-                                                                                class="p-1 px-2 flex items-center justify-center bg-[#2d3139] hover:bg-[#3d4451] border border-[#444c56] rounded text-[#cccccc] transition-all active:scale-95"
+                                                                                class="bg-[#007fd4] hover:bg-[#005fa3] text-white px-2 py-1 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm group active:scale-95"
                                                                                 pTooltip="Add another mapping row"
-                                                                                tooltipPosition="left">
-                                                                                <i
-                                                                                    class="pi pi-plus text-[10px] text-[#007fd4]"></i>
+                                                                                tooltipPosition="top"
+                                                                                tooltipStyleClass="custom-tooltip">
+                                                                                <i class="pi pi-plus"
+                                                                                    style="font-size: 8px;"></i>
+                                                                                Add
                                                                             </button>
                                                                         </div>
 
                                                                         <div class="space-y-2">
                                                                             <!-- List of current mappings -->
                                                                             <div *ngFor="let mapping of enumMappings(); let i = index"
-                                                                                class="grid grid-cols-[1fr,1fr,auto] gap-3 items-center group">
+                                                                                class="flex items-center w-full gap-4 group mb-3 last:mb-0">
 
-                                                                                <p-select [options]="sourceEnums()"
-                                                                                    [ngModel]="mapping.source"
-                                                                                    (ngModelChange)="updateEnumMapping(i, 'source', $event)"
-                                                                                    optionLabel="label"
-                                                                                    optionValue="value"
-                                                                                    placeholder="Source..."
-                                                                                    class="w-full" appendTo="body">
-                                                                                </p-select>
+                                                                                <!-- Left: Source Dropdown -->
+                                                                                <div class="flex-1 flex justify-start">
+                                                                                    <p-select [options]="sourceEnums()"
+                                                                                        [ngModel]="mapping.source"
+                                                                                        (ngModelChange)="updateEnumMapping(i, 'source', $event)"
+                                                                                        optionLabel="label"
+                                                                                        optionValue="value"
+                                                                                        placeholder="Source..."
+                                                                                        [style]="{'width': '180px'}"
+                                                                                        appendTo="body"
+                                                                                        class="custom-table-select">
+                                                                                    </p-select>
+                                                                                </div>
 
-                                                                                <p-select [options]="targetEnums()"
-                                                                                    [ngModel]="mapping.target"
-                                                                                    (ngModelChange)="updateEnumMapping(i, 'target', $event)"
-                                                                                    optionLabel="label"
-                                                                                    optionValue="value"
-                                                                                    placeholder="Target..."
-                                                                                    class="w-full" appendTo="body">
-                                                                                </p-select>
+                                                                                <!-- Middle: Direction Arrow -->
+                                                                                <div
+                                                                                    class="flex items-center justify-center">
+                                                                                    <i
+                                                                                        class="pi pi-arrow-right text-[12px] text-[#4ec9b0] font-bold"></i>
+                                                                                </div>
 
-                                                                                <button (click)="removeEnumMapping(i)"
-                                                                                    class="p-1.5 text-[#606060] hover:text-[#f85149] rounded transition-colors">
-                                                                                    <i class="pi pi-trash text-xs"></i>
-                                                                                </button>
+                                                                                <!-- Right: Target Dropdown & Delete -->
+                                                                                <div
+                                                                                    class="flex-1 flex items-center justify-end gap-3">
+                                                                                    <p-select [options]="targetEnums()"
+                                                                                        [ngModel]="mapping.target"
+                                                                                        (ngModelChange)="updateEnumMapping(i, 'target', $event)"
+                                                                                        optionLabel="label"
+                                                                                        optionValue="value"
+                                                                                        placeholder="Target..."
+                                                                                        [style]="{'width': '180px'}"
+                                                                                        appendTo="body"
+                                                                                        class="custom-table-select">
+                                                                                    </p-select>
+
+                                                                                    <button
+                                                                                        (click)="removeEnumMapping(i)"
+                                                                                        class="p-1.5 text-[#606060] hover:text-[#f85149] rounded transition-colors"
+                                                                                        pTooltip="Remove mapping"
+                                                                                        tooltipPosition="left"
+                                                                                        tooltipStyleClass="custom-tooltip">
+                                                                                        <i
+                                                                                            class="pi pi-trash text-sm"></i>
+                                                                                    </button>
+                                                                                </div>
                                                                             </div>
 
                                                                             <!-- Empty State -->

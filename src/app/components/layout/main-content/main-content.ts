@@ -52,6 +52,19 @@ export class MainContent {
         this.datasetService.resetFileDialog();
       }
     });
+
+    // Auto-add first row when enum_to_enum is selected and mapping is empty
+    effect(() => {
+      const step = this.currentStep();
+      if (step && step.transformation === 'enum_to_enum') {
+        const mappings = this.enumMappings();
+        if (mappings.length === 0) {
+          // Use setTimeout to avoid 'writing to signal during signal evolution' error if needed,
+          // though usually effect is fine for this if logic is guarded.
+          this.addEnumMapping();
+        }
+      }
+    });
   }
 
   get visible() {
