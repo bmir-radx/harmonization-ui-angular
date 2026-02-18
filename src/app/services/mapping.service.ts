@@ -26,6 +26,10 @@ export class MappingService {
         return this.mappingRows().some(row => row.status === 'complete');
     });
 
+    readonly completedRulesCount = computed(() => {
+        return this.mappingRows().filter(row => row.status === 'complete').length;
+    });
+
     readonly targetOptions = computed<TargetOption[]>(() => {
         const options: TargetOption[] = [];
         const files = this.datasetService.targetFiles();
@@ -101,13 +105,19 @@ export class MappingService {
     }
 
     updateMappingStatus(rowIndex: number, value: any) {
+        console.log(`Updating mapping status for row ${rowIndex} to value:`, value);
         this.mappingRows.update(rows => {
             const newRows = [...rows];
-            newRows[rowIndex] = {
-                ...newRows[rowIndex],
-                targetElement: value,
-                status: newRows[rowIndex].status === 'complete' ? 'complete' as const : 'attention' as const
-            };
+            if (newRows[rowIndex]) {
+                const currentStatus = newRows[rowIndex].status;
+                newRows[rowIndex] = {
+                    ...newRows[rowIndex],
+                    targetElement: value,
+                    // If we change the target element, maybe we should re-verify? 
+                    // For now, keep as 'complete' if it was already complete, unless value is cleared.
+                    status: !value ? 'attention' : (currentStatus === 'complete' ? 'complete' : 'attention')
+                };
+            }
             return newRows;
         });
     }
@@ -235,12 +245,21 @@ export class MappingService {
 
     saveCurrentRule() {
         const selectedId = this.selectedRowId();
-        if (selectedId === null) return;
+        console.log('Attempting to save current rule for ID:', selectedId);
+        if (selectedId === null) {
+            console.warn('No row selected to save rule.');
+            return;
+        }
 
         this.mappingRows.update(rows => {
             return rows.map(row => {
                 if (row.id === selectedId) {
-                    if (!row.targetElement) return row;
+                    console.log('Found row to save, targetElement:', row.targetElement);
+                    if (!row.targetElement) {
+                        console.warn('Cannot save rule without a target element.');
+                        return row;
+                    }
+                    this.messageService.add({ severity: 'success', summary: 'Rule Saved', detail: `Rule for ${row.sourceElement} saved.` });
                     return { ...row, status: 'complete' as const };
                 }
                 return row;
@@ -260,48 +279,66 @@ export class MappingService {
 
     // API Methods
     async runHarmonization() {
-        console.log('Starting harmonization...');
+        console.log('Starting harmonization process...');
         const rulesOutput: Record<string, Record<string, any>> = {};
         const pairs: { source: string; target: string }[] = [];
 
-        this.mappingRows()
-            .filter(row => row.status === 'complete')
-            .forEach(row => {
-                const operations = row.steps.map(step => {
-                    const combinedParams = { ...(step.params || {}) };
-                    return { operation: step.transformation, ...combinedParams };
-                });
+        const completedRows = this.mappingRows().filter(row => row.status === 'complete');
+        console.log(`Found ${completedRows.length} completed rules.`);
 
-                if (!rulesOutput[row.sourceElement]) rulesOutput[row.sourceElement] = {};
-                rulesOutput[row.sourceElement][row.targetElement!] = {
-                    source: row.sourceElement,
-                    target: row.targetElement,
-                    operations: operations
-                };
-
-                pairs.push({ source: row.sourceElement, target: row.targetElement! });
-            });
-
-        const sourceFile = [...this.datasetService.uploadedFiles()].reverse().find(f => f.type === 'data');
-        if (!sourceFile) return;
-
-        let basePath = '/Users/mete/HARMONIZATION/harmonization-ui-angular/tmp';
-        if (sourceFile.path) {
-            const lastSlash = sourceFile.path.lastIndexOf('/');
-            if (lastSlash !== -1) basePath = sourceFile.path.substring(0, lastSlash);
+        if (completedRows.length === 0) {
+            console.warn('No completed rules to harmonize.');
+            this.messageService.add({ severity: 'warn', summary: 'No Rules', detail: 'Please save at least one rule first.' });
+            return;
         }
 
-        const rulesPath = `${basePath}/rules.json`;
-        const outputPath = `${basePath}/output.csv`;
-        const replayLogPath = `${basePath}/replay.log`;
+        completedRows.forEach(row => {
+            const operations = row.steps.map(step => {
+                const combinedParams = { ...(step.params || {}) };
+                return { operation: step.transformation, ...combinedParams };
+            });
+
+            if (!rulesOutput[row.sourceElement]) rulesOutput[row.sourceElement] = {};
+            rulesOutput[row.sourceElement][row.targetElement!] = {
+                source: row.sourceElement,
+                target: row.targetElement,
+                operations: operations
+            };
+
+            pairs.push({ source: row.sourceElement, target: row.targetElement! });
+        });
+
+        const sourceFile = [...this.datasetService.uploadedFiles()].reverse().find(f => f.type === 'data');
+        console.log('Target source file for harmonization:', sourceFile);
+
+        if (!sourceFile) {
+            console.error('No data file found for harmonization.');
+            this.messageService.add({ severity: 'error', summary: 'Missing Data', detail: 'No data file found to harmonize.' });
+            return;
+        }
+
+        let basePath = '/tmp'; // Default fallback
+        if ((window as any).electron) {
+            // Try to use a better default for Electron
+            basePath = sourceFile.path ? sourceFile.path.substring(0, sourceFile.path.lastIndexOf('/')) : '';
+        }
+
+        const rulesPath = basePath ? `${basePath}/rules.json` : 'rules.json';
+        const outputPath = basePath ? `${basePath}/output.csv` : 'output.csv';
+        const replayLogPath = basePath ? `${basePath}/replay.log` : 'replay.log';
+
+        console.log('Harmonization paths:', { rulesPath, outputPath, replayLogPath });
 
         try {
-            if ((window as any).electron) {
+            if ((window as any).electron && (window as any).electron.saveFile) {
+                console.log('Saving rules.json via Electron to:', rulesPath);
                 await (window as any).electron.saveFile(rulesPath, JSON.stringify(rulesOutput, null, 2));
+            } else {
+                console.log('Skipping Electron file save (possibly web mode or API not available).');
             }
 
             const params: HarmonizeParams = {
-                data_file_path: sourceFile.path || `${basePath}/${sourceFile.name}`,
+                data_file_path: sourceFile.path || sourceFile.name,
                 rules_file_path: rulesPath,
                 replay_log_file_path: replayLogPath,
                 output_file_path: outputPath,
@@ -310,39 +347,107 @@ export class MappingService {
                 overwrite: true
             };
 
+            console.log('Sending harmonize request to API with params:', params);
             this.harmonizationApi.harmonize(params).subscribe({
                 next: (response: RpcResponse) => {
+                    console.log('Harmonize response received:', response);
+                    const resultPaths = { outputPath, rulesPath, replayLogPath };
                     if (response.job_id) {
-                        this.pollJob(response.job_id, outputPath, sourceFile!.folder);
+                        console.log('Starting job polling for:', response.job_id);
+                        this.pollJob(response.job_id, resultPaths, sourceFile!.folder);
+                    } else if (response.result) {
+                        this.handleJobCompletion(resultPaths, sourceFile!.folder);
+                    } else if (response.error) {
+                        console.error('API returned error:', response.error);
+                        this.handleError(response.error);
                     }
                 },
                 error: (err) => {
-                    this.messageService.add({ severity: 'error', summary: 'Harmonization Failed', detail: err.message });
+                    console.error('Harmonize API call failed:', err);
+                    this.messageService.add({ severity: 'error', summary: 'API Error', detail: err.message || 'Harmonization call failed.' });
                 }
             });
-        } catch (err) {
-            console.error('Error during harmonization preparation:', err);
+        } catch (err: any) {
+            console.error('Unexpected error during harmonization preparation:', err);
+            this.messageService.add({ severity: 'error', summary: 'Preparation Error', detail: err.message || 'An error occurred.' });
         }
     }
 
-    private pollJob(jobId: string, outputPath: string, targetFolder: string) {
+    private handleError(error: any) {
+        const detail = typeof error === 'string' ? error : (error.message || 'An error occurred');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail });
+    }
+
+    private pollJob(jobId: string, resultPaths: { outputPath: string; rulesPath: string; replayLogPath: string }, targetFolder: string) {
+        console.log(`Starting polling for job ID: ${jobId}`);
         const interval = setInterval(() => {
+            console.log(`Requesting status for job ${jobId}...`);
             this.harmonizationApi.getJob(jobId).subscribe({
                 next: (res: RpcResponse) => {
-                    if (res.status === 'completed') {
+                    console.log(`Status for job ${jobId}:`, res.status);
+                    // Handle both 'completed' and 'success' as finished states
+                    if (res.status === 'completed' || res.status === 'success') {
+                        console.log(`Job ${jobId} marked as completed/success.`);
                         clearInterval(interval);
-                        this.handleJobCompletion(res, targetFolder);
-                    } else if (res.status === 'failed') {
+                        this.handleJobCompletion(resultPaths, targetFolder);
+                    } else if (res.status === 'failed' || res.status === 'error') {
+                        console.error(`Job ${jobId} failed with error:`, res.error);
                         clearInterval(interval);
-                        this.messageService.add({ severity: 'error', summary: 'Job Failed', detail: 'Harmonization failed.' });
+                        this.messageService.add({ severity: 'error', summary: 'Job Failed', detail: res.error || 'Harmonization failed.' });
                     }
                 },
-                error: () => clearInterval(interval)
+                error: (err) => {
+                    console.error(`Endpoint error while polling job ${jobId}:`, err);
+                    clearInterval(interval);
+                }
             });
         }, 2000);
     }
 
-    private handleJobCompletion(result: any, targetFolder: string) {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed.' });
+    private async handleJobCompletion(resultPaths: { outputPath: string; rulesPath: string; replayLogPath: string }, targetFolder: string) {
+        console.log('Harmonization job completed. Processing results at paths:', resultPaths);
+
+        try {
+            if ((window as any).electron) {
+                // Read and add output.csv
+                try {
+                    const outputText = await (window as any).electron.readFile(resultPaths.outputPath);
+                    if (outputText) {
+                        const outputFile = this.datasetService.addFileFromText('output.csv', outputText, 'data', targetFolder, resultPaths.outputPath, true);
+                        this.datasetService.openFile(outputFile);
+                        console.log('Added and opened output.csv');
+                    }
+                } catch (e) {
+                    console.warn('Could not read output.csv:', e);
+                }
+
+                // Read and add replay.log
+                try {
+                    const logText = await (window as any).electron.readFile(resultPaths.replayLogPath);
+                    if (logText) {
+                        this.datasetService.addFileFromText('replay.log', logText, 'replay', targetFolder, resultPaths.replayLogPath, false);
+                        console.log('Added replay.log');
+                    }
+                } catch (e) {
+                    console.warn('Could not read replay.log:', e);
+                }
+
+                // Read and add rules.json
+                try {
+                    const rulesText = await (window as any).electron.readFile(resultPaths.rulesPath);
+                    if (rulesText) {
+                        this.datasetService.addFileFromText('rules.json', rulesText, 'rules', targetFolder, resultPaths.rulesPath, false);
+                        console.log('Added rules.json');
+                    }
+                } catch (e) {
+                    console.warn('Could not read rules.json:', e);
+                }
+            }
+
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed. Results added to sidebar.' });
+        } catch (err) {
+            console.error('Error handling job completion:', err);
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to process harmonization results.' });
+        }
     }
 }

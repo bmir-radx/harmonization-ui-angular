@@ -62,6 +62,26 @@ export class DatasetService {
         this.uploadedFiles.update(files => [...files, file]);
     }
 
+    addFileFromText(name: string, text: string, type: string, folder: string, path?: string, parseAsCsv: boolean = false) {
+        let data: any[] = [];
+        if (parseAsCsv) {
+            const result = Papa.parse(text, { header: true, skipEmptyLines: true });
+            data = result.data;
+        }
+
+        const uploadedFile: UploadedFile = {
+            name,
+            type,
+            data,
+            text,
+            folder,
+            path
+        };
+
+        this.addFile(uploadedFile);
+        return uploadedFile;
+    }
+
     addTargetFile(file: UploadedFile) {
         this.targetFiles.update(files => [...files, file]);
     }
