@@ -59,6 +59,16 @@
                                                 <i class="pi pi-check text-[#4caf50]" style="font-size: 10px;"></i>
                                                 <span>{{mappingService.completedRulesCount()}} rules</span>
                                             </div>
+
+                                            <!-- Search Field -->
+                                            <div class="relative ml-4">
+                                                <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-[#808080]"
+                                                    style="font-size: 10px;"></i>
+                                                <input type="text" [ngModel]="searchTerm()"
+                                                    (ngModelChange)="searchTerm.set($event)"
+                                                    placeholder="Filter elements..."
+                                                    class="bg-[#2d2d2d] border border-[#3c3c3c] rounded pl-8 pr-3 py-1 text-[#cccccc] text-xs focus:border-[#007fd4] outline-none transition-all w-48 transition-all">
+                                            </div>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <button
@@ -75,10 +85,10 @@
                                     </div>
 
                                     <!-- Table Content -->
-                                    <div class="flex-1 overflow-hidden">
-                                        <p-table [value]="mappingService.mappingRows()" [scrollable]="true"
-                                            scrollHeight="100%" class="mappings-table-v2"
-                                            [tableStyle]="{'min-width': '100%'}" dataKey="id">
+                                    <div class="flex-1 overflow-hidden h-full">
+                                        <p-table [value]="filteredMappingRows()" [scrollable]="true"
+                                            scrollHeight="calc(100vh - 200px)" class="mappings-table-v2"
+                                            [tableStyle]="{'min-width': '100%'}">
                                             <ng-template pTemplate="header">
                                                 <tr>
                                                     <th class="index-col">#</th>

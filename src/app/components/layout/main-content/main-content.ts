@@ -43,6 +43,21 @@ export class MainContent {
   themeService = inject(ThemeService);
   messageService = inject(MessageService);
 
+  searchTerm = signal<string>('');
+
+  filteredMappingRows = computed(() => {
+    const rows = this.mappingService.mappingRows();
+    const term = this.searchTerm().toLowerCase().trim();
+
+    if (!term) return rows;
+
+    return rows.filter(row =>
+      row.sourceElement.toLowerCase().includes(term) ||
+      (row.targetElement && row.targetElement.toLowerCase().includes(term)) ||
+      row.dataset.toLowerCase().includes(term)
+    );
+  });
+
   constructor() {
     effect(() => {
       this.isDarkMode = this.themeService.isDarkMode()();
