@@ -188,19 +188,22 @@ export class HeaderBar {
                         separator: true
                     },
                     {
-                        label: 'Zoom In',
+                        label: 'Increase Font Size',
                         icon: 'pi pi-plus',
-                        shortcut: 'Ctrl++'
+                        shortcut: 'Ctrl++',
+                        command: () => this.themeService.increaseFontSize()
                     },
                     {
-                        label: 'Zoom Out',
+                        label: 'Decrease Font Size',
                         icon: 'pi pi-minus',
-                        shortcut: 'Ctrl+-'
+                        shortcut: 'Ctrl+-',
+                        command: () => this.themeService.decreaseFontSize()
                     },
                     {
-                        label: 'Reset Zoom',
+                        label: 'Reset Font Size',
                         icon: 'pi pi-cog',
-                        shortcut: 'Ctrl+0'
+                        shortcut: 'Ctrl+0',
+                        command: () => this.themeService.resetFontSize()
                     },
                     {
                         separator: true
@@ -248,30 +251,19 @@ export class HeaderBar {
                         label: 'Increase Font Size',
                         icon: 'pi pi-plus',
                         shortcut: 'Ctrl++',
-                        command: () => {
-                            const value = `${parseFloat(this.getCSSVar('--font-size')) + 1}px`;
-                            document.documentElement.style.setProperty('--font-size', value);
-                            this.rightMenu = this.buildRightMenu();
-                        }
+                        command: () => this.themeService.increaseFontSize()
                     },
                     {
                         label: 'Decrease Font Size',
                         icon: 'pi pi-minus',
                         shortcut: 'Ctrl+-',
-                        command: () => {
-                            const value = `${parseFloat(this.getCSSVar('--font-size')) - 1}px`;
-                            document.documentElement.style.setProperty('--font-size', value);
-                            this.rightMenu = this.buildRightMenu();
-                        }
+                        command: () => this.themeService.decreaseFontSize()
                     },
                     {
                         label: 'Reset Font Size',
                         icon: 'pi pi-cog',
-                        shortcut: this.getCSSVar('--font-size'),
-                        command: () => {
-                            document.documentElement.style.setProperty('--font-size', '16px');
-                            this.rightMenu = this.buildRightMenu();
-                        }
+                        shortcut: '16px',
+                        command: () => this.themeService.resetFontSize()
                     }
                 ]
             }

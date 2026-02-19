@@ -10,7 +10,7 @@
     .p-datatable-thead>tr>th {
         background: #1e1e1e !important;
         color: #888888 !important;
-        font-size: 11px !important;
+        font-size: calc(var(--font-size) * 0.6875) !important; // 11px base
         font-weight: 700 !important;
         padding: 10px 16px !important;
         border-bottom: 1px solid #2d2d2d !important;
@@ -39,7 +39,7 @@
         td {
             padding: 8px 16px !important;
             color: #cccccc;
-            font-size: 13px;
+            font-size: calc(var(--font-size) * 0.8125);
             border: none !important;
         }
     }
@@ -89,7 +89,7 @@
             background: #1e1e1e !important;
             border: 1px solid #454545 !important;
             color: #cccccc !important;
-            font-size: 12px !important;
+            font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 6px 10px !important;
             border-radius: 4px !important;
             width: 100% !important;
@@ -113,7 +113,7 @@
 
         .p-select-option {
             color: #cccccc !important;
-            font-size: 12px !important;
+            font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 6px 12px !important;
             margin: 0 4px !important;
             border-radius: 3px !important;
@@ -135,7 +135,7 @@
         .p-select-empty-message,
         .p-select-list-empty-message {
             color: #808080 !important;
-            font-size: 12px !important;
+            font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 8px 12px !important;
             background: transparent !important;
         }
@@ -158,7 +158,7 @@
 
         .p-select-label {
             color: #cccccc !important;
-            font-size: 12px !important;
+            font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 0 8px !important;
             position: relative;
             display: flex;
@@ -176,7 +176,7 @@
                     top: 50% !important;
                     transform: translateY(-50%) !important;
                     color: #808080 !important;
-                    font-size: 12px !important;
+                    font-size: calc(var(--font-size) * 0.75) !important; // 12px base
                 }
             }
         }
@@ -185,8 +185,8 @@
             width: 24px !important;
 
             .p-icon {
-                width: 10px;
-                height: 10px;
+                width: calc(var(--font-size) * 0.625) !important;
+                height: calc(var(--font-size) * 0.625) !important;
                 color: #808080;
             }
         }
@@ -197,7 +197,7 @@
             background: #252526 !important;
             color: #cccccc !important;
             border: 1px solid #454545 !important;
-            font-size: 11px !important;
+            font-size: calc(var(--font-size) * 0.6875) !important; // 11px base
             padding: 4px 8px !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
             border-radius: 4px !important;

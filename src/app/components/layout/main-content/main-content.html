@@ -52,18 +52,18 @@
                                         class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#1e1e1e]">
                                         <div class="flex items-center gap-6">
                                             <div class="flex items-center gap-2 text-[#cccccc] text-xs">
-                                                <i class="pi pi-table" style="font-size: 10px;"></i>
+                                                <i class="pi pi-table" style="font-size: 0.625rem;"></i>
                                                 <span>{{mappingService.mappingRows().length}} elements</span>
                                             </div>
                                             <div class="flex items-center gap-2 text-[#cccccc] text-xs">
-                                                <i class="pi pi-check text-[#4caf50]" style="font-size: 10px;"></i>
+                                                <i class="pi pi-check text-[#4caf50]" style="font-size: 0.625rem;"></i>
                                                 <span>{{mappingService.completedRulesCount()}} rules</span>
                                             </div>
 
                                             <!-- Search Field -->
                                             <div class="relative ml-4">
                                                 <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-[#808080]"
-                                                    style="font-size: 10px;"></i>
+                                                    style="font-size: 0.625rem;"></i>
                                                 <input type="text" [ngModel]="searchTerm()"
                                                     (ngModelChange)="searchTerm.set($event)"
                                                     placeholder="Filter elements..."
@@ -73,7 +73,7 @@
                                         <div class="flex items-center gap-2">
                                             <button
                                                 class="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-2 py-1 rounded-md flex items-center gap-2 text-xs font-semibold shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all">
-                                                <i class="pi pi-sparkles" style="font-size: 10px;"></i>
+                                                <i class="pi pi-sparkles" style="font-size: 0.625rem;"></i>
                                                 AI
                                             </button>
                                             <button [disabled]="!mappingService.isReady()"

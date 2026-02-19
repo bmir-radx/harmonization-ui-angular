@@ -95,7 +95,7 @@
             .p-select-label {
                 padding-left: 12px !important;
                 color: #cccccc !important;
-                font-size: 13px !important;
+                font-size: calc(var(--font-size) * 0.8125) !important; // 13px base
             }
 
             .p-select-dropdown {

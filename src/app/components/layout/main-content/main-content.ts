@@ -189,10 +189,29 @@ export class MainContent {
       if (Array.isArray(val)) return val.map(v => ({ label: String(v), value: String(v) }));
 
       if (typeof val === 'string' && val.trim()) {
-        // Handle pipe-separated quoted values: "Value 1" | "Value 2"
+        // Handle pipe-separated quoted values: "Value 1" | "Value 2" or "1"=[Working]
         if (val.includes('|')) {
           const parts = val.split('|');
           const parsed = parts.map(p => {
+            const hasEq = p.includes('=');
+            const hasColon = p.includes(':');
+
+            if (hasEq || hasColon) {
+              const separator = hasEq ? '=' : ':';
+              const [left, ...rest] = p.split(separator);
+              const right = rest.join(separator);
+
+              const value = left.replace(/"/g, '').trim();
+              let labelText = right.trim();
+              if (labelText.startsWith('[') && labelText.endsWith(']')) {
+                labelText = labelText.substring(1, labelText.length - 1);
+              } else {
+                labelText = labelText.replace(/"/g, '');
+              }
+
+              return { value, label: value === labelText ? value : `${value} - ${labelText}` };
+            }
+
             const match = p.match(/"([^"]+)"/);
             const value = match ? match[1] : p.trim();
             return { value, label: value };
@@ -206,7 +225,7 @@ export class MainContent {
         const parsed = pairs.map(p => {
           const parts = p.includes('=') ? p.split('=') : p.split(':');
           if (parts.length === 2) {
-            return { value: parts[0].trim(), label: parts[1].trim() };
+            return { value: parts[0].trim(), label: `${parts[0].trim()} - ${parts[1].trim()}` };
           }
           return { value: p.trim(), label: p.trim() };
         }).filter(p => p.label || p.value);
@@ -224,13 +243,20 @@ export class MainContent {
     const selected = this.mappingService.selectedMappingRow();
     if (!selected) return [];
 
+    // 1. Try to get unique values from source data files
     const dataFile = this.datasetService.uploadedFiles().find(f => f.folder === selected.dataset && f.type === 'data');
-    if (!dataFile || !dataFile.data) return [];
+    if (dataFile && dataFile.data) {
+      const values = dataFile.data.map(row => row[selected.sourceElement])
+        .filter(v => v !== undefined && v !== null && v !== '');
 
-    const values = dataFile.data.map(row => row[selected.sourceElement])
-      .filter(v => v !== undefined && v !== null && v !== '');
+      if (values.length > 0) {
+        return Array.from(new Set(values)).sort().map(v => ({ label: String(v), value: String(v) }));
+      }
+    }
 
-    return Array.from(new Set(values)).sort().map(v => ({ label: String(v), value: String(v) }));
+    // 2. Fallback: Parse from source dictionary
+    const details = this.mappingService.getSourceDetails(selected.sourceElement, selected.dataset);
+    return this.getEnumsFromDetails(details);
   });
 
   targetEnums = computed(() => {
