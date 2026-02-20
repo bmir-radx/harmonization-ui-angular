@@ -393,15 +393,23 @@ export class MappingService {
                 overwrite: true
             };
 
-            console.log('Sending harmonize request to API with params:', params);
+            this.messageService.add({ severity: 'info', summary: 'Harmonization Submitted', detail: 'Submitting harmonization request to the server...', life: 15000 });
+
+            console.log('\n--- HARMONIZATION REQUEST PARAMS ---');
+            console.log(JSON.stringify(params, null, 2));
+
             this.harmonizationApi.harmonize(params).subscribe({
                 next: (response: RpcResponse) => {
-                    console.log('Harmonize response received:', response);
+                    console.log('\n--- HARMONIZE API SUBMISSION RESPONSE ---');
+                    console.log(JSON.stringify(response, null, 2));
+
                     const resultPaths = { outputPath, rulesPath, replayLogPath };
                     if (response.job_id) {
                         console.log('Starting job polling for:', response.job_id);
+                        this.messageService.add({ severity: 'info', summary: 'Job Queued', detail: `Harmonization job queued. Waiting to start...`, life: 15000 });
                         this.pollJob(response.job_id, resultPaths, sourceFile!.folder);
                     } else if (response.result) {
+                        this.messageService.add({ severity: 'info', summary: 'Running Synchronously', detail: `Job is executing and processing results...`, life: 15000 });
                         this.handleJobCompletion(resultPaths, sourceFile!.folder);
                     } else if (response.error) {
                         console.error('API returned error:', response.error);
@@ -426,28 +434,39 @@ export class MappingService {
 
     private pollJob(jobId: string, resultPaths: { outputPath: string; rulesPath: string; replayLogPath: string }, targetFolder: string) {
         console.log(`Starting polling for job ID: ${jobId}`);
+        let hasStarted = false;
+
         const interval = setInterval(() => {
             console.log(`Requesting status for job ${jobId}...`);
             this.harmonizationApi.getJob(jobId).subscribe({
                 next: (res: RpcResponse) => {
-                    console.log(`Status for job ${jobId}:`, res.status);
+                    console.log(`\n--- POLLING API RESPONSE FOR JOB ${jobId} ---`);
+                    console.log(JSON.stringify(res, null, 2));
+
+
+                    if (res.status === 'running' && !hasStarted) {
+                        hasStarted = true;
+                        this.messageService.add({ severity: 'info', summary: 'Job Started', detail: `Job is now actively running in the background...`, life: 15000 });
+                    }
+
                     // Handle both 'completed' and 'success' as finished states
                     if (res.status === 'completed' || res.status === 'success') {
                         console.log(`Job ${jobId} marked as completed/success.`);
                         clearInterval(interval);
+                        this.messageService.add({ severity: 'success', summary: 'Job Finished', detail: 'Harmonization completed remotely. Fetching output files...', life: 15000 });
                         this.handleJobCompletion(resultPaths, targetFolder);
                     } else if (res.status === 'failed' || res.status === 'error') {
                         console.error(`Job ${jobId} failed with error:`, res.error);
                         clearInterval(interval);
-                        this.messageService.add({ severity: 'error', summary: 'Job Failed', detail: res.error || 'Harmonization failed.' });
+                        this.messageService.add({ severity: 'error', summary: 'Job Failed', detail: res.error || 'Harmonization failed during execution.', life: 15000 });
                     }
                 },
                 error: (err) => {
                     console.error(`Endpoint error while polling job ${jobId}:`, err);
-                    clearInterval(interval);
+                    // Do not clear interval on network blips, keep trying
                 }
             });
-        }, 2000);
+        }, 3000);
     }
 
     private async handleJobCompletion(resultPaths: { outputPath: string; rulesPath: string; replayLogPath: string }, targetFolder: string) {
@@ -455,16 +474,22 @@ export class MappingService {
 
         try {
             if ((window as any).electron) {
+                let loadedOutputs = 0;
+
                 // Read and add output.csv
                 try {
                     const outputText = await (window as any).electron.readFile(resultPaths.outputPath);
                     if (outputText) {
                         const outputFile = this.datasetService.addFileFromText('output.csv', outputText, 'data', targetFolder, resultPaths.outputPath, true);
                         this.datasetService.openFile(outputFile);
+                        loadedOutputs++;
                         console.log('Added and opened output.csv');
+                    } else {
+                        throw new Error('File was empty or not found');
                     }
-                } catch (e) {
+                } catch (e: any) {
                     console.warn('Could not read output.csv:', e);
+                    this.messageService.add({ severity: 'warn', summary: 'Missing Output', detail: 'Could not load output.csv. It may be missing, too large, or failed locally.', life: 15000 });
                 }
 
                 // Read and add replay.log
@@ -472,6 +497,7 @@ export class MappingService {
                     const logText = await (window as any).electron.readFile(resultPaths.replayLogPath);
                     if (logText) {
                         this.datasetService.addFileFromText('replay.log', logText, 'replay', targetFolder, resultPaths.replayLogPath, false);
+                        loadedOutputs++;
                         console.log('Added replay.log');
                     }
                 } catch (e) {
@@ -490,14 +516,20 @@ export class MappingService {
                             console.warn('Could not parse rules.json for formatting provided raw content instead.');
                         }
                         this.datasetService.addFileFromText('rules.json', formattedText, 'rules', targetFolder, resultPaths.rulesPath, false);
+                        loadedOutputs++;
                         console.log('Added rules.json');
                     }
                 } catch (e) {
                     console.warn('Could not read rules.json:', e);
                 }
+
+                if (loadedOutputs > 0) {
+                    this.messageService.add({ severity: 'success', summary: 'Output Ready', detail: `Successfully loaded ${loadedOutputs} results to the sidebar.`, life: 15000 });
+                }
+            } else {
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed.', life: 10000 });
             }
 
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Harmonization completed. Results added to sidebar.' });
         } catch (err) {
             console.error('Error handling job completion:', err);
             this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to process harmonization results.' });
