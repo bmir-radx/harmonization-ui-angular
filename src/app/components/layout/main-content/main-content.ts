@@ -243,7 +243,14 @@ export class MainContent {
     const selected = this.mappingService.selectedMappingRow();
     if (!selected) return [];
 
-    // 1. Try to get unique values from source data files
+    // 1. Primary: Parse from source dictionary to capture meanings/labels
+    const details = this.mappingService.getSourceDetails(selected.sourceElement, selected.dataset);
+    const dictEnums = this.getEnumsFromDetails(details);
+    if (dictEnums.length > 0) {
+      return dictEnums;
+    }
+
+    // 2. Fallback: Try to get unique values from source data files
     const dataFile = this.datasetService.uploadedFiles().find(f => f.folder === selected.dataset && f.type === 'data');
     if (dataFile && dataFile.data) {
       const values = dataFile.data.map(row => row[selected.sourceElement])
@@ -254,9 +261,7 @@ export class MainContent {
       }
     }
 
-    // 2. Fallback: Parse from source dictionary
-    const details = this.mappingService.getSourceDetails(selected.sourceElement, selected.dataset);
-    return this.getEnumsFromDetails(details);
+    return [];
   });
 
   targetEnums = computed(() => {
@@ -265,7 +270,14 @@ export class MainContent {
 
     const targetElement = selected.targetElement;
 
-    // 1. Try to get unique values from target data files (matching sourceEnums logic)
+    // 1. Primary: Parse from target dictionary to capture meanings/labels
+    const details = this.mappingService.getTargetDetails(targetElement);
+    const dictEnums = this.getEnumsFromDetails(details);
+    if (dictEnums.length > 0) {
+      return dictEnums;
+    }
+
+    // 2. Fallback: Try to get unique values from target data files
     const targetDataFile = this.datasetService.targetFiles().find(f => f.type === 'data');
     if (targetDataFile && targetDataFile.data) {
       const values = targetDataFile.data.map(row => row[targetElement])
@@ -276,9 +288,7 @@ export class MainContent {
       }
     }
 
-    // 2. Fallback: Parse from target dictionary
-    const details = this.mappingService.getTargetDetails(targetElement);
-    return this.getEnumsFromDetails(details);
+    return [];
   });
 
   enumMappings = computed(() => {
