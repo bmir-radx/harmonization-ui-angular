@@ -8,39 +8,41 @@
 
 ::ng-deep .mappings-table-v2 {
     .p-datatable-thead>tr>th {
-        background: #1e1e1e !important;
-        color: #888888 !important;
+        background: var(--background) !important;
+        color: var(--muted-foreground) !important;
         font-size: calc(var(--font-size) * 0.6875) !important; // 11px base
         font-weight: 700 !important;
         padding: 10px 16px !important;
-        border-bottom: 1px solid #2d2d2d !important;
-        border-top: 1px solid #2d2d2d !important;
+        border-bottom: 1px solid var(--border) !important;
+        border-top: 1px solid var(--border) !important;
         letter-spacing: 0.5px;
         text-transform: uppercase;
     }
 
     .p-datatable-tbody>tr {
-        background: #1e1e1e !important;
-        border-bottom: 1px solid #2d2d2d !important;
+        background: var(--background) !important;
+        border-bottom: 1px solid var(--border) !important;
         transition: background 0.2s;
+        color: var(--foreground) !important;
 
         &:hover {
-            background: #252526 !important;
+            background: var(--card) !important;
         }
 
         &.selected-row {
-            background: #243447 !important; // Dark blue selection from image
+            background: var(--table-row-selected) !important;
 
             td {
-                color: #ffffff !important;
+                color: var(--foreground) !important;
             }
         }
 
         td {
             padding: 8px 16px !important;
-            color: #cccccc;
+            color: var(--foreground) !important;
             font-size: calc(var(--font-size) * 0.8125);
             border: none !important;
+            background: transparent !important;
         }
     }
 
@@ -57,17 +59,17 @@
 
 ::ng-deep {
     .p-select-overlay {
-        background: #252526 !important;
-        border: 1px solid #454545 !important;
+        background: var(--card) !important;
+        border: 1px solid var(--border) !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
         border-radius: 6px !important;
         overflow: hidden !important;
         margin-top: 4px;
 
         .p-select-header {
-            background: #252526 !important;
+            background: var(--card) !important;
             padding: 8px !important;
-            border-bottom: 1px solid #3c3c3c !important;
+            border-bottom: 1px solid var(--border) !important;
 
             // Aggressively hide any icon, svg, or specific PrimeNG icon elements
             .p-select-filter-icon,
@@ -77,6 +79,8 @@
             [class*="pi-"] {
                 display: none !important;
             }
+
+            color: var(--foreground) !important;
         }
 
         .p-select-filter-container {
@@ -86,9 +90,9 @@
 
         .p-select-filter,
         .p-inputtext {
-            background: #1e1e1e !important;
-            border: 1px solid #454545 !important;
-            color: #cccccc !important;
+            background: var(--background) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--foreground) !important;
             font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 6px 10px !important;
             border-radius: 4px !important;
@@ -97,44 +101,45 @@
             display: block !important;
 
             &::placeholder {
-                color: #808080 !important;
+                color: var(--muted-foreground) !important;
             }
 
             &:focus {
-                border-color: #007fd4 !important;
+                border-color: var(--primary) !important;
                 outline: none;
             }
         }
 
         .p-select-list {
             padding: 4px 0 !important;
-            background: #252526 !important;
+            background: var(--card) !important;
+            border: none !important;
         }
 
         .p-select-option {
-            color: #cccccc !important;
+            color: var(--foreground) !important;
             font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 6px 12px !important;
             margin: 0 4px !important;
             border-radius: 3px !important;
 
             &:hover {
-                background: #2a2d2e !important;
+                background: var(--muted) !important;
             }
 
             &.p-select-option-selected {
-                background: #094771 !important;
+                background: var(--primary) !important;
                 color: white !important;
             }
 
             &.p-focus {
-                background: #2a2d2e !important;
+                background: var(--muted) !important;
             }
         }
 
         .p-select-empty-message,
         .p-select-list-empty-message {
-            color: #808080 !important;
+            color: var(--muted-foreground) !important;
             font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 8px 12px !important;
             background: transparent !important;
@@ -142,22 +147,23 @@
     }
 
     .custom-table-select {
-        background: #1e1e1e !important;
-        border: 1px solid #454545 !important;
+        background: var(--background) !important;
+        color: var(--foreground) !important;
+        border: 1px solid var(--border) !important;
         border-radius: 4px !important;
         height: 30px !important;
         width: 100% !important;
 
         &:hover {
-            border-color: #007fd4 !important;
+            border-color: var(--primary) !important;
         }
 
         &.p-focus {
-            border-color: #007fd4 !important;
+            border-color: var(--primary) !important;
         }
 
         .p-select-label {
-            color: #cccccc !important;
+            color: var(--foreground) !important;
             font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 0 8px !important;
             position: relative;
@@ -175,7 +181,7 @@
                     left: 8px !important;
                     top: 50% !important;
                     transform: translateY(-50%) !important;
-                    color: #808080 !important;
+                    color: var(--muted-foreground) !important;
                     font-size: calc(var(--font-size) * 0.75) !important; // 12px base
                 }
             }
@@ -187,7 +193,7 @@
             .p-icon {
                 width: calc(var(--font-size) * 0.625) !important;
                 height: calc(var(--font-size) * 0.625) !important;
-                color: #808080;
+                color: var(--muted-foreground) !important;
             }
         }
     }
@@ -205,6 +211,46 @@
 
         .p-tooltip-arrow {
             display: none !important;
+        }
+    }
+
+    /* Switch to semantic variables for Dialog Defaults */
+    p-dialog .p-dialog {
+        background: var(--popover) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+
+        .p-dialog-header {
+            background: var(--popover) !important;
+            border-bottom: 1px solid var(--border) !important;
+            color: var(--foreground) !important;
+
+            .p-dialog-title {
+                color: var(--foreground) !important;
+            }
+
+            .p-dialog-header-icons button {
+                color: var(--muted-foreground) !important;
+                background: transparent !important;
+                border: none !important;
+
+                &:hover {
+                    color: var(--foreground) !important;
+                    background: var(--muted) !important;
+                }
+            }
+        }
+
+        .p-dialog-content {
+            background: var(--popover) !important;
+            color: var(--foreground) !important;
+        }
+
+        .p-dialog-footer {
+            background: var(--popover) !important;
+            border-top: 1px solid var(--border) !important;
+            color: var(--foreground) !important;
         }
     }
 }

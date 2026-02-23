@@ -1,10 +1,10 @@
-<div class="h-full flex flex-col bg-[#252526]">
+<div class="h-full flex flex-col bg-card">
     <!-- Tab Navigation - Show if we have mappings tabs enabled or open file tabs -->
     <p-tabs *ngIf="datasetService.openedFiles().length > 0" [value]="datasetService.activeFile()?.name">
         <p-tablist>
             <p-tab *ngFor="let file of datasetService.openedFiles()" [value]="file.name">
                 <div
-                    class="px-3 py-2 border-r border-[#3c3c3c] cursor-pointer text-sm flex items-center gap-2 whitespace-nowrap group relative">
+                    class="px-3 py-2 border-r border-border cursor-pointer text-sm flex items-center gap-2 whitespace-nowrap group relative">
                     <i *ngIf="file.type === 'mappings'" class="pi pi-sitemap w-4 h-4 text-[#ff9500]"
                         style="--p-icon-size: 16px"></i>
                     <i *ngIf="file.type === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6]"
@@ -30,9 +30,9 @@
                         </div>
                     </div>
                     <span class="truncate max-w-[120px]" [title]="file.name">{{file.name}}</span>
-                    <button class="ml-1 p-0.5 hover:bg-[#3c3c3c] rounded transition-colors opacity-100"
+                    <button class="ml-1 p-0.5 hover:bg-muted rounded transition-colors opacity-100"
                         (click)="datasetService.closeFile(file)" title="Close tab">
-                        <i class="pi pi-times w-3 h-3 text-[#cccccc] hover:text-[#ffffff]"
+                        <i class="pi pi-times w-3 h-3 text-foreground hover:text-[#ffffff]"
                             style="--p-icon-size: 12px;"></i>
                     </button>
                 </div>
@@ -43,31 +43,31 @@
                 <p-tabpanel *ngFor="let file of datasetService.openedFiles()" [value]="file.name">
 
                     <!-- Tab Content - Mappings -->
-                    <div *ngIf="file.type === 'mappings'" class="h-full bg-[#252526]">
+                    <div *ngIf="file.type === 'mappings'" class="h-full bg-card">
                         <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="horizontal">
                             <ng-template pTemplate="panel">
-                                <div class="h-full w-full bg-[#1e1e1e] overflow-hidden flex flex-col">
+                                <div class="h-full w-full bg-background overflow-hidden flex flex-col">
                                     <!-- Toolbar -->
                                     <div
-                                        class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#1e1e1e]">
+                                        class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-background">
                                         <div class="flex items-center gap-6">
-                                            <div class="flex items-center gap-2 text-[#cccccc] text-xs">
+                                            <div class="flex items-center gap-2 text-foreground text-xs">
                                                 <i class="pi pi-table" style="font-size: 0.625rem;"></i>
                                                 <span>{{mappingService.mappingRows().length}} elements</span>
                                             </div>
-                                            <div class="flex items-center gap-2 text-[#cccccc] text-xs">
+                                            <div class="flex items-center gap-2 text-foreground text-xs">
                                                 <i class="pi pi-check text-[#4caf50]" style="font-size: 0.625rem;"></i>
                                                 <span>{{mappingService.completedRulesCount()}} rules</span>
                                             </div>
 
                                             <!-- Search Field -->
                                             <div class="relative ml-4">
-                                                <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-[#808080]"
+                                                <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
                                                     style="font-size: 0.625rem;"></i>
                                                 <input type="text" [ngModel]="searchTerm()"
                                                     (ngModelChange)="searchTerm.set($event)"
                                                     placeholder="Filter elements..."
-                                                    class="bg-[#2d2d2d] border border-[#3c3c3c] rounded pl-8 pr-3 py-1 text-[#cccccc] text-xs focus:border-[#007fd4] outline-none transition-all w-48 transition-all">
+                                                    class="bg-[#2d2d2d] border border-border rounded pl-8 pr-3 py-1 text-foreground text-xs focus:border-[#007fd4] outline-none transition-all w-48 transition-all">
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2">
@@ -78,7 +78,7 @@
                                             </button>
                                             <button [disabled]="!mappingService.isReady()"
                                                 (click)="mappingService.runHarmonization()"
-                                                class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm bg-[#007fd4] text-white hover:bg-[#005fa3] disabled:bg-[#3c3c3c] disabled:text-[#808080] disabled:cursor-not-allowed">
+                                                class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm bg-[#007fd4] text-white hover:bg-[#005fa3] disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed">
                                                 Ready
                                             </button>
                                         </div>
@@ -104,8 +104,8 @@
                                                     class="cursor-pointer"
                                                     (click)="mappingService.selectMappingRow(row)">
                                                     <td class="index-col">{{rowIndex + 1}}</td>
-                                                    <td class="font-bold text-[#cccccc]">{{row.dataset}}</td>
-                                                    <td class="text-[#808080]">{{row.sourceElement}}</td>
+                                                    <td class="font-bold text-foreground">{{row.dataset}}</td>
+                                                    <td class="text-muted-foreground">{{row.sourceElement}}</td>
                                                     <td>
                                                         <p-select [options]="mappingService.targetOptions()"
                                                             [(ngModel)]="row.targetElement"
@@ -117,7 +117,7 @@
 
                                                             <ng-template pTemplate="selectedItem" let-selectedOption>
                                                                 <div class="flex items-center w-full text-xs">
-                                                                    <span class="truncate text-[#cccccc]">{{
+                                                                    <span class="truncate text-foreground">{{
                                                                         selectedOption.value }}</span>
                                                                 </div>
                                                             </ng-template>
@@ -129,7 +129,7 @@
                                                                         [ngClass]="getDataClass(option.type)">
                                                                         {{ getDataChar(option.type) }}
                                                                     </span>
-                                                                    <span class="truncate text-xs text-[#cccccc]">{{
+                                                                    <span class="truncate text-xs text-foreground">{{
                                                                         option.value }}</span>
                                                                 </div>
                                                             </ng-template>
@@ -145,7 +145,7 @@
                                                         <div class="flex items-center gap-1">
                                                             <button
                                                                 (click)="$event.stopPropagation(); mappingService.duplicateMappingRow(row)"
-                                                                class="p-1 text-[#808080] hover:text-[#007fd4] hover:bg-[#3c3c3c] rounded transition-colors"
+                                                                class="p-1 text-muted-foreground hover:text-[#007fd4] hover:bg-muted rounded transition-colors"
                                                                 pTooltip="Duplicate mapping for one-to-many"
                                                                 tooltipPosition="top"
                                                                 tooltipStyleClass="custom-tooltip">
@@ -153,7 +153,7 @@
                                                             </button>
                                                             <button *ngIf="row.isDuplicate"
                                                                 (click)="$event.stopPropagation(); mappingService.removeMappingRow(row)"
-                                                                class="p-1 text-[#808080] hover:text-[#ff3b30] hover:bg-[#3c3c3c] rounded transition-colors"
+                                                                class="p-1 text-muted-foreground hover:text-[#ff3b30] hover:bg-muted rounded transition-colors"
                                                                 pTooltip="Remove duplicated row" tooltipPosition="top"
                                                                 tooltipStyleClass="custom-tooltip">
                                                                 <i class="pi pi-trash text-sm"></i>
@@ -167,18 +167,18 @@
                                 </div>
                             </ng-template>
                             <ng-template pTemplate="panel">
-                                <div class="h-full w-full bg-[#252526] overflow-hidden">
+                                <div class="h-full w-full bg-card overflow-hidden">
                                     <p-splitter [panelSizes]="[50, 50]" [style]="{'height': '100%'}" layout="vertical">
                                         <ng-template pTemplate="panel">
-                                            <div class="h-full w-full bg-[#1e1e1e] flex flex-col overflow-hidden">
+                                            <div class="h-full w-full bg-background flex flex-col overflow-hidden">
                                                 <!-- Harmonization Rules Banner -->
                                                 <div
-                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-[#252526]">
-                                                    <h3 class="text-[#cccccc] text-sm font-medium">Harmonization Rules
+                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center justify-between bg-card">
+                                                    <h3 class="text-foreground text-sm font-medium">Harmonization Rules
                                                     </h3>
                                                     <button (click)="mappingService.saveCurrentRule()"
                                                         [disabled]="!mappingService.selectedMappingRow()?.targetElement"
-                                                        class="px-3 py-1.5 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm bg-[#007fd4] text-white hover:bg-[#005fa3] disabled:bg-[#3c3c3c] disabled:text-[#808080] disabled:cursor-not-allowed">
+                                                        class="px-3 py-1.5 rounded flex items-center gap-2 text-xs font-semibold transition-all shadow-sm bg-[#007fd4] text-white hover:bg-[#005fa3] disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed">
                                                         <i class="pi pi-check" style="font-size: 10px;"></i>
                                                         Save Rule
                                                     </button>
@@ -189,23 +189,23 @@
 
                                                     <!-- Required State (Image Match) -->
                                                     <div *ngIf="!mappingService.selectedMappingRow()?.targetElement"
-                                                        class="h-full flex flex-col items-center justify-center p-8 bg-[#1e1e1e]">
+                                                        class="h-full flex flex-col items-center justify-center p-8 bg-background">
                                                         <div
                                                             class="w-20 h-20 bg-[#f97316] rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(249,115,22,0.2)]">
                                                             <i class="pi pi-exclamation-circle text-white text-4xl"></i>
                                                         </div>
-                                                        <h3 class="text-[#cccccc] text-xl font-medium mb-3">Target Data
+                                                        <h3 class="text-foreground text-xl font-medium mb-3">Target Data
                                                             Element Required</h3>
                                                         <p
-                                                            class="text-[#808080] text-sm text-center max-w-md mb-8 leading-relaxed">
+                                                            class="text-muted-foreground text-sm text-center max-w-md mb-8 leading-relaxed">
                                                             Please select a target data element for <span
-                                                                class="text-[#cccccc] font-bold">"{{mappingService.selectedMappingRow()?.sourceElement}}"</span>
+                                                                class="text-foreground font-bold">"{{mappingService.selectedMappingRow()?.sourceElement}}"</span>
                                                             from the dropdown in the Target Data Element column to
                                                             configure harmonization rules.
                                                         </p>
                                                         <div
-                                                            class="px-6 py-3 border border-[#3c3c3c] rounded bg-[#252526] text-[#808080] text-sm">
-                                                            <span class="text-[#cccccc] font-bold">Next step:</span>
+                                                            class="px-6 py-3 border border-border rounded bg-card text-muted-foreground text-sm">
+                                                            <span class="text-foreground font-bold">Next step:</span>
                                                             Click the "Search..." button in the Target Data Element
                                                             column
                                                         </div>
@@ -214,22 +214,22 @@
                                                     <!-- Visualization (When mapping exists) -->
                                                     <div *ngIf="mappingService.selectedMappingRow()?.targetElement"
                                                         class="h-full flex flex-col">
-                                                        <div class="p-8 flex items-center justify-between bg-[#1e1e1e]">
+                                                        <div class="p-8 flex items-center justify-between bg-background">
                                                             <!-- Source Block -->
                                                             <div class="flex flex-col items-center gap-3 flex-1">
                                                                 <div
-                                                                    class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
+                                                                    class="w-full max-w-[180px] p-4 bg-card border border-border rounded-lg text-center">
                                                                     <div
                                                                         class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
                                                                         {{mappingService.selectedMappingRow()?.sourceElement}}
                                                                     </div>
-                                                                    <div class="text-[#808080] text-xs">(int)</div>
-                                                                    <div class="text-[#cccccc] text-xs mt-2">
+                                                                    <div class="text-muted-foreground text-xs">(int)</div>
+                                                                    <div class="text-foreground text-xs mt-2">
                                                                         {{mappingService.selectedMappingRow()?.dataset}}
                                                                     </div>
                                                                 </div>
                                                                 <span
-                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Source</span>
+                                                                    class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">Source</span>
                                                             </div>
 
                                                             <!-- Arrow & Steps Label -->
@@ -241,33 +241,33 @@
                                                                     </div>
                                                                 </div>
                                                                 <span
-                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Steps</span>
+                                                                    class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">Steps</span>
                                                             </div>
 
                                                             <!-- Target Block -->
                                                             <div class="flex flex-col items-center gap-3 flex-1">
                                                                 <div
-                                                                    class="w-full max-w-[180px] p-4 bg-[#252526] border border-[#3c3c3c] rounded-lg text-center">
+                                                                    class="w-full max-w-[180px] p-4 bg-card border border-border rounded-lg text-center">
                                                                     <div
                                                                         class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
                                                                         {{mappingService.selectedMappingRow()?.targetElement}}
                                                                     </div>
-                                                                    <div class="text-[#808080] text-xs">
+                                                                    <div class="text-muted-foreground text-xs">
                                                                         ({{mappingService.getTargetDetails(mappingService.selectedMappingRow()?.targetElement
                                                                         || '')?.Type
                                                                         || 'string'}})</div>
-                                                                    <div class="text-[#cccccc] text-xs mt-2">Target
+                                                                    <div class="text-foreground text-xs mt-2">Target
                                                                         Schema</div>
                                                                 </div>
                                                                 <span
-                                                                    class="text-[#808080] text-[10px] font-bold tracking-widest uppercase">Target</span>
+                                                                    class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">Target</span>
                                                             </div>
                                                         </div>
 
                                                         <!-- Transformation Steps Title Row -->
                                                         <div
                                                             class="px-4 py-3 flex items-center justify-between border-t border-[#2d2d2d]">
-                                                            <h4 class="text-[#cccccc] text-sm font-medium">
+                                                            <h4 class="text-foreground text-sm font-medium">
                                                                 Transformation Steps</h4>
                                                             <button (click)="mappingService.addTransformationStep()"
                                                                 type="button"
@@ -290,15 +290,15 @@
                                                                     </div>
                                                                     <div class="flex flex-col">
                                                                         <span
-                                                                            class="text-[#cccccc] text-sm font-bold">{{step.transformation
+                                                                            class="text-foreground text-sm font-bold">{{step.transformation
                                                                             || 'Step ' + (i + 1)}}</span>
-                                                                        <span class="text-[#808080] text-xs">Click to
+                                                                        <span class="text-muted-foreground text-xs">Click to
                                                                             configure</span>
                                                                     </div>
                                                                 </div>
                                                                 <button
                                                                     (click)="$event.stopPropagation(); mappingService.removeTransformationStep(i)"
-                                                                    class="text-[#808080] hover:text-[#ffffff] transition-colors p-1">
+                                                                    class="text-muted-foreground hover:text-[#ffffff] transition-colors p-1">
                                                                     <i class="pi pi-times text-xs"></i>
                                                                 </button>
                                                             </div>
@@ -307,9 +307,9 @@
                                                         <!-- Empty Transformation State -->
                                                         <div *ngIf="!mappingService.selectedMappingRow()?.steps || mappingService.selectedMappingRow()?.steps?.length === 0"
                                                             class="flex-1 flex flex-col items-center justify-center p-8 opacity-40">
-                                                            <div class="text-[#cccccc] text-sm font-medium mb-1">No
+                                                            <div class="text-foreground text-sm font-medium mb-1">No
                                                                 transformation steps</div>
-                                                            <div class="text-[#808080] text-xs">Click "Add Step" to
+                                                            <div class="text-muted-foreground text-xs">Click "Add Step" to
                                                                 create your first transformation</div>
                                                         </div>
                                                     </div>
@@ -317,12 +317,12 @@
                                             </div>
                                         </ng-template>
                                         <ng-template pTemplate="panel">
-                                            <div class="h-full w-full bg-[#1e1e1e] flex flex-col overflow-hidden">
+                                            <div class="h-full w-full bg-background flex flex-col overflow-hidden">
                                                 <!-- Step Configuration Header -->
                                                 <div
-                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center gap-2 bg-[#252526]">
-                                                    <i class="pi pi-cog text-[#cccccc] text-sm"></i>
-                                                    <h3 class="text-[#cccccc] text-sm font-medium">Step Configuration
+                                                    class="px-4 py-3 border-b border-[#2d2d2d] flex items-center gap-2 bg-card">
+                                                    <i class="pi pi-cog text-foreground text-sm"></i>
+                                                    <h3 class="text-foreground text-sm font-medium">Step Configuration
                                                     </h3>
                                                 </div>
 
@@ -332,10 +332,10 @@
                                                     <div *ngIf="!mappingService.selectedMappingRow()?.targetElement"
                                                         class="h-full flex flex-col items-center justify-center p-8">
                                                         <div class="w-16 h-16 bg-[#ff5f33] rounded-full mb-6"></div>
-                                                        <h4 class="text-[#cccccc] text-lg font-medium mb-2">Target
+                                                        <h4 class="text-foreground text-lg font-medium mb-2">Target
                                                             Required</h4>
                                                         <p
-                                                            class="text-[#808080] text-sm text-center max-w-xs leading-relaxed">
+                                                            class="text-muted-foreground text-sm text-center max-w-xs leading-relaxed">
                                                             Select a target data element first to configure
                                                             transformation steps
                                                         </p>
@@ -344,10 +344,10 @@
                                                     <!-- Secondary State: Target Selected but No Step Selected -->
                                                     <div *ngIf="mappingService.selectedMappingRow()?.targetElement && !mappingService.selectedMappingRow()?.selectedStepId"
                                                         class="h-full flex flex-col items-center justify-center p-8 opacity-40">
-                                                        <i class="pi pi-mouse text-[#808080] text-4xl mb-4"></i>
-                                                        <h4 class="text-[#cccccc] text-sm font-medium mb-1">No step
+                                                        <i class="pi pi-mouse text-muted-foreground text-4xl mb-4"></i>
+                                                        <h4 class="text-foreground text-sm font-medium mb-1">No step
                                                             selected</h4>
-                                                        <p class="text-[#808080] text-xs">Select a transformation step
+                                                        <p class="text-muted-foreground text-xs">Select a transformation step
                                                             to configure its rules</p>
                                                     </div>
 
@@ -355,7 +355,7 @@
                                                     <div *ngIf="mappingService.selectedMappingRow()?.selectedStepId"
                                                         class="px-4 py-4 flex flex-col gap-4">
                                                         <div class="flex flex-col gap-1">
-                                                            <h4 class="text-[#cccccc] text-base font-semibold">Configure
+                                                            <h4 class="text-foreground text-base font-semibold">Configure
                                                                 Step
                                                                 {{getStepIndex(mappingService.selectedMappingRow(),
                                                                 mappingService.selectedMappingRow()?.selectedStepId) +
@@ -365,7 +365,7 @@
 
                                                         <div class="flex flex-col gap-2">
                                                             <label
-                                                                class="text-[#cccccc] text-sm font-medium">Primitive</label>
+                                                                class="text-foreground text-sm font-medium">Primitive</label>
                                                             <p-select [options]="transformationOptions()"
                                                                 [ngModel]="currentStep()?.transformation"
                                                                 (onChange)="updateTransformation($event.value)"
@@ -382,11 +382,11 @@
                                                             <!-- Parameters -->
                                                             <div class="flex flex-col gap-4">
                                                                 <h5
-                                                                    class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
+                                                                    class="text-foreground text-xs font-bold uppercase tracking-wider opacity-60">
                                                                     Parameters</h5>
 
                                                                 <div *ngIf="activeConfig()?.params?.length === 0"
-                                                                    class="text-[#808080] text-sm italic">
+                                                                    class="text-muted-foreground text-sm italic">
                                                                     No parameters required.
                                                                 </div>
 
@@ -394,7 +394,7 @@
                                                                     class="flex flex-col gap-2">
                                                                     <label
                                                                         *ngIf="currentStep()?.transformation !== 'enum_to_enum' || param.key !== 'mapping'"
-                                                                        class="text-[#cccccc] text-sm font-medium">{{param.label}}</label>
+                                                                        class="text-foreground text-sm font-medium">{{param.label}}</label>
 
                                                                     <!-- Text/Number Input -->
                                                                     <input
@@ -402,7 +402,7 @@
                                                                         [type]="param.type"
                                                                         [ngModel]="currentStep()?.params?.[param.key]"
                                                                         (ngModelChange)="updateParam(param.key, $event)"
-                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors"
+                                                                        class="bg-[#2d2d2d] border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-[#007fd4] outline-none transition-colors"
                                                                         [placeholder]="param.placeholder || ''">
 
                                                                     <!-- Select Input -->
@@ -420,7 +420,7 @@
                                                                         class="flex flex-col gap-3">
                                                                         <div class="flex items-center justify-between">
                                                                             <label
-                                                                                class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
+                                                                                class="text-foreground text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
                                                                         </div>
 
                                                                         <div class="space-y-2">
@@ -490,7 +490,7 @@
 
                                                                         <!-- Empty State -->
                                                                         <div *ngIf="enumMappings().length === 0"
-                                                                            class="text-center py-4 border border-dashed border-[#3c3c3c] rounded text-[#808080] text-[10px]">
+                                                                            class="text-center py-4 border border-dashed border-border rounded text-muted-foreground text-[10px]">
                                                                             No mappings defined. Click "Add Mapping"
                                                                             to start.
                                                                         </div>
@@ -502,9 +502,9 @@
                                                                         <input type="checkbox"
                                                                             [ngModel]="currentStep()?.params?.[param.key]"
                                                                             (ngModelChange)="updateParam(param.key, $event)"
-                                                                            class="w-4 h-4 rounded border-[#3c3c3c] bg-[#2d2d2d] text-[#007fd4] focus:ring-[#007fd4] focus:ring-offset-[#1e1e1e]">
+                                                                            class="w-4 h-4 rounded border-border bg-[#2d2d2d] text-[#007fd4] focus:ring-[#007fd4] focus:ring-offset-[#1e1e1e]">
                                                                         <span
-                                                                            class="text-[#808080] text-sm">{{param.label}}</span>
+                                                                            class="text-muted-foreground text-sm">{{param.label}}</span>
                                                                     </div>
 
                                                                     <!-- Default Textarea Input (if not mapping) -->
@@ -512,7 +512,7 @@
                                                                         *ngIf="param.type === 'textarea' && (currentStep()?.transformation !== 'enum_to_enum' || param.key !== 'mapping')"
                                                                         [ngModel]="currentStep()?.params?.[param.key]"
                                                                         (ngModelChange)="updateParam(param.key, $event)"
-                                                                        class="bg-[#2d2d2d] border border-[#3c3c3c] rounded-md px-3 py-2 text-[#cccccc] text-sm focus:border-[#007fd4] outline-none transition-colors min-h-[80px]"
+                                                                        class="bg-[#2d2d2d] border border-border rounded-md px-3 py-2 text-foreground text-sm focus:border-[#007fd4] outline-none transition-colors min-h-[80px]"
                                                                         [placeholder]="param.placeholder || ''"></textarea>
 
                                                                 </div>
@@ -520,10 +520,10 @@
                                                                 <!-- Example -->
                                                                 <div class="flex flex-col gap-4 mt-6">
                                                                     <h5
-                                                                        class="text-[#cccccc] text-xs font-bold uppercase tracking-wider opacity-60">
+                                                                        class="text-foreground text-xs font-bold uppercase tracking-wider opacity-60">
                                                                         Example</h5>
                                                                     <div
-                                                                        class="bg-[#1e1e1e] border border-[#3c3c3c] rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
+                                                                        class="bg-background border border-border rounded-md p-4 font-mono text-sm overflow-x-auto text-[#4ec9b0]">
                                                                         <ng-container
                                                                             *ngIf="activeConfig()?.example?.() as ex">
                                                                             <span>{{activeConfig()?.name?.replace?.(' ',
@@ -551,7 +551,7 @@
                         [attr.theme]="isDarkMode ? 'dark' : 'light'" [attr.data]="file.text"></data-dictionary-viewer>
 
                     <!-- Tab Content - Data -->
-                    <div *ngIf="file.type === 'data'" class="h-full flex flex-col bg-[#252526]">
+                    <div *ngIf="file.type === 'data'" class="h-full flex flex-col bg-card">
                         <div class="flex-1 overflow-auto" [style]="{ overflowX: 'scroll', overflowY: 'auto' }">
                             <div [style]="{ width: 'max-content' }">
                                 <table class="text-sm border-collapse w-full"
@@ -559,21 +559,21 @@
                                     <thead>
                                         <tr>
                                             <th *ngFor="let field of getHeaders(file.data)"
-                                                class="sticky top-0 bg-[#3c3c3c] border-r border-[#3c3c3c] text-left text-[#cccccc] font-medium relative group"
+                                                class="sticky top-0 bg-muted border-r border-border text-left text-foreground font-medium relative group"
                                                 style="position: sticky">
                                                 <div class="px-4 py-3 flex items-center justify-between">
                                                     <div class="flex items-center gap-2 flex-1 min-w-0">
                                                         <button
                                                             class="flex items-center gap-2 hover:text-[#007fd4] transition-colors min-w-0 flex-1">
                                                             <span class="truncate">{{field}}</span>
-                                                            <i class="pi pi-arrow-right-arrow-left w-4 h-4 text-[#666666]"
+                                                            <i class="pi pi-arrow-right-arrow-left w-4 h-4 text-muted-foreground"
                                                                 style="--p-icon-size: 12px; transform: rotate(90deg)"></i>
                                                         </button>
                                                     </div>
 
                                                     <div class="relative shrink-0">
                                                         <button
-                                                            class="p-1 rounded hover:bg-[#4c4c4c] transition-colors text-[#808080]">
+                                                            class="p-1 rounded hover:bg-accent transition-colors text-muted-foreground">
                                                             <i class="pi pi-filter w-4 h-4"
                                                                 style="--p-icon-size: 12px;"></i>
                                                         </button>
@@ -585,7 +585,7 @@
                                     <tbody>
                                         <tr *ngFor="let row of file.data | slice:0:100">
                                             <td *ngFor="let field of getHeaders(file.data)"
-                                                class="px-4 py-3 border-r border-[#3c3c3c] text-[#cccccc] overflow-hidden">
+                                                class="px-4 py-3 border-r border-border text-foreground overflow-hidden">
                                                 <div class="truncate" [style]="{width: '200px'}">
                                                     {{row[field]}}
                                                 </div>
@@ -598,7 +598,7 @@
                     </div>
                     <!-- Tab Content - JSON or Text or Rules or Replay -->
                     <div *ngIf="file.type === 'json' || file.type === 'text' || file.type === 'rules' || file.type === 'replay'"
-                        class="h-full bg-[#1e1e1e] overflow-auto p-6 font-mono text-sm text-[#d4d4d4] selection:bg-[#264f78]">
+                        class="h-full bg-background overflow-auto p-6 font-mono text-sm text-foreground selection:bg-[#264f78]">
                         <pre
                             class="whitespace-pre-wrap leading-relaxed">{{file.text | slice:0:100000}}{{file.text.length > 100000 ? '...\n[Content truncated for preview]' : ''}}</pre>
                     </div>
@@ -613,50 +613,50 @@
     <div *ngIf="datasetService.openedFiles().length === 0" class="flex-1 overflow-hidden">
 
         <!-- EmptyState component -->
-        <div class="h-full flex items-center justify-center bg-[#252526] p-8">
+        <div class="h-full flex items-center justify-center bg-card p-8">
             <div class="text-center max-w-md">
 
                 <!-- Icon-->
                 <div class="mb-6">
-                    <div class="w-20 h-20 bg-[#3c3c3c] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="pi pi-database w-10 h-10 text-[#007fd4]" style="--p-icon-size: 40px;"></i>
                     </div>
                 </div>
 
                 <!-- Main heading -->
-                <h2 class="text-xl font-medium text-[#cccccc] mb-3">
+                <h2 class="text-xl font-medium text-foreground mb-3">
                     Get Started with Data Harmonization
                 </h2>
 
                 <!-- Description -->
-                <p class="text-[#a0a0a0] text-base mb-8 leading-relaxed">
+                <p class="text-muted-foreground text-base mb-8 leading-relaxed">
                     Begin by uploading your source datasets and creating or uploading your target data dictionary to
                     start the harmonization process.
                 </p>
 
                 <!-- Steps - Now showing as parallel options -->
                 <div class="mb-8">
-                    <h3 class="text-[#cccccc] font-medium mb-4">Choose your starting point:</h3>
+                    <h3 class="text-foreground font-medium mb-4">Choose your starting point:</h3>
 
                     <div class="flex flex-col gap-4">
 
                         <!-- Debug Option -->
                         <button (click)="datasetService.loadTestData()"
-                            class="bg-[#2d2d30] border border-[#ff5f33] text-[#ff5f33] rounded-lg p-2 mb-4 hover:bg-[#3c3c3c]">
+                            class="bg-popover border border-[#ff5f33] text-[#ff5f33] rounded-lg p-2 mb-4 hover:bg-muted">
                             Load Test Data (Debug)
                         </button>
 
                         <!-- Source Dataset Option -->
                         <button (click)="datasetService.openFileDialog()"
-                            class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
+                            class="bg-popover border border-border rounded-lg p-4 hover:bg-muted hover:border-primary transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
                             <div class="flex items-start gap-3 text-left">
                                 <div
                                     class="w-8 h-8 bg-[#007fd4] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                                     <i class="pi pi-upload w-4 h-4 text-white" style="--p-icon-size: 16px;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-[#cccccc] font-medium mb-1">Upload Source Dataset</h4>
-                                    <p class="text-[#808080] text-sm">
+                                    <h4 class="text-foreground font-medium mb-1">Upload Source Dataset</h4>
+                                    <p class="text-muted-foreground text-sm">
                                         Select or drag and drop your source data files and data dictionary
                                     </p>
                                 </div>
@@ -664,23 +664,23 @@
                         </button>
 
                         <!-- OR Divider -->
-                        <div class="flex items-center gap-3 text-[#808080] text-sm">
-                            <div class="flex-1 h-px bg-[#3c3c3c]"></div>
+                        <div class="flex items-center gap-3 text-muted-foreground text-sm">
+                            <div class="flex-1 h-px bg-muted"></div>
                             <span class="px-2">OR</span>
-                            <div class="flex-1 h-px bg-[#3c3c3c]"></div>
+                            <div class="flex-1 h-px bg-muted"></div>
                         </div>
 
                         <!-- Target Dictionary Option -->
                         <button
-                            class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4 hover:bg-[#3c3c3c] hover:border-[#007fd4] transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
+                            class="bg-popover border border-border rounded-lg p-4 hover:bg-muted hover:border-primary transition-all duration-200 cursor-pointer w-full disabled:cursor-not-allowed disabled:opacity-50">
                             <div class="flex items-start gap-3 text-left">
                                 <div
                                     class="w-8 h-8 bg-[#4CAF50] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                                     <i class="pi pi-file w-4 h-4 text-white" style="--p-icon-size: 16px;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="text-[#cccccc] font-medium mb-1">Create Target Data Dictionary</h4>
-                                    <p class="text-[#808080] text-sm">
+                                    <h4 class="text-foreground font-medium mb-1">Create Target Data Dictionary</h4>
+                                    <p class="text-muted-foreground text-sm">
                                         Upload or create your target schema to define harmonization targets
                                     </p>
                                 </div>
@@ -690,7 +690,7 @@
                     </div>
 
                     <!-- Next Step -->
-                    <div class="mt-6 flex items-center justify-center gap-2 text-[#808080] text-sm">
+                    <div class="mt-6 flex items-center justify-center gap-2 text-muted-foreground text-sm">
                         <i class="pi pi-arrow-right w-4 h-4" style="--p-icon-size: 16px;"></i>
                         <span>Once both are ready, start harmonization mapping</span>
                     </div>
@@ -698,12 +698,12 @@
                 </div>
 
                 <!-- Upload hints -->
-                <div class="bg-[#2d2d30] border border-[#3c3c3c] rounded-lg p-4">
-                    <h4 class="text-[#cccccc] font-medium mb-3 flex items-center gap-2">
+                <div class="bg-popover border border-border rounded-lg p-4">
+                    <h4 class="text-foreground font-medium mb-3 flex items-center gap-2">
                         <i class="pi pi-file w-4 h-4" style="--p-icon-size: 16px;"></i>
                         Supported File Types
                     </h4>
-                    <div class="text-[#a0a0a0] text-sm space-y-1">
+                    <div class="text-muted-foreground text-sm space-y-1">
                         <div><strong>Data Files:</strong> CSV, Excel (.xlsx)</div>
                         <div><strong>Data Dictionaries:</strong> CSV, Excel (.xlsx)</div>
                     </div>
@@ -716,22 +716,22 @@
     <!-- File Type Selection Dialog -->
     <p-dialog header="Select File Type" [modal]="true" [(visible)]="visible" class="w-full sm:max-w-2xl shadow-lg"
         [style]="{ width: '100%', maxWidth: '42rem' }">
-        <p class="text-sm text-[#a0a0a0]" style="margin-bottom: calc(var(--spacing) * 4);">Choose whether this file
+        <p class="text-sm text-muted-foreground" style="margin-bottom: calc(var(--spacing) * 4);">Choose whether this file
             contains actual data records or describes the data structure.</p>
         <div class="space-y-4">
-            <p class="text-[#a0a0a0] text-sm">
+            <p class="text-muted-foreground text-sm">
                 What type of file is "{{datasetService.uploadedFile()?.name}}"?
             </p>
 
             <div class="grid grid-cols-1 gap-3">
                 <app-button (clicked)="onSelectType('dictionary')"
-                    class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left"
+                    class="h-auto p-4 bg-muted border-border hover:bg-accent hover:border-primary text-left"
                     size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
                         <i class="pi pi-file w-5 h-5 text-[#4ec9b0] mt-0.5 shrink-0" style="--p-icon-size: 16px;"></i>
                         <div class="text-left">
-                            <div class="text-[#cccccc] font-medium mb-1">Data Dictionary</div>
-                            <div class="text-[#808080] text-sm">
+                            <div class="text-foreground font-medium mb-1">Data Dictionary</div>
+                            <div class="text-muted-foreground text-sm">
                                 Describes data structure/schema (e.g., column definitions, data types)
                             </div>
                         </div>
@@ -739,13 +739,13 @@
                 </app-button>
 
                 <app-button (clicked)="onSelectType('data')"
-                    class="h-auto p-4 bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] hover:border-[#007fd4] text-left"
+                    class="h-auto p-4 bg-muted border-border hover:bg-accent hover:border-primary text-left"
                     size="md" variant="outline">
                     <div class="flex items-start gap-3 w-full">
                         <i class="pi pi-table w-5 h-5 text-[#569cd6] mt-0.5 shrink-0" style="--p-icon-size: 16px;"></i>
                         <div class="text-left">
-                            <div class="text-[#cccccc] font-medium mb-1">Data File</div>
-                            <div class="text-[#808080] text-sm">
+                            <div class="text-foreground font-medium mb-1">Data File</div>
+                            <div class="text-muted-foreground text-sm">
                                 Contains actual data records/rows (e.g., participant data, measurements)
                             </div>
                         </div>
@@ -753,9 +753,9 @@
                 </app-button>
             </div>
 
-            <div class="flex justify-end gap-2 pt-4 border-t border-[#3c3c3c]">
+            <div class="flex justify-end gap-2 pt-4 border-t border-border">
                 <app-button (click)="datasetService.hideDialog()"
-                    class="bg-[#3c3c3c] border-[#4c4c4c] hover:bg-[#4c4c4c] text-[#cccccc]"
+                    class="bg-muted border-border hover:bg-accent text-foreground"
                     variant="outline">Cancel</app-button>
             </div>
         </div>

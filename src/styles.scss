@@ -4622,3 +4622,34 @@ th:nth-last-child(-n+2) .filter-dropdown {
 .p-toast-message-error .p-toast-icon {
   color: #ef4444 !important;
 }
+
+/* Sync Theme Transition Rules */
+.theme-switching {
+  overflow: hidden !important;
+
+  // Mask everything except the loader
+  body>*:not(.theme-switch-overlay) {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  // Handle PrimeNG overlays that are outside the usual root tree
+  .p-component-overlay,
+  .p-dialog-mask,
+  .p-toast,
+  .p-tooltip {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+.theme-switch-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important; // Absolute top
+  background-color: var(--background) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

@@ -8,16 +8,29 @@ export class ThemeService {
     readonly darkMode = this._darkMode.asReadonly();
     private readonly _fontSize = signal<number>(16);
     readonly fontSize = this._fontSize.asReadonly();
+    readonly isChangingTheme = signal<boolean>(false);
 
     toggleDarkMode() {
-        const newMode = !this._darkMode();
-        this._darkMode.set(newMode);
-        this.applyDarkModeToHtml(newMode);
+        // Show loading spinner natively first
+        this.isChangingTheme.set(true);
+
+        // Wait 150ms to ensure the UI paints the loader
+        setTimeout(() => {
+            const newMode = !this._darkMode();
+            this._darkMode.set(newMode);
+            this.applyDarkModeToHtml(newMode, true);
+
+            // Allow 400ms for browser to handle the massive repaint of tables
+            setTimeout(() => {
+                this.isChangingTheme.set(false);
+                this.applyDarkModeToHtml(newMode, false);
+            }, 400);
+        }, 150);
     }
 
     setDarkMode(isDarkMode: boolean) {
         this._darkMode.set(isDarkMode);
-        this.applyDarkModeToHtml(isDarkMode);
+        this.applyDarkModeToHtml(isDarkMode, false);
     }
 
     isDarkMode() {
@@ -41,12 +54,18 @@ export class ThemeService {
         this.applyFontSize(16);
     }
 
-    private applyDarkModeToHtml(isDarkMode: boolean) {
+    private applyDarkModeToHtml(isDarkMode: boolean, isSwitching: boolean = false) {
         const htmlEl = document.documentElement;
         if (isDarkMode) {
             htmlEl.classList.add('dark');
         } else {
             htmlEl.classList.remove('dark');
+        }
+
+        if (isSwitching) {
+            htmlEl.classList.add('theme-switching');
+        } else {
+            htmlEl.classList.remove('theme-switching');
         }
     }
 
