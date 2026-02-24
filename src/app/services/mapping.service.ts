@@ -104,21 +104,20 @@ export class MappingService {
         this.selectedRowId.set(row ? row.id : null);
     }
 
-    updateMappingStatus(rowIndex: number, value: any) {
-        console.log(`Updating mapping status for row ${rowIndex} to value:`, value);
+    updateMappingStatus(rowId: number, value: any) {
+        console.log(`Updating mapping status for row ID ${rowId} to value:`, value);
         this.mappingRows.update(rows => {
-            const newRows = [...rows];
-            if (newRows[rowIndex]) {
-                const currentStatus = newRows[rowIndex].status;
-                newRows[rowIndex] = {
-                    ...newRows[rowIndex],
-                    targetElement: value,
-                    // If we change the target element, maybe we should re-verify? 
-                    // For now, keep as 'complete' if it was already complete, unless value is cleared.
-                    status: !value ? 'attention' : (currentStatus === 'complete' ? 'complete' : 'attention')
-                };
-            }
-            return newRows;
+            return rows.map(row => {
+                if (row.id === rowId) {
+                    const currentStatus = row.status;
+                    return {
+                        ...row,
+                        targetElement: value,
+                        status: !value ? 'attention' : (currentStatus === 'complete' ? 'complete' : 'attention')
+                    };
+                }
+                return row;
+            });
         });
     }
 

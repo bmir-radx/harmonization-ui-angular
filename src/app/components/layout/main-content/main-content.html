@@ -113,7 +113,7 @@
 
                                     <!-- Table Content -->
                                     <div class="flex-1 overflow-hidden h-full">
-                                        <p-table [value]="filteredMappingRows()" [scrollable]="true"
+                                        <p-table [value]="filteredMappingRows()" [scrollable]="true" dataKey="id"
                                             scrollHeight="calc(100vh - 200px)" class="mappings-table-v2"
                                             [tableStyle]="{'min-width': '100%'}">
                                             <ng-template pTemplate="header">
@@ -144,7 +144,7 @@
                                                     <td *ngIf="visibleColumns().includes('targetElement')">
                                                         <p-select [options]="mappingService.targetOptions()"
                                                             [(ngModel)]="row.targetElement"
-                                                            (onChange)="mappingService.updateMappingStatus(rowIndex, $event.value)"
+                                                            (onChange)="mappingService.updateMappingStatus(row.id, $event.value)"
                                                             optionLabel="label" optionValue="value"
                                                             placeholder="Search..." [filter]="true"
                                                             filterPlaceholder="Search Targets..." [appendTo]="'body'"
