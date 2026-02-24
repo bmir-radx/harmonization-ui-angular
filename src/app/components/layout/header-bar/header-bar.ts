@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../services/theme.service';
 import { ProjectService, Project } from '../../../services/project.service';
@@ -18,6 +18,9 @@ export class HeaderBar {
     isDarkMode = true;
     currentProject: Project | null = null;
     projectHistory: HistoryItem[] = [];
+
+    isLeftVisible = model(true);
+    isRightVisible = model(true);
 
     leftMenu: MenuItem[] | undefined;
     rightMenu: MenuItem[] | undefined;
@@ -160,17 +163,24 @@ export class HeaderBar {
                     {
                         label: 'Toggle Left Sidebar',
                         icon: 'pi pi-chevron-left',
-                        shortcut: 'Ctrl+Shift+E'
+                        shortcut: 'Ctrl+Shift+E',
+                        command: () => this.isLeftVisible.set(!this.isLeftVisible())
                     },
                     {
                         label: 'Toggle Right Sidebar',
                         icon: 'pi pi-chevron-right',
-                        shortcut: 'Ctrl+Shift+R'
+                        shortcut: 'Ctrl+Shift+R',
+                        command: () => this.isRightVisible.set(!this.isRightVisible())
                     },
                     {
                         label: 'Toggle All Sidebars',
                         icon: 'pi pi-eye',
-                        shortcut: 'Ctrl+Shift+B'
+                        shortcut: 'Ctrl+Shift+B',
+                        command: () => {
+                            const bothVisible = this.isLeftVisible() && this.isRightVisible();
+                            this.isLeftVisible.set(!bothVisible);
+                            this.isRightVisible.set(!bothVisible);
+                        }
                     },
                     {
                         separator: true

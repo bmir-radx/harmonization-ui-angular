@@ -2,26 +2,102 @@
 
     <!-- Main Content Container - Hidden during theme change -->
     <div class="h-full flex flex-col" [class.invisible]="themeService.isChangingTheme()">
-        <app-header-bar></app-header-bar>
+        <app-header-bar [isLeftVisible]="isLeftSidebarVisible()"
+            (isLeftVisibleChange)="isLeftSidebarVisible.set($event)" [isRightVisible]="isRightSidebarVisible()"
+            (isRightVisibleChange)="isRightSidebarVisible.set($event)">
+        </app-header-bar>
 
-        <div class="flex-1 overflow-hidden">
-            <p-splitter [panelSizes]="[15, 70, 15]" style="height:100%;" class="mb-8">
+        <div class="flex-1 overflow-hidden relative group/layout">
+            <!-- Floating Open Buttons (when sidebars are hidden) -->
+            @if (!isLeftSidebarVisible()) {
+            <div class="absolute left-0 top-0 bottom-0 w-8 z-[100] flex items-center group/left-handle cursor-pointer pointer-events-auto"
+                (click)="$event.stopPropagation(); isLeftSidebarVisible.set(true)">
+                <div
+                    class="ml-1 p-1 bg-card border border-border border-l-0 rounded-r-md text-muted-foreground group-hover/left-handle:text-primary group-hover/left-handle:bg-accent transition-all duration-300 shadow-xl h-14 flex items-center opacity-40 group-hover/layout:opacity-100">
+                    <i class="pi pi-chevron-right text-[10px]"></i>
+                </div>
+            </div>
+            }
+
+            @if (!isRightSidebarVisible()) {
+            <div class="absolute right-0 top-0 bottom-0 w-8 z-[100] flex items-center justify-end group/right-handle cursor-pointer pointer-events-auto"
+                (click)="$event.stopPropagation(); isRightSidebarVisible.set(true)">
+                <div
+                    class="mr-1 p-1 bg-card border border-border border-r-0 rounded-l-md text-muted-foreground group-hover/right-handle:text-primary group-hover/right-handle:bg-accent transition-all duration-300 shadow-xl h-14 flex items-center opacity-40 group-hover/layout:opacity-100">
+                    <i class="pi pi-chevron-left text-[10px]"></i>
+                </div>
+            </div>
+            }
+
+            <!-- Layout States -->
+            @if (isLeftSidebarVisible() && isRightSidebarVisible()) {
+            <p-splitter [panelSizes]="[20, 60, 20]" [minSizes]="[15, 50, 15]" style="height:100%;"
+                class="border-none bg-transparent">
                 <ng-template #panel>
-                    <div class="h-full w-full">
+                    <div class="h-full w-full relative group/left-sidebar overflow-hidden">
                         <app-left-sidebar></app-left-sidebar>
+                        <button (click)="isLeftSidebarVisible.set(false)"
+                            class="absolute top-1/2 -translate-y-1/2 right-0 z-20 p-1 bg-card border border-border border-r-0 rounded-l-md opacity-0 group-hover/left-sidebar:opacity-100 hover:text-primary transition-all duration-300 h-10 flex items-center shadow-lg">
+                            <i class="pi pi-chevron-left text-[8px]"></i>
+                        </button>
                     </div>
                 </ng-template>
                 <ng-template #panel>
-                    <div class="h-full w-full min-w-0 overflow-hidden">
+                    <div class="h-full w-full min-w-0 overflow-hidden bg-background">
                         <app-main-content></app-main-content>
                     </div>
                 </ng-template>
                 <ng-template #panel>
-                    <div class="h-full w-full">
+                    <div class="h-full w-full relative group/right-sidebar overflow-hidden">
                         <app-right-sidebar></app-right-sidebar>
+                        <button (click)="isRightSidebarVisible.set(false)"
+                            class="absolute top-1/2 -translate-y-1/2 left-0 z-20 p-1 bg-card border border-border border-l-0 rounded-r-md opacity-0 group-hover/right-sidebar:opacity-100 hover:text-primary transition-all duration-300 h-10 flex items-center shadow-lg">
+                            <i class="pi pi-chevron-right text-[8px]"></i>
+                        </button>
                     </div>
                 </ng-template>
             </p-splitter>
+            } @else if (isLeftSidebarVisible()) {
+            <p-splitter [panelSizes]="[20, 80]" [minSizes]="[15, 65]" style="height:100%;"
+                class="border-none bg-transparent">
+                <ng-template #panel>
+                    <div class="h-full w-full relative group/left-sidebar overflow-hidden">
+                        <app-left-sidebar></app-left-sidebar>
+                        <button (click)="isLeftSidebarVisible.set(false)"
+                            class="absolute top-1/2 -translate-y-1/2 right-0 z-20 p-1 bg-card border border-border border-r-0 rounded-l-md opacity-0 group-hover/left-sidebar:opacity-100 hover:text-primary transition-all duration-300 h-10 flex items-center shadow-lg">
+                            <i class="pi pi-chevron-left text-[8px]"></i>
+                        </button>
+                    </div>
+                </ng-template>
+                <ng-template #panel>
+                    <div class="h-full w-full min-w-0 overflow-hidden bg-background">
+                        <app-main-content></app-main-content>
+                    </div>
+                </ng-template>
+            </p-splitter>
+            } @else if (isRightSidebarVisible()) {
+            <p-splitter [panelSizes]="[80, 20]" [minSizes]="[65, 15]" style="height:100%;"
+                class="border-none bg-transparent">
+                <ng-template #panel>
+                    <div class="h-full w-full min-w-0 overflow-hidden bg-background">
+                        <app-main-content></app-main-content>
+                    </div>
+                </ng-template>
+                <ng-template #panel>
+                    <div class="h-full w-full relative group/right-sidebar overflow-hidden">
+                        <app-right-sidebar></app-right-sidebar>
+                        <button (click)="isRightSidebarVisible.set(false)"
+                            class="absolute top-1/2 -translate-y-1/2 left-0 z-20 p-1 bg-card border border-border border-l-0 rounded-r-md opacity-0 group-hover/right-sidebar:opacity-100 hover:text-primary transition-all duration-300 h-10 flex items-center shadow-lg">
+                            <i class="pi pi-chevron-right text-[8px]"></i>
+                        </button>
+                    </div>
+                </ng-template>
+            </p-splitter>
+            } @else {
+            <div class="h-full w-full bg-background overflow-hidden">
+                <app-main-content></app-main-content>
+            </div>
+            }
         </div>
 
         <app-project-selection-modal *ngIf="!project()"></app-project-selection-modal>

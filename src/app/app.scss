@@ -6,6 +6,12 @@
     background-color: #007fd4;
 }
 
+.group\/layout:hover {
+    .p-1 {
+        transition-delay: 100ms;
+    }
+}
+
 ::ng-deep .mappings-table-v2 {
     .p-datatable-thead>tr>th {
         background: var(--background) !important;
@@ -138,11 +144,79 @@
         }
 
         .p-select-empty-message,
-        .p-select-list-empty-message {
+        .p-select-list-empty-message,
+        .p-multiselect-empty-message,
+        .p-multiselect-list-empty-message {
             color: var(--muted-foreground) !important;
             font-size: calc(var(--font-size) * 0.75) !important; // 12px base
             padding: 8px 12px !important;
             background: transparent !important;
+        }
+    }
+
+    ::ng-deep {
+        .p-multiselect-overlay {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 6px !important;
+            overflow: hidden !important;
+            margin-top: 4px;
+
+            .p-multiselect-header {
+                background: var(--card) !important;
+                padding: 8px !important;
+                border-bottom: 1px solid var(--border) !important;
+                color: var(--foreground) !important;
+            }
+
+            .p-multiselect-list {
+                padding: 4px 0 !important;
+                background: var(--card) !important;
+            }
+
+            .p-multiselect-option {
+                color: var(--foreground) !important;
+                font-size: calc(var(--font-size) * 0.75) !important;
+                padding: 6px 12px !important;
+                margin: 0 4px !important;
+                border-radius: 3px !important;
+
+                &:hover {
+                    background: var(--muted) !important;
+                }
+
+                &.p-multiselect-option-selected {
+                    background: var(--primary) !important;
+                    color: white !important;
+                }
+            }
+        }
+
+        .p-multiselect {
+            background: var(--background) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 4px !important;
+            height: 30px !important;
+            display: flex;
+            align-items: center;
+
+            .p-multiselect-label {
+                padding: 0 8px !important;
+                font-size: calc(var(--font-size) * 0.75) !important;
+                color: var(--foreground) !important;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .p-multiselect-dropdown {
+                width: 24px !important;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
     }
 

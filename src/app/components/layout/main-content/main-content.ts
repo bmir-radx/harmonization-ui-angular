@@ -12,6 +12,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { MultiSelect } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
 import { TabsModule } from 'primeng/tabs';
 import { SplitterModule } from 'primeng/splitter';
@@ -28,6 +30,7 @@ import { TooltipModule } from 'primeng/tooltip';
     Button,
     TableModule,
     SelectModule,
+    MultiSelect,
     FormsModule,
     TooltipModule
   ],
@@ -44,10 +47,30 @@ export class MainContent {
   messageService = inject(MessageService);
 
   searchTerm = signal<string>('');
+  selectedDatasets = signal<string[]>([]);
+  availableDatasets = computed(() => {
+    const datasets = Array.from(new Set(this.mappingService.mappingRows().map(r => r.dataset)));
+    return datasets.map(d => ({ label: d, value: d }));
+  });
+
+  allColumns = [
+    { field: 'index', header: '#', class: 'index-col' },
+    { field: 'dataset', header: 'DATA SET' },
+    { field: 'sourceElement', header: 'SOURCE DATA ELEMENT' },
+    { field: 'targetElement', header: 'TARGET DATA ELEMENT' },
+    { field: 'status', header: 'STATUS', class: 'status-col' },
+    { field: 'actions', header: 'ACTIONS', class: 'actions-col w-[80px]' }
+  ];
+  visibleColumns = signal<string[]>(['index', 'dataset', 'sourceElement', 'targetElement', 'status', 'actions']);
 
   filteredMappingRows = computed(() => {
-    const rows = this.mappingService.mappingRows();
+    let rows = this.mappingService.mappingRows();
     const term = this.searchTerm().toLowerCase().trim();
+    const datasets = this.selectedDatasets();
+
+    if (datasets.length > 0) {
+      rows = rows.filter(row => datasets.includes(row.dataset));
+    }
 
     if (!term) return rows;
 

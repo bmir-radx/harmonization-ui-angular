@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, effect, inject } from '@angular/core';
+import { Component, OnInit, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from './services/theme.service';
 import { ProjectService } from './services/project.service';
@@ -32,6 +32,9 @@ export class App implements OnInit {
   get project() {
     return this.projectService.currentProject;
   }
+
+  isLeftSidebarVisible = signal(true);
+  isRightSidebarVisible = signal(true);
 
   ngOnInit() {
     this.themeService.setDarkMode(true);
