@@ -91,15 +91,26 @@ export class MainContent {
       }
     });
 
-    // Auto-add first row when enum_to_enum is selected and mapping is empty
+    // Auto-initialize mappings from source enums when enum_to_enum is selected
     effect(() => {
       const step = this.currentStep();
       if (step && step.transformation === 'enum_to_enum') {
-        const mappings = this.enumMappings();
-        if (mappings.length === 0) {
-          // Use setTimeout to avoid 'writing to signal during signal evolution' error if needed,
-          // though usually effect is fine for this if logic is guarded.
-          this.addEnumMapping();
+        const sourceEnums = this.sourceEnums();
+        const currentMapping = step.params['mapping'] || {};
+
+        let hasChanges = false;
+        const newMapping = { ...currentMapping };
+
+        // Ensure all source enums have at least an entry in mapping if empty
+        if (Object.keys(currentMapping).length === 0 && sourceEnums.length > 0) {
+          sourceEnums.forEach(s => {
+            newMapping[s.value] = '';
+          });
+          hasChanges = true;
+        }
+
+        if (hasChanges) {
+          this.updateParam('mapping', newMapping);
         }
       }
     });
@@ -345,6 +356,21 @@ export class MainContent {
     const newMappings = [...currentMappings];
     newMappings[index] = { ...newMappings[index], [field]: String(value || '') };
     this.updateEnumMappingParam(newMappings);
+  }
+
+  updateEnumMappingBySource(sourceValue: string, targetValue: string) {
+    const step = this.currentStep();
+    if (!step) return;
+
+    const currentMapping = { ...(step.params['mapping'] || {}) };
+    currentMapping[sourceValue] = targetValue;
+    this.updateParam('mapping', currentMapping);
+  }
+
+  getMappedValue(sourceValue: string): string {
+    const step = this.currentStep();
+    if (!step || !step.params['mapping']) return '';
+    return step.params['mapping'][sourceValue] || '';
   }
 
   removeEnumMapping(index: number) {

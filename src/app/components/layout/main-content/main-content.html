@@ -458,84 +458,62 @@
                                                                         class="custom-table-select step-config-select">
                                                                     </p-select>
 
-                                                                    <!-- Custom Enum to Enum Parameter -->
+                                                                    <!-- Custom Enum to Enum Parameter (Source-Driven Table) -->
                                                                     <div *ngIf="currentStep()?.transformation === 'enum_to_enum' && param.key === 'mapping'"
                                                                         class="flex flex-col gap-3">
                                                                         <div class="flex items-center justify-between">
                                                                             <label
-                                                                                class="text-foreground text-xs font-bold uppercase tracking-wider opacity-60">Mappings</label>
+                                                                                class="text-foreground text-xs font-bold uppercase tracking-wider opacity-60">Value
+                                                                                Mappings</label>
                                                                         </div>
 
-                                                                        <div class="space-y-2">
-                                                                            <!-- List of current mappings -->
-                                                                            <div *ngFor="let mapping of enumMappings(); let i = index"
-                                                                                class="flex items-center w-full gap-4 group mb-3 last:mb-0">
-
-                                                                                <!-- Left: Source Dropdown -->
-                                                                                <div class="flex-1 flex justify-start">
-                                                                                    <p-select [options]="sourceEnums()"
-                                                                                        [ngModel]="mapping.source"
-                                                                                        (ngModelChange)="updateEnumMapping(i, 'source', $event)"
-                                                                                        optionLabel="label"
-                                                                                        optionValue="value"
-                                                                                        placeholder="Source..."
-                                                                                        [style]="{'width': '180px'}"
-                                                                                        appendTo="body"
-                                                                                        class="custom-table-select">
-                                                                                    </p-select>
-                                                                                </div>
-
-                                                                                <!-- Middle: Direction Arrow -->
-                                                                                <div
-                                                                                    class="flex items-center justify-center">
-                                                                                    <i
-                                                                                        class="pi pi-arrow-right text-[12px] text-[#4ec9b0] font-bold"></i>
-                                                                                </div>
-
-                                                                                <!-- Right: Target Dropdown & Delete -->
-                                                                                <div
-                                                                                    class="flex-1 flex items-center justify-end gap-3">
-                                                                                    <p-select [options]="targetEnums()"
-                                                                                        [ngModel]="mapping.target"
-                                                                                        (ngModelChange)="updateEnumMapping(i, 'target', $event)"
-                                                                                        optionLabel="label"
-                                                                                        optionValue="value"
-                                                                                        placeholder="Target..."
-                                                                                        [style]="{'width': '180px'}"
-                                                                                        appendTo="body"
-                                                                                        class="custom-table-select">
-                                                                                    </p-select>
-
-                                                                                    <button
-                                                                                        (click)="removeEnumMapping(i)"
-                                                                                        class="p-1.5 text-[#606060] hover:text-[#f85149] rounded transition-colors"
-                                                                                        pTooltip="Remove mapping"
-                                                                                        tooltipPosition="left"
-                                                                                        tooltipStyleClass="custom-tooltip">
-                                                                                        <i
-                                                                                            class="pi pi-trash text-sm"></i>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <!-- Add Mapping Row (Aligned with delete icons) -->
-                                                                            <div class="flex justify-end pt-1 pr-[6px]">
-                                                                                <button (click)="addEnumMapping()"
-                                                                                    class="bg-[#007fd4] hover:bg-[#005fa3] text-white w-7 h-7 rounded flex items-center justify-center transition-all shadow-sm active:scale-95"
-                                                                                    pTooltip="Add another mapping row"
-                                                                                    tooltipPosition="top"
-                                                                                    tooltipStyleClass="custom-tooltip">
-                                                                                    <i class="pi pi-plus"
-                                                                                        style="font-size: 10px;"></i>
-                                                                                </button>
-                                                                            </div>
+                                                                        <div
+                                                                            class="border border-border rounded-md overflow-hidden bg-background/20 max-h-[350px] overflow-y-auto">
+                                                                            <table
+                                                                                class="w-full border-collapse table-fixed">
+                                                                                <thead class="sticky top-0 z-10">
+                                                                                    <tr
+                                                                                        class="bg-[#2a2a2a] border-b border-border">
+                                                                                        <th
+                                                                                            class="px-3 py-2 text-left text-[9px] font-bold tracking-wider opacity-60 w-1/2 border-r border-border/10">
+                                                                                            Source Values</th>
+                                                                                        <th
+                                                                                            class="px-3 py-2 text-left text-[9px] font-bold tracking-wider opacity-60 w-1/2">
+                                                                                            Target Values</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody
+                                                                                    class="divide-y divide-border/30">
+                                                                                    <tr *ngFor="let source of sourceEnums()"
+                                                                                        class="hover:bg-accent/5 transition-colors">
+                                                                                        <td
+                                                                                            class="px-3 py-2 text-foreground text-sm font-medium w-1/2 truncate border-r border-border/10">
+                                                                                            {{source.label}}
+                                                                                        </td>
+                                                                                        <td class="px-3 py-2 w-1/2">
+                                                                                            <p-select
+                                                                                                [options]="targetEnums()"
+                                                                                                [ngModel]="getMappedValue(source.value)"
+                                                                                                (onChange)="updateEnumMappingBySource(source.value, $event.value)"
+                                                                                                optionLabel="label"
+                                                                                                optionValue="value"
+                                                                                                placeholder="Select target..."
+                                                                                                [style]="{'width': '100%', 'height': '28px'}"
+                                                                                                appendTo="body"
+                                                                                                class="custom-table-select">
+                                                                                            </p-select>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
                                                                         </div>
 
                                                                         <!-- Empty State -->
-                                                                        <div *ngIf="enumMappings().length === 0"
-                                                                            class="text-center py-4 border border-dashed border-border rounded text-muted-foreground text-[10px]">
-                                                                            No mappings defined. Click "Add Mapping"
-                                                                            to start.
+                                                                        <div *ngIf="sourceEnums().length === 0"
+                                                                            class="text-center py-6 border border-dashed border-border rounded text-muted-foreground text-xs flex flex-col gap-2">
+                                                                            <i class="pi pi-info-circle text-lg"></i>
+                                                                            <span>No source values found for this
+                                                                                element.</span>
                                                                         </div>
                                                                     </div>
 
