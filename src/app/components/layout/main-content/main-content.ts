@@ -1,4 +1,5 @@
 import { Component, ViewChild, ElementRef, effect, inject, computed, signal } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { Dialog } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
@@ -45,6 +46,69 @@ export class MainContent {
   mappingService = inject(MappingService);
   themeService = inject(ThemeService);
   messageService = inject(MessageService);
+  sanitizer = inject(DomSanitizer);
+
+  getHighlightedText(file: any): SafeHtml {
+    if (!file || !file.text) return '';
+
+    const text = file.text.slice(0, 50000); // reduced size for safety
+    const truncated = file.text.length > 50000 ? '\n\n[Content truncated for preview]' : '';
+
+    // Check if it looks like JSON if type is missing or 'text'
+    const looksLikeJson = file.type === 'rules' ||
+      file.type === 'json' ||
+      file.name.toLowerCase().endsWith('.json') ||
+      (text.trim().startsWith('{') || text.trim().startsWith('['));
+
+    if (looksLikeJson && text) {
+      try {
+        const highlighted = this.highlightJson(text);
+        return this.sanitizer.bypassSecurityTrustHtml(`<div class="json-wrapper">${highlighted}${truncated}</div>`);
+      } catch (e) {
+        console.error('JSON highlighting failed', e);
+      }
+    }
+
+    const escapedText = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return this.sanitizer.bypassSecurityTrustHtml(escapedText + truncated);
+  }
+
+  private highlightJson(json: string): string {
+    const escaped = json
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const jsonRegex = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+
+    return escaped.replace(jsonRegex, (match) => {
+      let cls = 'json-string';
+      let style = 'color: #ce9178;';
+
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'json-key';
+          style = 'color: #9cdcfe;';
+        } else {
+          cls = 'json-string';
+          style = 'color: #ce9178;';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'json-boolean';
+        style = 'color: #569cd6;';
+      } else if (/null/.test(match)) {
+        cls = 'json-null';
+        style = 'color: #569cd6;';
+      } else if (/[0-9]/.test(match)) {
+        cls = 'json-number';
+        style = 'color: #b5cea8;';
+      }
+      return `<span class="${cls}" style="${style}">${match}</span>`;
+    });
+  }
 
   searchTerm = signal<string>('');
   selectedDatasets = signal<string[]>([]);

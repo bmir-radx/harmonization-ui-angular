@@ -328,3 +328,21 @@
         }
     }
 }
+
+/* JSON Syntax Highlighting (Global for innerHTML) */
+.json-key {
+    color: #9cdcfe !important;
+}
+
+.json-string {
+    color: #ce9178 !important;
+}
+
+.json-number {
+    color: #b5cea8 !important;
+}
+
+.json-boolean,
+.json-null {
+    color: #569cd6 !important;
+}

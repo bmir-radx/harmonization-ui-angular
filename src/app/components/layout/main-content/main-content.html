@@ -635,8 +635,8 @@
                     <!-- Tab Content - JSON or Text or Rules or Replay -->
                     <div *ngIf="file.type === 'json' || file.type === 'text' || file.type === 'rules' || file.type === 'replay'"
                         class="h-full bg-background overflow-auto p-6 font-mono text-sm text-foreground selection:bg-[#264f78]">
-                        <pre
-                            class="whitespace-pre-wrap leading-relaxed">{{file.text | slice:0:100000}}{{file.text.length > 100000 ? '...\n[Content truncated for preview]' : ''}}</pre>
+                        <pre class="whitespace-pre-wrap leading-relaxed json-content"
+                            [innerHTML]="getHighlightedText(file)"></pre>
                     </div>
                 </p-tabpanel>
             </p-tabpanels>
