@@ -170,18 +170,33 @@
                                                             </ng-template>
                                                         </p-select>
                                                     </td>
-                                                    <td *ngIf="visibleColumns().includes('status')" class="status-col">
-                                                        <i *ngIf="row.status === 'attention'"
-                                                            class="pi pi-exclamation-triangle text-[#ff9500] text-sm"></i>
-                                                        <i *ngIf="row.status === 'complete'"
-                                                            class="pi pi-check text-[#4caf50] text-sm"></i>
+                                                    <td *ngIf="visibleColumns().includes('status')"
+                                                        class="status-col text-center">
+                                                        <div *ngIf="row.status === 'attention'"
+                                                            class="inline-flex items-center justify-center">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                                    d="M12 2L1 21H23L12 2ZM11 9H13V15H11V9ZM11 17H13V19H11V17Z"
+                                                                    fill="#ff6900" />
+                                                            </svg>
+                                                        </div>
+                                                        <div *ngIf="row.status === 'complete'"
+                                                            class="inline-flex items-center justify-center">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M5 13L9 17L19 7" stroke="#00c951"
+                                                                    stroke-width="2.5" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </div>
                                                     </td>
                                                     <td *ngIf="visibleColumns().includes('actions')"
-                                                        class="actions-col">
-                                                        <div class="flex items-center gap-1">
+                                                        class="actions-col text-center">
+                                                        <div class="flex items-center justify-center gap-1">
                                                             <button
                                                                 (click)="$event.stopPropagation(); mappingService.duplicateMappingRow(row)"
-                                                                class="p-1 text-muted-foreground hover:text-[#007fd4] hover:bg-muted rounded transition-colors"
+                                                                class="p-1 text-[#007fd4] hover:bg-muted rounded transition-colors"
                                                                 pTooltip="Duplicate mapping for one-to-many"
                                                                 tooltipPosition="top"
                                                                 tooltipStyleClass="custom-tooltip">
