@@ -3299,8 +3299,8 @@
   --p-tree-padding: 0 0 0 24px;
   --p-tree-indent: 24px;
   --p-tree-node-padding: 0 10px;
-  --p-tree-node-selected-background: #094771;
-  --p-tree-node-hover-background: #444444;
+  --p-tree-node-selected-background: #007fd426;
+  --p-tree-node-hover-background: #f3f4f6;
   --p-tree-transition-duration: 0.15s;
 }
 
@@ -3377,6 +3377,8 @@ i.pi {
   --p-menubar-submenu-background: #2d2d30;
   --p-menubar-submenu-border-color: #3c3c3c;
   --p-menubar-separator-border-color: #3c3c3c;
+  --p-tree-node-selected-background: #094771;
+  --p-tree-node-hover-background: #2a2d2e;
 }
 
 html {
@@ -3508,9 +3510,6 @@ html {
   color: gray !important;
 }
 
-.dark .text-\[\#4ec9b0\] {
-  color: #4ec9b0 !important;
-}
 
 .text-\[\#cccccc\] {
   color: var(--foreground);
@@ -3521,9 +3520,6 @@ html {
   color: var(--muted-foreground);
 }
 
-.text-\[\#4ec9b0\] {
-  color: var(--filter-active);
-}
 
 .dark .border-\[\#3c3c3c\] {
   border-color: #3c3c3c !important;

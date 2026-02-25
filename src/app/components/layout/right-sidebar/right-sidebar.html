@@ -106,7 +106,7 @@
         <div *ngIf="datasetService.targetFiles().length > 0" class="space-y-1 min-w-max pt-2">
             <p-tree [value]="files" selectionMode="single" [(selection)]="selectedNode">
                 <ng-template let-node pTemplate="file">
-                    <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer hover:bg-[#2a2d2e]"
+                    <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-item"
                         (dblclick)="datasetService.openFile(node.data)">
                         <div class="w-4 h-4 shrink-0">
                             <svg class="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 16">
@@ -117,13 +117,13 @@
                             </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="text-[#cccccc] text-sm truncate">{{node.label}}</div>
+                            <div class="text-sm truncate">{{node.label}}</div>
                         </div>
                     </div>
                 </ng-template>
                 <ng-template let-node pTemplate="field">
                     <div
-                        class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer hover:bg-[#2a2d2e]">
+                        class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer sidebar-item">
                         <div class="relative w-4 h-4">
                             <div class="relative w-full h-full">
                                 <div class="box-border flex flex-col items-center justify-center w-full h-full">
@@ -135,7 +135,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="text-[#cccccc] flex-1 truncate">{{node.label}}</span>
+                        <span class="flex-1 truncate">{{node.label}}</span>
                     </div>
                 </ng-template>
             </p-tree>

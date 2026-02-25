@@ -329,20 +329,57 @@
     }
 }
 
+/* Sidebar Items */
+.sidebar-item {
+    color: var(--sidebar-foreground) !important;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+        background: var(--p-tree-node-hover-background) !important;
+    }
+
+    &.active {
+        background: var(--p-tree-node-selected-background) !important;
+    }
+}
+
 /* JSON Syntax Highlighting (Global for innerHTML) */
+/* Light Theme Defaults */
 .json-key {
-    color: #9cdcfe !important;
+    color: #0451a5 !important; // Deep blue
+    font-weight: 500;
 }
 
 .json-string {
-    color: #ce9178 !important;
+    color: #a31515 !important; // Dark red
 }
 
 .json-number {
-    color: #b5cea8 !important;
+    color: #098658 !important; // Dark green
 }
 
 .json-boolean,
 .json-null {
-    color: #569cd6 !important;
+    color: #0000ff !important; // Classic blue
+}
+
+/* Dark Theme Overrides */
+.dark {
+    .json-key {
+        color: #9cdcfe !important; // Light blue
+        font-weight: normal;
+    }
+
+    .json-string {
+        color: #ce9178 !important; // Orange-red
+    }
+
+    .json-number {
+        color: #b5cea8 !important; // Light green
+    }
+
+    .json-boolean,
+    .json-null {
+        color: #569cd6 !important; // Blue
+    }
 }

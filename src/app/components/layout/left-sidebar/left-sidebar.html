@@ -87,15 +87,15 @@
                     (onNodeSelect)="datasetService.selectFolder($event.node.label!)"
                     (onNodeUnselect)="datasetService.clearFolder()">
                     <ng-template let-node pTemplate="folder">
-                        <div class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-dataset-item">
+                        <div class="flex items-center gap-2 p-2 cursor-pointer whitespace-nowrap sidebar-item">
                             <i class="pi pi-folder-open w-5 h-5 text-[#007FD4]" style="--p-icon-size: 20px;"></i>
                             <div class="flex-1 min-w-0">
-                                <div class="text-[#cccccc] font-medium truncate">{{node.label}}</div>
+                                <div class="font-medium truncate">{{node.label}}</div>
                             </div>
                         </div>
                     </ng-template>
                     <ng-template let-node pTemplate="file">
-                        <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-file-item"
+                        <div class="flex items-center gap-2 p-2 whitespace-nowrap cursor-pointer sidebar-item"
                             (dblclick)="datasetService.openFile(node.file)">
                             <i *ngIf="node.subtype === 'data'" class="pi pi-table w-4 h-4 text-[#569cd6] shrink-0"
                                 style="--p-icon-size: 16px;"></i>
@@ -121,12 +121,13 @@
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="text-[#cccccc] text-sm truncate">{{node.label}}</div>
+                                <div class="text-sm truncate">{{node.label}}</div>
                             </div>
                         </div>
                     </ng-template>
                     <ng-template let-node pTemplate="field">
-                        <div class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer">
+                        <div
+                            class="flex items-center gap-3 py-1 px-2 text-sm whitespace-nowrap cursor-pointer sidebar-item">
                             <div class="relative w-4 h-4">
                                 <div class="relative w-full h-full">
                                     <div
@@ -139,7 +140,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <span class="text-[#cccccc] flex-1 truncate">{{node.field}}</span>
+                            <span class="flex-1 truncate">{{node.field}}</span>
                         </div>
                     </ng-template>
                     <ng-template let-node pTemplate="default">
