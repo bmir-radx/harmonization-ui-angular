@@ -4,6 +4,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { DatasetService } from '../../../services/dataset.service';
+import { MappingService } from '../../../services/mapping.service';
 import { UploadedFile } from '../../../models/mapping.model';
 
 @Component({
@@ -14,9 +15,14 @@ import { UploadedFile } from '../../../models/mapping.model';
 })
 export class RightSidebar {
   datasetService = inject(DatasetService);
+  mappingService = inject(MappingService);
 
   files: TreeNode[] = [];
   selectedNode!: TreeNode;
+
+  getElementType(element: any): string {
+    return element['Type'] || element['type'] || element['Datatype'] || element['datatype'] || 'String';
+  }
 
   constructor() {
     effect(() => {
@@ -45,10 +51,6 @@ export class RightSidebar {
       this.datasetService.parseTargetCSV(input.files[0]);
     }
     input.value = '';
-  }
-
-  getDataClass(type: string): string {
-    return 'text-[#4ec9b0]';
   }
 }
 

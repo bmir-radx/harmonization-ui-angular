@@ -127,8 +127,10 @@
                         <div class="relative w-4 h-4">
                             <div class="relative w-full h-full">
                                 <div class="box-border flex flex-col items-center justify-center w-full h-full">
-                                    <div class="font-bold text-[14px] text-center text-[#4ec9b0]">
-                                        <p class="block whitespace-pre">s</p>
+                                    <div class="font-bold text-[14px] text-center"
+                                        [ngClass]="mappingService.getDataClass(getElementType(node.data))">
+                                        <p class="block whitespace-pre">
+                                            {{mappingService.getDataChar(getElementType(node.data))}}</p>
                                     </div>
                                 </div>
                             </div>

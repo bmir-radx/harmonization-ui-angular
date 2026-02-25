@@ -161,8 +161,8 @@
                                                                 <div class="flex items-center gap-3 w-full py-1">
                                                                     <span
                                                                         class="font-mono font-bold w-3 flex justify-center"
-                                                                        [ngClass]="getDataClass(option.type)">
-                                                                        {{ getDataChar(option.type) }}
+                                                                        [ngClass]="mappingService.getDataClass(option.type)">
+                                                                        {{ mappingService.getDataChar(option.type) }}
                                                                     </span>
                                                                     <span class="truncate text-xs text-foreground">{{
                                                                         option.value }}</span>

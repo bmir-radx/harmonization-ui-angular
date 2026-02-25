@@ -132,10 +132,9 @@
                                     <div
                                         class="box-border content-stretch flex flex-col items-center justify-center relative w-full h-full">
                                         <div class="font-['Inter:Bold',_sans-serif] font-bold leading-[0] not-italic relative shrink-0 text-[14px] text-center"
-                                            [ngClass]="getDataClass(node.datatype)">
+                                            [ngClass]="mappingService.getDataClass(node.datatype)">
                                             <p class="block leading-[normal] whitespace-pre">
-                                                {{node.datatype.toLowerCase() === 'datetime' ? 't' :
-                                                node.datatype[0].toLowerCase()}}</p>
+                                                {{mappingService.getDataChar(node.datatype)}}</p>
                                         </div>
                                     </div>
                                 </div>
