@@ -306,11 +306,9 @@ export class MappingService {
     // API Methods
     async runHarmonization() {
         console.log('Starting harmonization process...');
-        const rulesOutput: Record<string, Record<string, any>> = {};
-        const pairs: { source: string; target: string }[] = [];
 
+        // 1. Filter rows that are complete
         const completedRows = this.mappingRows().filter(row => row.status === 'complete');
-        console.log(`Found ${completedRows.length} completed rules.`);
 
         if (completedRows.length === 0) {
             console.warn('No completed rules to harmonize.');
@@ -318,117 +316,135 @@ export class MappingService {
             return;
         }
 
-        completedRows.forEach(row => {
-            const operations = row.steps.map(step => {
-                const combinedParams = { ...(step.params || {}) };
+        // 2. Group completed rows by dataset
+        const datasetsWithRules = Array.from(new Set(completedRows.map(row => row.dataset)));
+        console.log(`Found ${completedRows.length} completed rules across ${datasetsWithRules.length} datasets:`, datasetsWithRules);
 
-                // For enum_to_enum, ensure mapping is a clean object (no __empty_ keys)
-                if (step.transformation === 'enum_to_enum' && combinedParams['mapping']) {
-                    let mapping = combinedParams['mapping'];
-                    if (typeof mapping === 'string') {
-                        try { mapping = JSON.parse(mapping); } catch (e) { }
+        if (datasetsWithRules.length > 1) {
+            this.messageService.add({ severity: 'info', summary: 'Multiple Datasets', detail: `Rules found for ${datasetsWithRules.length} datasets. Each will be processed separately.`, life: 10000 });
+        }
+
+        // 3. For each dataset that has rules, prepare and send a request
+        for (const datasetName of datasetsWithRules) {
+            const datasetRows = completedRows.filter(row => row.dataset === datasetName);
+            if (datasetRows.length === 0) continue;
+
+            console.log(`Processing dataset: ${datasetName} with ${datasetRows.length} rules.`);
+
+            const rulesOutput: Record<string, Record<string, any>> = {};
+            const pairs: { source: string; target: string }[] = [];
+
+            datasetRows.forEach(row => {
+                const operations = row.steps.map(step => {
+                    const combinedParams = { ...(step.params || {}) };
+
+                    // For enum_to_enum, ensure mapping is a clean object (no __empty_ keys)
+                    if (step.transformation === 'enum_to_enum' && combinedParams['mapping']) {
+                        let mapping = combinedParams['mapping'];
+                        if (typeof mapping === 'string') {
+                            try { mapping = JSON.parse(mapping); } catch (e) { }
+                        }
+
+                        if (typeof mapping === 'object' && mapping !== null) {
+                            const cleanMapping: Record<string, string> = {};
+                            Object.entries(mapping).forEach(([key, val]) => {
+                                if (!key.startsWith('__empty_')) {
+                                    cleanMapping[key] = String(val);
+                                }
+                            });
+                            combinedParams['mapping'] = cleanMapping;
+                        }
                     }
 
-                    if (typeof mapping === 'object' && mapping !== null) {
-                        const cleanMapping: Record<string, string> = {};
-                        Object.entries(mapping).forEach(([key, val]) => {
-                            if (!key.startsWith('__empty_')) {
-                                cleanMapping[key] = String(val);
-                            }
-                        });
-                        combinedParams['mapping'] = cleanMapping;
-                    }
-                }
+                    return { operation: step.transformation, ...combinedParams };
+                });
 
-                return { operation: step.transformation, ...combinedParams };
+                if (!rulesOutput[row.sourceElement]) rulesOutput[row.sourceElement] = {};
+                rulesOutput[row.sourceElement][row.targetElement!] = {
+                    source: row.sourceElement,
+                    target: row.targetElement,
+                    operations: operations
+                };
+
+                pairs.push({ source: row.sourceElement, target: row.targetElement! });
             });
 
-            if (!rulesOutput[row.sourceElement]) rulesOutput[row.sourceElement] = {};
-            rulesOutput[row.sourceElement][row.targetElement!] = {
-                source: row.sourceElement,
-                target: row.targetElement,
-                operations: operations
-            };
+            // 4. Find the correct data file for THIS dataset
+            const sourceFile = this.datasetService.uploadedFiles().find(f => f.folder === datasetName && f.type === 'data');
 
-            pairs.push({ source: row.sourceElement, target: row.targetElement! });
-        });
-
-        const sourceFile = [...this.datasetService.uploadedFiles()].reverse().find(f => f.type === 'data');
-        console.log('Target source file for harmonization:', sourceFile);
-
-        if (!sourceFile) {
-            console.error('No data file found for harmonization.');
-            this.messageService.add({ severity: 'error', summary: 'Missing Data', detail: 'No data file found to harmonize.' });
-            return;
-        }
-
-        let basePath = '/tmp'; // Default fallback
-        if ((window as any).electron) {
-            // Try to use a better default for Electron
-            basePath = sourceFile.path ? sourceFile.path.substring(0, sourceFile.path.lastIndexOf('/')) : '';
-        }
-
-        const rulesPath = basePath ? `${basePath}/rules.json` : 'rules.json';
-        const outputPath = basePath ? `${basePath}/output.csv` : 'output.csv';
-        const replayLogPath = basePath ? `${basePath}/replay.log` : 'replay.log';
-
-        console.log('Harmonization paths:', { rulesPath, outputPath, replayLogPath });
-
-        try {
-            if ((window as any).electron && (window as any).electron.saveFile) {
-                console.log('Saving rules.json via Electron to:', rulesPath);
-                await (window as any).electron.saveFile(rulesPath, JSON.stringify(rulesOutput, null, 2));
-            } else {
-                console.log('Skipping Electron file save (possibly web mode or API not available).');
+            if (!sourceFile) {
+                console.error(`No data file found for dataset ${datasetName}.`);
+                this.messageService.add({ severity: 'error', summary: 'Missing Data', detail: `No data file found for ${datasetName}.` });
+                continue; // Move to next dataset
             }
 
-            const params: HarmonizeParams = {
-                data_file_path: sourceFile.path || sourceFile.name,
-                rules_file_path: rulesPath,
-                replay_log_file_path: replayLogPath,
-                output_file_path: outputPath,
-                mode: 'pairs',
-                pairs: pairs,
-                overwrite: true
-            };
+            let basePath = '/tmp';
+            if ((window as any).electron) {
+                basePath = sourceFile.path ? sourceFile.path.substring(0, sourceFile.path.lastIndexOf('/')) : '';
+            }
 
-            this.messageService.add({ severity: 'info', summary: 'Harmonization Submitted', detail: 'Submitting harmonization request to the server...', life: 15000 });
+            const safeDatasetName = datasetName.replace(/[^a-zA-Z0-9_.-]/g, '_'); // Sanitize dataset name for file paths
+            const rulesPath = basePath ? `${basePath}/rules_${safeDatasetName}.json` : `rules_${safeDatasetName}.json`;
+            const outputPath = basePath ? `${basePath}/output_${safeDatasetName}.csv` : `output_${safeDatasetName}.csv`;
+            const replayLogPath = basePath ? `${basePath}/replay_${safeDatasetName}.log` : `replay_${safeDatasetName}.log`;
 
-            console.log('\n--- HARMONIZATION REQUEST PARAMS ---');
-            console.log(JSON.stringify(params, null, 2));
+            console.log(`Harmonization paths for ${datasetName}:`, { rulesPath, outputPath, replayLogPath });
 
-            this.harmonizationApi.harmonize(params).subscribe({
-                next: (response: RpcResponse) => {
-                    console.log('\n--- HARMONIZE API SUBMISSION RESPONSE ---');
-                    console.log(JSON.stringify(response, null, 2));
-
-                    const resultPaths = { outputPath, rulesPath, replayLogPath };
-                    if (response.job_id) {
-                        console.log('Starting job polling for:', response.job_id);
-                        this.messageService.add({ severity: 'info', summary: 'Job Queued', detail: `Harmonization job queued. Waiting to start...`, life: 15000 });
-                        this.pollJob(response.job_id, resultPaths, sourceFile!.folder);
-                    } else if (response.result) {
-                        this.messageService.add({ severity: 'info', summary: 'Running Synchronously', detail: `Job is executing and processing results...`, life: 15000 });
-                        this.handleJobCompletion(resultPaths, sourceFile!.folder);
-                    } else if (response.error) {
-                        console.error('API returned error:', response.error);
-                        this.handleError(response.error);
-                    }
-                },
-                error: (err) => {
-                    console.error('Harmonize API call failed:', err);
-                    this.messageService.add({ severity: 'error', summary: 'API Error', detail: err.message || 'Harmonization call failed.' });
+            try {
+                if ((window as any).electron && (window as any).electron.saveFile) {
+                    console.log(`Saving rules to: ${rulesPath}`);
+                    await (window as any).electron.saveFile(rulesPath, JSON.stringify(rulesOutput, null, 2));
+                } else {
+                    console.log('Skipping Electron file save (possibly web mode or API not available).');
                 }
-            });
-        } catch (err: any) {
-            console.error('Unexpected error during harmonization preparation:', err);
-            this.messageService.add({ severity: 'error', summary: 'Preparation Error', detail: err.message || 'An error occurred.' });
+
+                const params: HarmonizeParams = {
+                    data_file_path: sourceFile.path || sourceFile.name,
+                    rules_file_path: rulesPath,
+                    replay_log_file_path: replayLogPath,
+                    output_file_path: outputPath,
+                    mode: 'pairs',
+                    pairs: pairs,
+                    overwrite: true
+                };
+
+                this.messageService.add({ severity: 'info', summary: 'Submitting', detail: `Processing reconciliation for ${datasetName}...`, life: 15000 });
+
+                console.log(`\n--- HARMONIZATION REQUEST PARAMS for ${datasetName} ---`);
+                console.log(JSON.stringify(params, null, 2));
+
+                this.harmonizationApi.harmonize(params).subscribe({
+                    next: (response: RpcResponse) => {
+                        console.log(`\n--- HARMONIZE API SUBMISSION RESPONSE for ${datasetName} ---`);
+                        console.log(JSON.stringify(response, null, 2));
+
+                        const resultPaths = { outputPath, rulesPath, replayLogPath };
+                        if (response.job_id) {
+                            console.log('Starting job polling for:', response.job_id);
+                            this.pollJob(response.job_id, resultPaths, datasetName);
+                        } else if (response.result) {
+                            this.handleJobCompletion(resultPaths, datasetName);
+                        } else if (response.error) {
+                            console.error('API returned error:', response.error);
+                            this.handleError(response.error, datasetName);
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Harmonize API call failed:', err);
+                        this.messageService.add({ severity: 'error', summary: 'API Error', detail: err.message || `Harmonization call for ${datasetName} failed.` });
+                    }
+                });
+            } catch (err: any) {
+                console.error(`Unexpected error during harmonization preparation for ${datasetName}:`, err);
+                this.messageService.add({ severity: 'error', summary: 'Preparation Error', detail: err.message || `An error occurred during preparation for ${datasetName}.` });
+            }
         }
     }
 
-    private handleError(error: any) {
+    private handleError(error: any, datasetName?: string) {
+        console.error('Harmonization error:', error);
         const detail = typeof error === 'string' ? error : (error.message || 'An error occurred');
-        this.messageService.add({ severity: 'error', summary: 'Error', detail });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: `Reconciliation process failed for ${datasetName ? datasetName : 'a dataset'}. ${detail}` });
     }
 
     private pollJob(jobId: string, resultPaths: { outputPath: string; rulesPath: string; replayLogPath: string }, targetFolder: string) {
