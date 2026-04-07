@@ -54,14 +54,14 @@ jobs:
       - name: Extract Sidecar
         shell: bash
         run: |
-          mkdir -p resources/sidecar/${{ matrix.targetOs }}/harmonization-sidecar
+          mkdir -p resources/sidecar/${{ matrix.targetOs }}/
           
           if [ "${{ matrix.isZip }}" = "true" ]; then
             # Windows artifact is a zip
-            unzip -o resources/temp-sidecar/* -d resources/sidecar/${{ matrix.targetOs }}/harmonization-sidecar/ || echo "Failed to unzip but continuing..."
+            unzip -o resources/temp-sidecar/* -d resources/sidecar/${{ matrix.targetOs }}/ || echo "Failed to unzip but continuing..."
           else
             # Mac and Linux artifacts are tar.gz
-            tar -xzf resources/temp-sidecar/* -C resources/sidecar/${{ matrix.targetOs }}/harmonization-sidecar/ || echo "Failed to untar but continuing..."
+            tar -xzf resources/temp-sidecar/* -C resources/sidecar/${{ matrix.targetOs }}/ || echo "Failed to untar but continuing..."
           fi
 
       - name: Build and Publish Electron App

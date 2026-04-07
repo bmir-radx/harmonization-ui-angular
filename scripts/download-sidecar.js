@@ -17,16 +17,24 @@ const binaryPath = path.join(resourcesDir, binaryName);
 // we will verify if the user has manually placed the sidecar in the proper path,
 // or provide a stub where automatic download logic would go.
 
-if (!fs.existsSync(binaryPath)) {
+if (!fs.existsSync(binaryPath) || !fs.statSync(binaryPath).isFile()) {
     console.error(`
-[ERROR] Missing sidecar binary for ${targetOs}.
-Please manually download the harmonization-sidecar for ${targetOs} and extract it to:
-${resourcesDir}
+[ERROR] Missing sidecar executable for ${targetOs}.
+(Or the path is pointing to a directory instead of a file due to double nesting.)
 
-Expected binary at: ${binaryPath}
+Please manually download the harmonization-sidecar for ${targetOs} and extract it to:
+${path.join(__dirname, '..', 'resources', 'sidecar', targetOs)}
+
+Expected executable to be found precisely at: ${binaryPath}
 (Ensure the _internal folder is also present alongside the executable).
 `);
     process.exit(1);
 } else {
+    if (targetOs !== 'win') {
+        try {
+            fs.chmodSync(binaryPath, '755');
+        } catch (e) {
+        }
+    }
     console.log(`[SUCCESS] Found sidecar binary for ${targetOs} at ${binaryPath}`);
 }

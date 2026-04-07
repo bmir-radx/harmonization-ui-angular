@@ -43,3 +43,10 @@ __screenshots__/
 Thumbs.db
 
 .vscode/
+
+# Electron-Builder Output
+/release/
+
+# Downloaded Backend Sidecars
+/resources/sidecar/
+/resources/temp-sidecar/
