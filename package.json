@@ -16,7 +16,7 @@
   },
   "build": {
     "appId": "com.harmonization.app",
-    "productName": "Harmonization Application",
+    "productName": "Harmonizer",
     "directories": {
       "output": "release"
     },
