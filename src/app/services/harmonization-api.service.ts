@@ -34,8 +34,14 @@ export interface RpcResponse {
 })
 export class HarmonizationApiService {
     private http = inject(HttpClient);
-    // Use relative path for proxy
+    // Use relative path for proxy by default, override in Electron
     private apiUrl = '/api';
+
+    constructor() {
+        if ((window as any).electron && (window as any).electron.getApiUrlSync) {
+            this.apiUrl = (window as any).electron.getApiUrlSync();
+        }
+    }
 
     harmonize(params: HarmonizeParams): Observable<RpcResponse> {
         const request: RpcRequest = {

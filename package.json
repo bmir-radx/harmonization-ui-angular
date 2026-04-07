@@ -9,7 +9,49 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "electron": "electron .",
-    "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron .\""
+    "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron .\"",
+    "pack:mac": "node scripts/download-sidecar.js mac && npm run build && electron-builder --mac",
+    "pack:win": "node scripts/download-sidecar.js win && npm run build && electron-builder --win",
+    "pack:linux": "node scripts/download-sidecar.js linux && npm run build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.harmonization.app",
+    "productName": "Harmonization Application",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/data-harmonization-angular/**/*",
+      "electron/**/*"
+    ],
+    "mac": {
+      "extraResources": [
+        {
+          "from": "resources/sidecar/mac/",
+          "to": "sidecar",
+          "filter": ["**/*"]
+        }
+      ]
+    },
+    "win": {
+      "extraResources": [
+        {
+          "from": "resources/sidecar/win/",
+          "to": "sidecar",
+          "filter": ["**/*"]
+        }
+      ]
+    },
+    "linux": {
+      "target": "AppImage",
+      "extraResources": [
+        {
+          "from": "resources/sidecar/linux/",
+          "to": "sidecar",
+          "filter": ["**/*"]
+        }
+      ]
+    }
   },
   "prettier": {
     "printWidth": 100,
