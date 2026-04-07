@@ -37,7 +37,7 @@ export class App implements OnInit {
   isRightSidebarVisible = signal(true);
 
   ngOnInit() {
-    this.themeService.setDarkMode(true);
+    this.themeService.setDarkMode(false);
 
     // Auto-create a default project for testing purposes
     this.projectService.setProject({

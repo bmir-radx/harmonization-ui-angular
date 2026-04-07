@@ -120,4 +120,44 @@
             transform: translateY(0);
         }
     }
+
+    .column-visibility-popover {
+        .p-popover-content {
+            padding: 0 !important;
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4) !important;
+        }
+    }
+
+    .custom-scrollbar {
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+
+            &:hover {
+                background: var(--muted-foreground);
+            }
+        }
+    }
+
+    .p-checkbox {
+        .p-checkbox-box {
+            border-color: var(--border) !important;
+            background: var(--background) !important;
+
+            &.p-highlight {
+                background: #007fd4 !important;
+                border-color: #007fd4 !important;
+            }
+        }
+    }
 }

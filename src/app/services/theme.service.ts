@@ -4,11 +4,15 @@ import { Injectable, signal } from '@angular/core';
     providedIn: 'root'
 })
 export class ThemeService {
-    private readonly _darkMode = signal<boolean>(true);
+    private readonly _darkMode = signal<boolean>(false);
     readonly darkMode = this._darkMode.asReadonly();
     private readonly _fontSize = signal<number>(16);
     readonly fontSize = this._fontSize.asReadonly();
     readonly isChangingTheme = signal<boolean>(false);
+
+    constructor() {
+        this.applyDarkModeToHtml(this._darkMode(), false);
+    }
 
     toggleDarkMode() {
         // Show loading spinner natively first

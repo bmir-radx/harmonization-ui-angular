@@ -18,6 +18,9 @@ import { MultiSelect } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
 import { TabsModule } from 'primeng/tabs';
 import { SplitterModule } from 'primeng/splitter';
+import { PopoverModule } from 'primeng/popover';
+import { Popover } from 'primeng/popover';
+import { CheckboxModule } from 'primeng/checkbox';
 
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -33,7 +36,9 @@ import { TooltipModule } from 'primeng/tooltip';
     SelectModule,
     MultiSelect,
     FormsModule,
-    TooltipModule
+    TooltipModule,
+    Popover,
+    CheckboxModule
   ],
   templateUrl: './main-content.html',
   styleUrl: './main-content.scss',
@@ -91,7 +96,7 @@ export class MainContent {
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
           cls = 'json-key';
-          style = 'color: #9cdcfe;';
+          style = 'color: #007fd4;';
         } else {
           cls = 'json-string';
           style = 'color: #ce9178;';
@@ -144,6 +149,121 @@ export class MainContent {
       row.dataset.toLowerCase().includes(term)
     );
   });
+
+  // For data files column visibility
+  dataVisibleColumnsMap = signal<Record<string, string[]>>({});
+  columnSearchTerm = signal<string>('');
+
+  getFilteredHeaders(file: any): string[] {
+    if (!file || !file.data) return [];
+    const headers = this.getHeaders(file.data);
+    const term = this.columnSearchTerm().toLowerCase().trim();
+    if (!term) return headers;
+    return headers.filter(h => h.toLowerCase().includes(term));
+  }
+
+  toggleColumn(file: any, column: string) {
+    if (!file) return;
+
+    const currentVisible = this.getFileVisibleColumns(file);
+    let nextVisible: string[];
+
+    if (currentVisible.includes(column)) {
+      nextVisible = currentVisible.filter(c => c !== column);
+    } else {
+      nextVisible = [...currentVisible, column];
+    }
+
+    this.dataVisibleColumnsMap.update(map => ({
+      ...map,
+      [file.name]: nextVisible
+    }));
+  }
+
+  showAllColumns(file: any) {
+    if (!file || !file.data) return;
+    const headers = this.getHeaders(file.data);
+    this.dataVisibleColumnsMap.update(map => ({
+      ...map,
+      [file.name]: headers
+    }));
+  }
+
+  hideAllColumns(file: any) {
+    if (!file) return;
+    this.dataVisibleColumnsMap.update(map => ({
+      ...map,
+      [file.name]: []
+    }));
+  }
+
+  getFileVisibleColumns(file: any): string[] {
+    if (!file || !file.data) return [];
+    const map = this.dataVisibleColumnsMap();
+    if (map[file.name]) return map[file.name];
+    // Default: all columns visible
+    return this.getHeaders(file.data);
+  }
+
+  isColumnVisible(file: any, column: string): boolean {
+    return this.getFileVisibleColumns(file).includes(column);
+  }
+
+  showInputDataMerged = signal<Record<string, boolean>>({});
+
+  toggleShowInputData(file: any, value?: boolean) {
+    if (!file) return;
+    this.showInputDataMerged.update(map => ({
+      ...map,
+      [file.name]: value !== undefined ? value : !map[file.name]
+    }));
+  }
+
+  private mergedFileCache = new Map<string, { original: any, input: any, merged: any }>();
+
+  getDisplayFile(file: any) {
+    if (!this.hasMergedView(file.name)) return file;
+    const inputFile = this.getInputFileFor(file);
+    if (!inputFile) return file;
+
+    const cached = this.mergedFileCache.get(file.name);
+    if (cached && cached.original === file && cached.input === inputFile) {
+      return cached.merged;
+    }
+
+    // Merge logic: append output columns to input columns
+    const mergedData = file.data.map((row: any, idx: number) => {
+      const inputRow = inputFile.data[idx] || {};
+      return { ...inputRow, ...row };
+    });
+
+    const merged = {
+      ...file,
+      data: mergedData,
+      isMerged: true
+    };
+
+    this.mergedFileCache.set(file.name, { original: file, input: inputFile, merged });
+    return merged;
+  }
+
+  getInputFileFor(file: any) {
+    if (!file || file.name !== 'output.csv') return null;
+    // Find a 'data' type file in the same folder that isn't the output itself
+    return this.datasetService.uploadedFiles().find(f =>
+      f.folder === file.folder &&
+      f.type === 'data' &&
+      f.name !== 'output.csv'
+    );
+  }
+
+  getDataValue(row: any, field: string): any {
+    return row ? (row as any)[field] : '';
+  }
+
+  hasMergedView(fileName: string): boolean {
+    return !!this.showInputDataMerged()[fileName];
+  }
 
   constructor() {
     effect(() => {

@@ -105,7 +105,10 @@
                                             </button>
                                             <button [disabled]="!mappingService.isReady()"
                                                 (click)="mappingService.runHarmonization()"
-                                                class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm bg-[#007fd4] text-white hover:bg-[#005fa3] disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed">
+                                                [class.bg-[#007fd4]]="mappingService.isReady()"
+                                                [class.hover:bg-[#005fa3]]="mappingService.isReady()"
+                                                [class.bg-[#3c3c3c]]="!mappingService.isReady()"
+                                                class="px-3 py-1.5 rounded flex items-center font-semibold text-xs transition-all shadow-sm text-white disabled:text-[#808080] disabled:cursor-not-allowed">
                                                 Ready
                                             </button>
                                         </div>
@@ -271,45 +274,56 @@
                                                             <div class="flex flex-col items-center gap-3 flex-1">
                                                                 <div
                                                                     class="w-full max-w-[180px] p-4 bg-card border border-border rounded-lg text-center">
-                                                                    <div
-                                                                        class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
+                                                                    <div class="font-bold text-sm mb-1 leading-tight break-words"
+                                                                        style="color: #ff6900 !important;">
                                                                         {{mappingService.selectedMappingRow()?.sourceElement}}
                                                                     </div>
                                                                     <div class="text-muted-foreground text-xs">(int)
                                                                     </div>
-                                                                    <div class="text-foreground text-xs mt-2">
+                                                                    <div class="text-foreground text-xs mt-2 font-bold"
+                                                                        style="font-weight: 700 !important;">
                                                                         {{mappingService.selectedMappingRow()?.dataset}}
                                                                     </div>
                                                                 </div>
                                                                 <span
                                                                     class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">Source</span>
                                                             </div>
-
                                                             <!-- Arrow & Steps Label -->
-                                                            <div class="flex flex-col items-center gap-3 px-4">
-                                                                <div
-                                                                    class="relative w-40 h-px bg-[#007fd4] flex items-center justify-end">
-                                                                    <div
-                                                                        class="w-2 h-2 border-t-2 border-r-2 border-[#007fd4] rotate-45 -mr-0.5 mt-[-0.5px]">
+                                                            <div
+                                                                class="flex flex-col items-center justify-center min-w-[120px] px-2 relative">
+                                                                <!-- Number of steps badge -->
+                                                                <div *ngIf="(mappingService.selectedMappingRow()?.steps?.length || 0) > 0"
+                                                                    class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full mb-3 text-white text-[10px] w-5 h-5 rounded-full font-bold z-20 flex items-center justify-center shadow-md border border-white/20"
+                                                                    style="background-color: #ff6900 !important;">
+                                                                    {{mappingService.selectedMappingRow()?.steps?.length}}
+                                                                </div>
+
+                                                                <div class="flex items-center w-full relative h-6">
+                                                                    <div class="w-full h-1.5 rounded-full"
+                                                                        style="background-color: #ff6900 !important; box-shadow: 0 0 6px rgba(255, 105, 0, 0.2);">
+                                                                    </div>
+                                                                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 border-t-[3px] border-r-[3px] rotate-45 -mr-2"
+                                                                        style="border-color: #ff6900 !important;">
                                                                     </div>
                                                                 </div>
                                                                 <span
-                                                                    class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">Steps</span>
+                                                                    class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase mt-1">Steps</span>
                                                             </div>
 
                                                             <!-- Target Block -->
                                                             <div class="flex flex-col items-center gap-3 flex-1">
                                                                 <div
                                                                     class="w-full max-w-[180px] p-4 bg-card border border-border rounded-lg text-center">
-                                                                    <div
-                                                                        class="text-[#4ec9b0] font-bold text-sm mb-1 leading-tight break-words">
+                                                                    <div class="font-bold text-sm mb-1 leading-tight break-words"
+                                                                        style="color: #ff6900 !important;">
                                                                         {{mappingService.selectedMappingRow()?.targetElement}}
                                                                     </div>
                                                                     <div class="text-muted-foreground text-xs">
                                                                         ({{mappingService.getTargetDetails(mappingService.selectedMappingRow()?.targetElement
                                                                         || '')?.Type
                                                                         || 'string'}})</div>
-                                                                    <div class="text-foreground text-xs mt-2">Target
+                                                                    <div class="text-foreground text-xs mt-2 font-bold"
+                                                                        style="font-weight: 700 !important;">Target
                                                                         Schema</div>
                                                                 </div>
                                                                 <span
@@ -588,50 +602,40 @@
 
                     <!-- Tab Content - Data -->
                     <div *ngIf="file.type === 'data'" class="h-full flex flex-col bg-card">
-                        <div class="flex-1 overflow-auto" [style]="{ overflowX: 'scroll', overflowY: 'auto' }">
-                            <div [style]="{ width: 'max-content' }">
-                                <table class="text-sm border-collapse w-full"
-                                    [style]="{ width: 'max-content', tableLayout: 'auto' }">
-                                    <thead>
-                                        <tr>
-                                            <th *ngFor="let field of getHeaders(file.data)"
-                                                class="sticky top-0 bg-muted border-r border-border text-left text-foreground font-medium relative group"
-                                                style="position: sticky">
-                                                <div class="px-4 py-3 flex items-center justify-between">
-                                                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                                                        <button
-                                                            class="flex items-center gap-2 hover:text-[#007fd4] transition-colors min-w-0 flex-1">
-                                                            <span class="truncate">{{field}}</span>
-                                                            <i class="pi pi-arrow-right-arrow-left w-4 h-4 text-muted-foreground"
-                                                                style="--p-icon-size: 12px; transform: rotate(90deg)"></i>
-                                                        </button>
-                                                    </div>
+                        <!-- Toolbar for Data Tab -->
+                        <div class="px-4 py-3 border-b border-border flex items-center justify-between bg-background">
+                            <div class="flex items-center gap-6">
+                                <div class="flex items-center gap-2 text-foreground text-xs">
+                                    <i class="pi pi-table" style="font-size: 0.625rem;"></i>
+                                    <span>{{file.data?.length || 0}} records</span>
+                                </div>
+                                <!-- Records count left in main toolbar -->
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div *ngIf="file.name === 'output.csv' && getInputFileFor(file)"
+                                    class="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded text-foreground text-xs">
+                                    <p-checkbox [binary]="true" [ngModel]="hasMergedView(file.name)"
+                                        (ngModelChange)="toggleShowInputData(file, $event)"
+                                        [inputId]="'show-input-' + file.name">
+                                    </p-checkbox>
+                                    <label [for]="'show-input-' + file.name"
+                                        class="text-[10px] font-bold tracking-wider text-foreground cursor-pointer whitespace-nowrap">
+                                        Show Input Data
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-                                                    <div class="relative shrink-0">
-                                                        <button
-                                                            class="p-1 rounded hover:bg-accent transition-colors text-muted-foreground">
-                                                            <i class="pi pi-filter w-4 h-4"
-                                                                style="--p-icon-size: 12px;"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let row of file.data | slice:0:100">
-                                            <td *ngFor="let field of getHeaders(file.data)"
-                                                class="px-4 py-3 border-r border-border text-foreground overflow-hidden">
-                                                <div class="truncate" [style]="{width: '200px'}">
-                                                    {{row[field]}}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <!-- Popover removed from here, moving to dataTable template -->
+
+                        <div class="flex-1 overflow-hidden relative">
+                            <div class="h-full flex flex-col bg-background">
+                                <ng-container
+                                    *ngTemplateOutlet="dataTable; context: { f: getDisplayFile(file), showFilters: true }"></ng-container>
                             </div>
                         </div>
                     </div>
+
                     <!-- Tab Content - JSON or Text or Rules or Replay -->
                     <div *ngIf="file.type === 'json' || file.type === 'text' || file.type === 'rules' || file.type === 'replay'"
                         class="h-full bg-background overflow-auto p-6 font-mono text-sm text-foreground selection:bg-[#264f78]">
@@ -796,4 +800,93 @@
             </div>
         </div>
     </p-dialog>
+
+    <ng-template #dataTable let-f="f" let-showFilters="showFilters">
+        <div class="flex-1 flex flex-col min-h-0 bg-background overflow-hidden">
+            <!-- Independent Column Filter for each table -->
+            <div *ngIf="showFilters" class="px-4 py-2 border-b border-border flex items-center bg-card/30">
+                <button (click)="localOp.toggle($event)"
+                    class="flex items-center gap-2 px-2 py-1 bg-background border border-border rounded text-foreground text-[10px] font-bold tracking-wider hover:border-[#007fd4] transition-all">
+                    <i class="pi pi-columns" style="font-size: 0.5rem;"></i>
+                    <span>Columns</span>
+                    <i class="pi pi-chevron-down ml-1" style="font-size: 0.4rem;"></i>
+                </button>
+
+                <p-popover #localOp styleClass="column-visibility-popover">
+                    <div class="p-3 flex flex-col gap-3 min-w-64 bg-card border border-border shadow-xl rounded-lg">
+                        <div class="flex items-center justify-end gap-3 px-1">
+                            <button (click)="showAllColumns(f)"
+                                class="text-[#007fd4] text-[10px] font-bold tracking-wider hover:underline transition-all">Show
+                                All</button>
+                            <button (click)="hideAllColumns(f)"
+                                class="text-muted-foreground text-[10px] font-bold tracking-wider hover:underline transition-all">Hide
+                                All</button>
+                        </div>
+
+                        <div class="relative">
+                            <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                style="font-size: 0.625rem;"></i>
+                            <input type="text" [ngModel]="columnSearchTerm()"
+                                (ngModelChange)="columnSearchTerm.set($event)" placeholder="Search columns..."
+                                class="w-full bg-background border border-border rounded pl-8 pr-3 py-1.5 text-foreground text-xs focus:border-[#007fd4] outline-none transition-all">
+                        </div>
+
+                        <div class="max-h-64 overflow-y-auto flex flex-col gap-0.5 -mx-1 px-1 custom-scrollbar">
+                            <div *ngFor="let header of getFilteredHeaders(f)"
+                                class="flex items-center gap-3 px-2 py-2 hover:bg-muted rounded cursor-pointer group transition-colors"
+                                (click)="$event.stopPropagation(); toggleColumn(f, header)">
+                                <p-checkbox [binary]="true" [ngModel]="isColumnVisible(f, header)"
+                                    (ngModelChange)="toggleColumn(f, header)"
+                                    [style]="{'--p-checkbox-width': '14px', '--p-checkbox-height': '14px'}">
+                                </p-checkbox>
+                                <span
+                                    class="text-foreground text-xs truncate flex-1 group-hover:text-primary transition-colors">{{header}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </p-popover>
+            </div>
+
+            <div class="flex-1 overflow-auto custom-scrollbar" [style]="{ overflowX: 'scroll', overflowY: 'auto' }">
+                <div [style]="{ width: 'max-content', minWidth: '100%' }">
+                    <table class="text-sm border-collapse w-full"
+                        [style]="{ width: 'max-content', tableLayout: 'auto' }">
+                        <thead>
+                            <tr>
+                                <ng-container *ngFor="let field of getHeaders(f.data)">
+                                    <th *ngIf="isColumnVisible(f, field)"
+                                        class="sticky top-0 bg-muted border-r border-border text-left text-foreground font-medium relative group"
+                                        style="position: sticky; z-index: 10;">
+                                        <div class="px-4 py-3 flex items-center justify-between">
+                                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                                <button
+                                                    class="flex items-center gap-2 hover:text-[#007fd4] transition-colors min-w-0 flex-1">
+                                                    <span class="truncate">{{field}}</span>
+                                                    <i class="pi pi-arrow-right-arrow-left w-4 h-4 text-muted-foreground"
+                                                        style="--p-icon-size: 12px; transform: rotate(90deg)"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </ng-container>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of f.data | slice:0:100; let rowIndex = index"
+                                [class.bg-muted]="rowIndex % 2 === 0" class="hover:bg-accent/5 transition-colors">
+                                <ng-container *ngFor="let field of getHeaders(f.data)">
+                                    <td *ngIf="isColumnVisible(f, field)"
+                                        class="px-4 py-3 border-r border-border text-foreground overflow-hidden">
+                                        <div class="truncate" [style]="{width: '200px'}">
+                                            {{getDataValue(row, field)}}
+                                        </div>
+                                    </td>
+                                </ng-container>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </ng-template>
 </div>
