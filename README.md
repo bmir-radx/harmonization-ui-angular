@@ -24,7 +24,7 @@ You do not need any coding experience to use Harmonizer. The application runs as
 
 This application operates in a multi-repo environment:
 - **Frontend (This Repository):** Angular 17+ and Electron main process.
-- **Backend ([harmonization-framework](https://github.com/bmir-radx/harmonization-framework)):** A standalone Python FastAPI application (the "sidecar") dealing with the schema parsing, transformations, and AI generation. 
+- **Backend ([harmonization-framework](https://github.com/bmir-radx/harmonization-framework)):** A standalone Python FastAPI application (the "sidecar") dealing with the schema parsing and transformations. 
 
 At runtime, the Electron frontend dynamically allocates a port, spawns the compiled Python sidecar, and securely proxies UI interactions to its endpoints.
 
