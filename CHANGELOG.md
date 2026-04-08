@@ -7,7 +7,7 @@
 * **Core Logic Testing:** Established massive isolated `Karma` testing suites rigorously stress-testing `MappingService`, `DatasetService`, `ThemeService`, `ProjectService`, and `HistoryService`.
 * **Open Source Documentation:** Published comprehensive [README.md](https://github.com/bmir-radx/harmonization-ui-angular/blob/main/README.md) covering deployment loops, cross-platform architecture mechanisms, and macOS un-quarantining requirements.
 * **Community Guidelines:** Published strict [CONTRIBUTING.md](https://github.com/bmir-radx/harmonization-ui-angular/blob/main/CONTRIBUTING.md) enforcing git-flow procedures and CI test gates for external developers.
-* **Licensing:** Bound repository and binaries to [BSD 3-Clause](https://github.com/bmir-radx/harmonization-ui-angular/blob/main/LICENSE) distribution protocol.
+* **Licensing:** Bound repository and binaries to [BSD 2-Clause](https://github.com/bmir-radx/harmonization-ui-angular/blob/main/LICENSE) distribution protocol.
 
 ### Changed
 * **Branding Execution:** Globally scrubbed older names and properly rebound Electron binaries, `.dmg`, window titles, and logging tags natively to the **Harmonizer** title structure!
