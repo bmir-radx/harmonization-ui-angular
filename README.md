@@ -15,6 +15,11 @@ You do not need any coding experience to use Harmonizer. The application runs as
    - **Linux:** `.AppImage`
 3. Launch the application and load your source data to begin!
 
+> [!NOTE]
+> **macOS Users:** Because this is an open-source research tool and not distributed through the official Mac App Store, Apple's Gatekeeper will initially block the application, stating it cannot check it for malicious software.
+> To open it: Simply open your Mac's `System Settings -> Privacy & Security`, scroll down, and click **Open Anyway** next to the Harmonizer block warning.
+> Alternatively, if you prefer the terminal, you can instantly clear the quarantine flag by running: `xattr -cr /Applications/Harmonizer.app`
+
 ## Architecture
 
 This application operates in a multi-repo environment:
@@ -64,4 +69,4 @@ npm run pack:linux # For Linux
 *(Note: You must have manually placed the extracted sidecar into `resources/sidecar/<os>/` for local tests to succeed).*
 
 ## License
-Provided under standard open-source constraints by BMIR.
+Provided under standard open-source constraints by Stanford University department of Computational Medicine.
