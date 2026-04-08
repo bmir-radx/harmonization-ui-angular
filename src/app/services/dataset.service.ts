@@ -192,43 +192,5 @@ export class DatasetService {
         return `Dataset ${max + 1}`;
     }
 
-    loadTestData() {
-        const targetData = [
-            { "Variable Name": "t_age", "Label": "Target Age", "Type": "Integer" },
-            { "Variable Name": "t_gender", "Label": "Target Gender", "Type": "String", "Enumerations": "1=Male, 2=Female" }
-        ];
-        this.addTargetFile({
-            name: 'target_dict.csv',
-            type: 'dictionary',
-            data: targetData,
-            text: Papa.unparse(targetData),
-            folder: 'target_dict.csv'
-        });
 
-        const sourceDictData = [
-            { "Id": "s_dob", "Label": "Date of Birth", "Datatype": "Date" },
-            { "Id": "s_sex", "Label": "Sex", "Datatype": "String" }
-        ];
-        this.addFile({
-            name: 'source_dict.csv',
-            type: 'dictionary',
-            data: sourceDictData,
-            text: Papa.unparse(sourceDictData),
-            folder: 'Source Dataset A'
-        });
-
-        const sourceDataData = [
-            { "s_dob": "1990-01-01", "s_sex": "M" },
-            { "s_dob": "1992-05-20", "s_sex": "F" },
-            { "s_dob": "1985-11-12", "s_sex": "M" },
-            { "s_dob": "1998-03-05", "s_sex": "Other" }
-        ];
-        this.addFile({
-            name: 'source_data.csv',
-            type: 'data',
-            data: sourceDataData,
-            text: Papa.unparse(sourceDataData),
-            folder: 'Source Dataset A'
-        });
-    }
 }

@@ -38,12 +38,6 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.themeService.setDarkMode(false);
-
-    // Auto-create a default project for testing purposes
-    this.projectService.setProject({
-      name: 'Test Project',
-      description: 'Auto-created for testing'
-    });
   }
 }
 

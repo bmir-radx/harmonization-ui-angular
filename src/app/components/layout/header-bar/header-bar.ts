@@ -117,14 +117,7 @@ export class HeaderBar {
                         icon: 'pi pi-upload',
                         shortcut: 'Ctrl+I'
                     },
-                    {
-                        label: 'Load Test Data',
-                        icon: 'pi pi-bolt',
-                        shortcut: 'Ctrl+Shift+T',
-                        command: () => {
-                            this.datasetService.loadTestData();
-                        }
-                    },
+
                     {
                         separator: true
                     },
