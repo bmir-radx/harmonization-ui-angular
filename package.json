@@ -1,6 +1,7 @@
 {
   "name": "data-harmonization-angular",
   "version": "1.0.0-beta.1",
+  "license": "BSD-3-Clause",
   "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
