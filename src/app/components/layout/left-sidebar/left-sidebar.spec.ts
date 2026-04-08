@@ -1,3 +1,5 @@
+import { provideHttpClient } from "@angular/common/http";
+import { MessageService } from "primeng/api";
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LeftSidebar } from './left-sidebar';
@@ -8,6 +10,7 @@ describe('LeftSidebar', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [provideHttpClient(), MessageService],
       imports: [LeftSidebar]
     })
     .compileComponents();

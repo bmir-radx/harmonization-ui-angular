@@ -1,9 +1,12 @@
+import { provideHttpClient } from "@angular/common/http";
+import { MessageService } from "primeng/api";
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      providers: [provideHttpClient(), MessageService],
       imports: [App],
     }).compileComponents();
   });
@@ -18,6 +21,6 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, data-harmonization-angular');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Welcome to Harmonizer');
   });
 });
