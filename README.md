@@ -1,59 +1,67 @@
-# DataHarmonizationAngular
+# Harmonizer
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+Harmonizer is a cross-platform desktop application designed for seamless, offline data harmonization. It combines a visually rich Angular frontend with a robust Python processing engine, packaged seamlessly via Electron.
 
-## Development server
+Researchers can load raw datasets and target data dictionaries directly into the application, visually map elements, and leverage the built-in AI/rule-based engine to execute real-time data transformations entirely on their local machine.
 
-To start a local development server, run:
+## Getting Started
 
+You do not need any coding experience to use Harmonizer. The application runs as a fully contained desktop executable.
+
+1. Navigate to the [Releases page](https://github.com/bmir-radx/harmonization-ui-angular/releases).
+2. Download the installer for your operating system:
+   - **macOS:** `.dmg`
+   - **Windows:** `.exe`
+   - **Linux:** `.AppImage`
+3. Launch the application and load your source data to begin!
+
+## Architecture
+
+This application operates in a multi-repo environment:
+- **Frontend (This Repository):** Angular 17+ and Electron main process.
+- **Backend ([harmonization-framework](https://github.com/bmir-radx/harmonization-framework)):** A standalone Python FastAPI application (the "sidecar") dealing with the schema parsing, transformations, and AI generation. 
+
+At runtime, the Electron frontend dynamically allocates a port, spawns the compiled Python sidecar, and securely proxies UI interactions to its endpoints.
+
+## Local Development
+
+If you wish to contribute or modify the application locally:
+
+### 1. Prerequisites
+- **Node.js** (v24+ recommended)
+- **npm** or **yarn**
+
+### 2. Setup the Workspace
 ```bash
-ng serve
+git clone https://github.com/bmir-radx/harmonization-ui-angular.git
+cd harmonization-ui-angular
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 3. Spin up the Dev Environment
+During development, the Angular `proxy.conf.json` attempts to route `/api` traffic to `http://localhost:8000`. You must have the [harmonization-framework](https://github.com/bmir-radx/harmonization-framework) running locally on port 8000.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+Once the backend is listening, boot the Electron + Angular development server:
 ```bash
-ng generate component component-name
+npm run electron:dev
 ```
+This leverages `concurrently` to spin up Angular and immediately attach an Electron window once the compile is complete.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Building for Production
 
+This project leverages GitHub Actions for CI/CD distribution. Upon pushing a new tag (`v*`), the pipeline will:
+1. Download the pre-compiled native Python sidecars from the framework repository.
+2. Inject them into the local package environment.
+3. Transpile the Angular application.
+4. Export `.dmg`, `.exe`, and `.AppImage` installers directly to GitHub Releases using `electron-builder`.
+
+To test the builder manually on your local system:
 ```bash
-ng generate --help
+npm run pack:mac   # For macOS
+npm run pack:win   # For Windows
+npm run pack:linux # For Linux
 ```
+*(Note: You must have manually placed the extracted sidecar into `resources/sidecar/<os>/` for local tests to succeed).*
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## License
+Provided under standard open-source constraints by BMIR.
