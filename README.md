@@ -1,4 +1,4 @@
-# Harmonizer
+# Harmonizer: An Open-Source Tool for Transparent and Reproducible Data Harmonization
 
 Harmonizer is a cross-platform desktop application designed for seamless, offline data harmonization. It combines a visually rich Angular frontend with a robust Python processing engine, packaged seamlessly via Electron.
 
