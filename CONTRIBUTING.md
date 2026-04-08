@@ -20,10 +20,14 @@ If you have an idea for a new transformation mapping tool, AI integration, or wo
 ### 3. Submitting a Pull Request
 We follow a standard Gitflow model.
 1. **Fork** the repository and create a new feature branch out from `dev` (e.g., `feature/awesome-new-tool`).
-2. Make your code changes cleanly and run unit tests.
-3. Ensure the Angular CSS component budget doesn't drastically exceed styling limits.
-4. Open a Pull Request targeting the **`dev`** branch (NOT `main`).
-5. Ensure your PR description explains *why* the change was made and any sidecar dependencies it might have.
+2. **Make your local changes** cleanly, and ensure you run `npm run build` locally to verify TypeScript compiles without errors.
+3. **Verify the test suite** locally by executing `npm run test:coverage`. Every new core service branch logic must maintain high unit test coverage.
+4. Ensure the Angular component budget doesn't drastically exceed UI styling constraints.
+5. Open a Pull Request strictly targeting the **`dev`** branch (NOT `main`). 
+6. Ensure your PR description explains *why* the change was made and any sidecar dependencies it might have.
+
+> [!IMPORTANT]
+> **Continuous Integration Guard:** When your Pull Request is submitted, our automated GitHub Actions workflow (`pr-checks.yml`) will instantly intercept it, boot up a headless browser environment, and run the entire test suite. If any existing core behavior breaks or TypeScript compilation fails, your Pull Request will automatically be blocked from merging until the code is resolved!
 
 ### Multi-Repo Note
 If your UI feature requires a new endpoint or capability in the Python sidecar, please submit a corresponding PR to the [harmonization-framework](https://github.com/bmir-radx/harmonization-framework) repository first. The UI will only be merged once the backend endpoints are verified.
