@@ -1,4 +1,4 @@
-# Harmonizer
+# Harmonizer: An Open-Source Tool for Transparent and Reproducible Data Harmonization
 
 Harmonizer is a cross-platform desktop application designed for seamless, offline data harmonization. It combines a visually rich Angular frontend with a robust Python processing engine, packaged seamlessly via Electron.
 
@@ -24,7 +24,7 @@ You do not need any coding experience to use Harmonizer. The application runs as
 
 This application operates in a multi-repo environment:
 - **Frontend (This Repository):** Angular 17+ and Electron main process.
-- **Backend ([harmonization-framework](https://github.com/bmir-radx/harmonization-framework)):** A standalone Python FastAPI application (the "sidecar") dealing with the schema parsing, transformations, and AI generation. 
+- **Backend ([harmonization-framework](https://github.com/bmir-radx/harmonization-framework)):** A standalone Python FastAPI application (the "sidecar") dealing with the schema parsing and transformations. 
 
 At runtime, the Electron frontend dynamically allocates a port, spawns the compiled Python sidecar, and securely proxies UI interactions to its endpoints.
 
