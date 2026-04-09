@@ -1,6 +1,6 @@
 # Harmonizer Changelog
 
-## [1.0.0-beta.2] - 2026-04-08
+## [1.0.0-beta.3] - 2026-04-09
 
 ### Added
 * **Automated CI/CD Workflows:** Successfully implemented dynamic GitHub Actions workflows (`pr-checks.yml`, `release.yml`) enforcing automated Angular test coverage and TypeScript assertions. 
