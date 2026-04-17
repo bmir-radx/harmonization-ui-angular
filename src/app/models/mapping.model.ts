@@ -45,6 +45,11 @@ export interface MappingRow {
     status: 'attention' | 'complete';
     steps: TransformationStep[];
     selectedStepId: number | null;
+    metadata?: {
+        comments?: string[];
+        provenance?: string;
+        [key: string]: any;
+    };
 }
 
 export interface ProjectState {

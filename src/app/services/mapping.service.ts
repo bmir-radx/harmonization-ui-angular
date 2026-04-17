@@ -121,6 +121,20 @@ export class MappingService {
         });
     }
 
+    updateMetadata(rowId: number, metadata: any) {
+        this.mappingRows.update(rows => {
+            return rows.map(row => {
+                if (row.id === rowId) {
+                    return {
+                        ...row,
+                        metadata: { ...row.metadata, ...metadata }
+                    };
+                }
+                return row;
+            });
+        });
+    }
+
     selectTransformationStep(stepId: number | null) {
         this.mappingRows.update(rows => {
             const selectedId = this.selectedRowId();
@@ -363,6 +377,7 @@ export class MappingService {
                 rulesOutput[row.sourceElement][row.targetElement!] = {
                     source: row.sourceElement,
                     target: row.targetElement,
+                    ...(row.metadata && Object.keys(row.metadata).length > 0 ? { metadata: row.metadata } : {}),
                     operations: operations
                 };
 
