@@ -93,6 +93,21 @@ export const PRIMITIVE_CONFIGS: Record<string, TransformationConfig> = {
             context: `offset: 5`
         })
     },
+    'parse_array': {
+        label: 'Parse Array',
+        params: [
+            { key: 'format', label: 'Format', type: 'select', options: ['json'] },
+            { key: 'item_type', label: 'Item Type', type: 'select', options: ['auto', 'string', 'integer', 'float', 'boolean'] },
+            { key: 'strict', label: 'Strict', type: 'boolean' },
+            { key: 'default', label: 'Default Value', type: 'text', placeholder: 'null' },
+            { key: 'allow_singleton', label: 'Allow Singleton', type: 'boolean' }
+        ],
+        example: () => ({
+            input: `"[8,8,8,8,6]"`,
+            output: `[8, 8, 8, 8, 6]`,
+            context: `format: 'json', item_type: 'integer'`
+        })
+    },
     'reduce': {
         label: 'Reduce',
         params: [

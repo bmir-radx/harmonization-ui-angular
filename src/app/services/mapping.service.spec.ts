@@ -123,6 +123,82 @@ describe('MappingService', () => {
     });
   });
 
+  describe('Parse Array Primitive', () => {
+    beforeEach(() => {
+      service.mappingRows.set([
+        { id: 1, dataset: 'DS1', sourceElement: 'a', targetElement: 'target_a', status: 'attention', steps: [], selectedStepId: null }
+      ]);
+      service.selectMappingRow(service.mappingRows()[0]);
+    });
+
+    it('should initialize parse_array defaults correctly', () => {
+      service.addTransformationStep();
+      service.updateTransformation('parse_array');
+      
+      const st = service.selectedMappingRow();
+      expect(st?.steps[0].transformation).toBe('parse_array');
+      expect(st?.steps[0].params['format']).toBe('json');
+      expect(st?.steps[0].params['item_type']).toBe('auto');
+      expect(st?.steps[0].params['strict']).toBeTrue();
+    });
+
+    it('should coerce and type check parse_array parameters upon serialization', fakeAsync(() => {
+      // Mock electron environment
+      const mockElectron = {
+        saveFile: jasmine.createSpy('saveFile').and.returnValue(Promise.resolve())
+      };
+      (window as any).electron = mockElectron;
+
+      // Mock DatasetService uploadedFiles getter to return a function that returns the files
+      const uploadedSpy = Object.getOwnPropertyDescriptor(datasetServiceSpy, 'uploadedFiles')?.get as jasmine.Spy;
+      uploadedSpy.and.returnValue(() => [
+        { name: 'data.csv', type: 'data', data: [], text: '', folder: 'DS1' }
+      ]);
+
+      service.mappingRows.set([
+        {
+          id: 1,
+          dataset: 'DS1',
+          sourceElement: 'week_hours',
+          targetElement: 'total_hours',
+          status: 'complete',
+          steps: [
+            {
+              id: 101,
+              transformation: 'parse_array',
+              params: {
+                format: 'json',
+                item_type: 'integer',
+                strict: 'true',
+                default: '123',
+                allow_singleton: 1
+              }
+            }
+          ],
+          selectedStepId: 101
+        }
+      ]);
+
+      apiServiceSpy.harmonize.and.returnValue(of({ status: 'success', job_id: 'job_123' }));
+      apiServiceSpy.getJob.and.returnValue(of({ status: 'completed' }));
+
+      service.runHarmonization();
+      tick();
+
+      expect(mockElectron.saveFile).toHaveBeenCalled();
+      const savedContent = JSON.parse(mockElectron.saveFile.calls.mostRecent().args[1]);
+      
+      const operation = savedContent['week_hours']['total_hours']['operations'][0];
+      expect(operation.operation).toBe('parse_array');
+      expect(operation.strict).toBeTrue(); // Coerced to boolean
+      expect(operation.allow_singleton).toBeTrue(); // Coerced to boolean
+      expect(operation.default).toBe(123); // Coerced to integer
+
+      // Clean up global window mock
+      delete (window as any).electron;
+    }));
+  });
+
   describe('Data Class Helpers', () => {
     it('should return appropriate icon styling attributes for primitive types', () => {
       expect(service.getDataClass('string')).toBe('text-[#4ec9b0]');
