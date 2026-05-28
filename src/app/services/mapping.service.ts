@@ -121,6 +121,20 @@ export class MappingService {
         });
     }
 
+    updateMetadata(rowId: number, metadata: any) {
+        this.mappingRows.update(rows => {
+            return rows.map(row => {
+                if (row.id === rowId) {
+                    return {
+                        ...row,
+                        metadata: { ...row.metadata, ...metadata }
+                    };
+                }
+                return row;
+            });
+        });
+    }
+
     selectTransformationStep(stepId: number | null) {
         this.mappingRows.update(rows => {
             const selectedId = this.selectedRowId();
@@ -183,7 +197,13 @@ export class MappingService {
                 if (row.id === selectedId) {
                     const steps = (row.steps || []).map(step => {
                         if (step.id === row.selectedStepId) {
-                            return { ...step, transformation, params: {} };
+                            const defaultParams: Record<string, any> = {};
+                            if (transformation === 'parse_array') {
+                                defaultParams['format'] = 'json';
+                                defaultParams['item_type'] = 'auto';
+                                defaultParams['strict'] = true;
+                            }
+                            return { ...step, transformation, params: defaultParams };
                         }
                         return step;
                     });
@@ -356,6 +376,31 @@ export class MappingService {
                         }
                     }
 
+                    // For parse_array, ensure strict and allow_singleton are booleans and default is parsed/typed
+                    if (step.transformation === 'parse_array') {
+                        if (combinedParams['strict'] !== undefined) {
+                            combinedParams['strict'] = !!combinedParams['strict'];
+                        }
+                        if (combinedParams['allow_singleton'] !== undefined) {
+                            combinedParams['allow_singleton'] = !!combinedParams['allow_singleton'];
+                        }
+                        if (combinedParams['default'] !== undefined) {
+                            const defVal = combinedParams['default'];
+                            if (defVal === 'null' || defVal === '' || defVal === null) {
+                                combinedParams['default'] = null;
+                            } else if (combinedParams['item_type'] === 'integer') {
+                                const parsed = parseInt(defVal, 10);
+                                combinedParams['default'] = isNaN(parsed) ? defVal : parsed;
+                            } else if (combinedParams['item_type'] === 'float') {
+                                const parsed = parseFloat(defVal);
+                                combinedParams['default'] = isNaN(parsed) ? defVal : parsed;
+                            } else if (combinedParams['item_type'] === 'boolean') {
+                                if (defVal === 'true' || defVal === true) combinedParams['default'] = true;
+                                else if (defVal === 'false' || defVal === false) combinedParams['default'] = false;
+                            }
+                        }
+                    }
+
                     return { operation: step.transformation, ...combinedParams };
                 });
 
@@ -363,6 +408,7 @@ export class MappingService {
                 rulesOutput[row.sourceElement][row.targetElement!] = {
                     source: row.sourceElement,
                     target: row.targetElement,
+                    ...(row.metadata && Object.keys(row.metadata).length > 0 ? { metadata: row.metadata } : {}),
                     operations: operations
                 };
 

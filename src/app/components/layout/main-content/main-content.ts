@@ -580,5 +580,24 @@ export class MainContent {
   updateParam(key: string, value: any) {
     this.mappingService.updateParam(key, value);
   }
+
+  updateProvenance(provenance: string) {
+    const selected = this.mappingService.selectedMappingRow();
+    if (!selected) return;
+    this.mappingService.updateMetadata(selected.id, { provenance });
+  }
+
+  get formattedComments(): string {
+    const selected = this.mappingService.selectedMappingRow();
+    if (!selected || !selected.metadata || !selected.metadata.comments) return '';
+    return selected.metadata.comments.join('\n');
+  }
+
+  updateComments(commentsStr: string) {
+    const selected = this.mappingService.selectedMappingRow();
+    if (!selected) return;
+    const comments = commentsStr.split('\n').filter(c => c.trim() !== '');
+    this.mappingService.updateMetadata(selected.id, { comments });
+  }
 }
 
